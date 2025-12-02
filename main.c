@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <conio.h>
 
 void garisx();
 void garisy();
+void inputpass(char pass[]);
+void clearinput(int x, int y, int l);
 void login(char nama[50], char pass[50]);
 void supadm(char nama[50]);
 int consoleW();
@@ -55,6 +58,54 @@ void garisy()
     }
 }
 
+void clearinput(int x, int y, int l) // membersihkan input yang salah
+{
+    HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(move, (COORD){x, y});
+    for (int i = 0; i < l; i++)
+        printf(" ");
+}
+
+void inputpass(char pass[])
+{
+    char ch;
+    int i = 0, visible = 0;
+    HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            pass[i] = '\0';
+            break;
+        }
+        else if (ch == 9) // baca input ketika TAB (show/hide)
+        {
+            visible = !visible;
+
+            SetConsoleCursorPosition(move, (COORD){31,13});
+            printf("Password\t: ");
+            for (int j = 0; j < i; j++)
+                printf(visible ? "%c" : "*", pass[j]);
+        }
+        else if (ch == 8) // baca input ketika BACKSPACE
+        {
+            if (i > 0)
+            {
+                i--;
+                printf("\b \b"); //fungsi untuk backspace
+            }
+        }
+        else
+        {
+            pass[i++] = ch;
+            printf(visible ? "%c" : "*", ch);
+        }
+    }
+}
+
 void login(char nama[50], char pass[50])
 {
     HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -87,11 +138,21 @@ void login(char nama[50], char pass[50])
     SetConsoleCursorPosition(move, (COORD){30, 20}); printf("└");
     SetConsoleCursorPosition(move, (COORD){85, 20}); printf("┘");
 
-    SetConsoleCursorPosition(move, (COORD){31, 11});
-    printf("Usename\t: "); scanf("%s", nama);
+    while (strcmp(nama, "superadmin") != 0 || strcmp(pass, "superadmin") != 0){
+        clearinput(31, 11, 50);
+        clearinput(31, 12, 50);
+        clearinput(31, 13, 50);
+        SetConsoleCursorPosition(move, (COORD){31, 11});
+        printf("Usename\t: "); scanf("%s", nama);
 
-    SetConsoleCursorPosition(move, (COORD){31, 12});
-    printf("Password\t: "); scanf("%s", pass);
+        SetConsoleCursorPosition(move, (COORD){31, 12});
+        printf("(TAB untuk see/unsee)");
+        SetConsoleCursorPosition(move, (COORD){31, 13});
+        printf("Password\t: "); fflush(stdin); inputpass(pass);
+
+        SetConsoleCursorPosition(move, (COORD){32, 15});
+        printf("Login gagal!\n");
+    }
 }
 void supadm(char nama[50])
 {

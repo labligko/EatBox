@@ -16,7 +16,6 @@ int main(void)
         supadm(nama);
 
     }
-
     printf("\x1b[0m");
     getchar();
     return 0;

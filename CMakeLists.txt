@@ -3,4 +3,9 @@ project(eatBox C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(eatBox main.c)
+add_executable(eatBox
+        main.c
+        data.h
+        function.h
+        login.h
+)

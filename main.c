@@ -3,6 +3,7 @@
 #include "data.h"
 #include "function.h"
 #include "login.h"
+#include "interface.h"
 
 int main(void)
 {
@@ -13,8 +14,7 @@ int main(void)
     login(nama, pass);
     if (nama[0] != '\0' && pass[0] != '\0')
     {
-        supadm(nama);
-
+        tampilan(nama);
     }
     printf("\x1b[0m");
     getchar();

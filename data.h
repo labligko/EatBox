@@ -18,7 +18,7 @@ typedef struct {
 //MASTER
 typedef struct
 {
-    char id_akun[10];
+    char id[10];
     char username[50];
     char password[35];
     char telp[15];
@@ -27,7 +27,7 @@ typedef struct
     text alamat;
     int status;
     int poin;
-}Akun;
+}Karyawan;
 
 typedef struct
 {

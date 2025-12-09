@@ -316,6 +316,33 @@ void inputtext(char input[])
         }
     }
 }
+void inputid(char input[])
+{
+    char ch;
+    int i = 0;
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        if (ch == 27)return;;
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            input[i] = '\0'; //biar ENTER g masuk ke array
+            break;
+        }
+        if (ch == 8 && i > 0) // baca input ketika BACKSPACE
+        {
+            i--;
+            printf("\b \b"); //fungsi untuk backspace
+        }
+        else if (ch >= 33 && ch <= 126) {
+            input[i++] = ch;
+            printf("%c", ch);
+        }
+    }
+}
 
 char *cutname(char nama[])
 {
@@ -333,7 +360,7 @@ int onlyNum(char *s)
 {
     int len = strlen(s);
 
-    if (len <= 10) return 0;
+    if (len <= 10 || len >15) return 0;
     for (int i = 0; s[i] != '\0'; i++)
         if (!isdigit(s[i])) return 0; //CEK KHUSUS ANGKA
     return 1;
@@ -347,7 +374,7 @@ int cekrole(char *r)
 {
     if (
         strcmp(r, "superadmin") == 0 ||
-        strcmp(r, "admin") == 0 ||
+        strcmp(r, "staff") == 0 ||
         strcmp(r, "manajer") == 0 ||
         strcmp(r, "kasir") == 0 ||
         strcmp(r, "member") == 0 ||
@@ -437,6 +464,5 @@ void showcurs()
     info.dwSize = 20;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
-
 
 #endif //EATBOX_FUNCTION_H

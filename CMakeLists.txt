@@ -8,7 +8,9 @@ add_executable(eatBox
         data.h
         function.h
         login.h
-        interface.h
+        MASTER/superadmin.h
         CRUD/create.h
         CRUD/read.h
+        CRUD/delete.h
+        CRUD/update.h
 )

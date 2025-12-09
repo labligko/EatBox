@@ -2,7 +2,7 @@
 #define EATBOX_LOGIN_H
 
 #include "function.h"
-#include "interface.h"
+#include "MASTER/superadmin.h"
 
 int cekLogin(const char *nama, const char *pass, char *role)
 {
@@ -85,7 +85,7 @@ void login(char nama[50], char pass[50])
     supadm(nama);
 
     if (strcmp(role, "superadmin") == 0){supadm(nama);}
-    else if (strcmp(role, "admin") == 0){admin(nama);}
+    else if (strcmp(role, "admin") == 0){staff(nama);}
     else if (strcmp(role, "manajer") == 0){manajer(nama);}
     else if (strcmp(role, "kasir") == 0){kasir(nama);}
 }

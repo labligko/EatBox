@@ -441,8 +441,10 @@ int menuSelect(int x, int y, char *menu[], int count)
         // panah
         if (key == -32 || key == 224) {
             key = _getch();
-            if (key == 72|| key == 75) pos--; // UP
-            if (key == 80|| key == 77) pos++; // DOWN
+            if (key == 72) pos--; // UP
+            if (key == 80) pos++; // DOWN
+            if (key == 75) return -1; //LEFT
+            if (key == 77) return -2; //RIGHT
         }
 
         // w/s

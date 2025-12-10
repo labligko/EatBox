@@ -242,7 +242,6 @@ void createAdmin(char nama[50])
         }
     }
 }
-
 void updateAdmin(char nama[50])
 {
     system("cls");
@@ -281,9 +280,9 @@ void updateAdmin(char nama[50])
     fclose(f);
 
     if (!found) {
-        gotoxy(30,12); printf("ID '%s' tidak ditemukan!", targetID);
+        gotoxy(30,13); printf("ID '%s' tidak ditemukan!", targetID);
         Sleep(1500);
-        return;
+        supadm(nama);
     }
 
     int filled_username = 1, filled_password = 1, filled_telp = 1;
@@ -453,7 +452,6 @@ void updateAdmin(char nama[50])
         }
     }
 }
-
 void hapusAdmin(char nama[50])
 {
     while (1)
@@ -527,15 +525,10 @@ void supadm(char nama[50])
     gotoxy(60, 10);
     printf("DATA KARYAWAN");
 
-    // --- SETUP FRAME ---
-    int left = 28;
-    int right = 131;
-    int top = 11;
-    int bot = 32;
+    int left = 28, right = 131, top = 11, bot = 34;
 
     frame(left, top, right, bot);
 
-    // Garis Pemisah Kolom (Visual)
     for (int y = top; y < bot-1; y++) {
         gotoxy(left+8, y+1);  printf("│");
         gotoxy(left+25, y+1); printf("│");
@@ -547,9 +540,8 @@ void supadm(char nama[50])
     gotoxy(left, top); printf("┌"); gotoxy(right,top); printf("┐");
     gotoxy(left, bot); printf("└"); gotoxy(right,bot); printf("┘");
 
-    // --- HEADER TABEL ---
     int yhead = top + 1;
-    gotoxy(left+2, yhead);  printf("No");
+    gotoxy(left+2, yhead);  printf("Id");
     gotoxy(left+10, yhead); printf("Nama Karyawan");
     gotoxy(left+27, yhead); printf("No. telp");
     gotoxy(left+44, yhead); printf("Email");
@@ -561,7 +553,6 @@ void supadm(char nama[50])
         gotoxy(x, yhead+1); printf("─");
     }
 
-    // --- TAMPILKAN DATA & HITUNG HALAMAN ---
     // Panggil fungsi read dan tampung total datanya
     int totalData = dataKaryawan(left, yhead + 2, currentPage);
 
@@ -573,45 +564,44 @@ void supadm(char nama[50])
     if (currentPage < 1) currentPage = 1;
 
     // Tampilkan Info Halaman di bawah tabel
-    gotoxy(left, bot+3);
-    printf("Halaman: %d / %d  (Total: %d)", currentPage, maxPage, totalData);
+    gotoxy(left+1, bot+1);
+    printf("Halaman: %d / %d (Total: %d)   [<] Sebelumnya  [>] Selanjutnya", currentPage, maxPage, totalData);
 
 
-    // --- MENU DINAMIS (LOGIKA NAVIGASI) ---
-    // Kita buat array menu yang isinya bisa berubah
-    char *menuSup[10];
-    int index = 0;
-
-    // Menu Standar (0-4)
-    menuSup[index++] = " Data Karyawan";  // 0
-    menuSup[index++] = " Tambah Karyawan"; // 1
-    menuSup[index++] = " Ubah Karyawan";   // 2
-    menuSup[index++] = " Hapus Karyawan";  // 3
-    menuSup[index++] = " Keluar";          // 4
-
-    // Menu Navigasi (Muncul sesuai kondisi)
-    int idxNext = -1, idxPrev = -1;
-
-    if (currentPage < maxPage) {
-        idxNext = index;
-        menuSup[index++] = " Selanjutnya >>";
-    }
-    if (currentPage > 1) {
-        idxPrev = index;
-        menuSup[index++] = " << Sebelumnya";
-    }
+    // array menu
+    char *menuSup[] = {
+        " Data Karyawan",
+        " Tambah Karyawan",
+        " Ubah Karyawan",
+        " Hapus Karyawan",
+        " Keluar"
+    };
 
     // Tampilan Kiri
-    gotoxy(1,10); printf("Halo, %s", cutname(nama)); // Pastikan fungsi cutname ada
+    gotoxy(1,10); printf("Halo, %s", cutname(nama));
     gotoxy(1,20); printf(" [↕] Pilih Menu");
 
     // Panggil menuSelect dengan jumlah index yang dinamis
-    int pilih = menuSelect(1,12, menuSup, index);
+    int pilih = menuSelect(1,12, menuSup, 5);
 
-    // --- LOGIKA PEMILIHAN ---
-    // Karena index menu bisa geser, kita cek berdasarkan string atau urutan logika
-
-    if (pilih == 0) { // Data Karyawan (Refresh / Reset ke Hal 1)
+    if (pilih == -1)
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+        }
+        supadm(nama);
+    }
+    else if (pilih == -2)
+    {
+        if (currentPage < maxPage)
+        {
+            currentPage++;
+        }
+        supadm(nama);
+    }
+    else if (pilih == 0)
+    {
         currentPage = 1;
         supadm(nama);
     }
@@ -619,25 +609,6 @@ void supadm(char nama[50])
     else if (pilih == 2) updateAdmin(nama);
     else if (pilih == 3) hapusAdmin(nama);
     else if (pilih == 4) exit(0);
-
-    // Logika Tombol Next/Prev
-    else if (pilih == idxNext) { // Jika user pilih "Selanjutnya"
-        currentPage++;
-        supadm(nama);
-    }
-    else if (pilih == idxPrev) { // Jika user pilih "Sebelumnya"
-        currentPage--;
-        supadm(nama);
-    }
-}
-
-void staff(char nama[50]){}
-void manajer(char nama[50]){}
-void kasir(char nama[50]){}
-
-void tampilan(char nama[50])
-{
-    supadm(nama);
 }
 
 void injectDummyData()

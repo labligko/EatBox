@@ -12,10 +12,10 @@ int main(void)
     system("chcp 65001 > nul"); //ini buat baca UFT-8
 
     login(nama, pass);
-    if (nama[0] != '\0' && pass[0] != '\0')
-    {
-        tampilan(nama);
-    }
+
+    // if (nama[0] != '\0' && pass[0] != '\0')
+    // {
+    // }
     printf("\x1b[0m");
     getchar();
     return 0;

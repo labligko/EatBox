@@ -31,10 +31,17 @@ int dataKaryawan(int left, int startY, int page)
         // Jika data yang dicetak sudah mencapai 20, jangan print lagi (tapi tetap loop utk hitung totalData)
         if (printedCount >= limit) continue;
 
-        // Parsing data
-        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d|%d",
-       a.id, a.username, a.password, a.telp, a.email, a.role,
-       a.alamat, &a.status, &a.poin);
+        str[strcspn(str, "\n")] = 0;
+
+        // Cek apakah parsing berhasil membaca 9 data?
+        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d|%d",
+               a.id, a.username, a.password, a.telp, a.email, a.role,
+               a.alamat, &a.status, &a.poin);
+
+        // Jika jumlah data yang terbaca kurang dari 9 (misal cuma 7 kayak data lama), skip baris ini
+        if (parsed < 9) {
+            continue;
+        }
 
         if (a.status == 1) strcpy(stat,"Aktif");
         else strcpy(stat,"Non-Aktif");

@@ -13,4 +13,7 @@ add_executable(eatBox
         CRUD/read.h
         CRUD/delete.h
         CRUD/update.h
+        MASTER/kasir.h
+        MASTER/manajer.h
+        MASTER/staff.h
 )

@@ -8,4 +8,12 @@ add_executable(eatBox
         data.h
         function.h
         login.h
+        MASTER/superadmin.h
+        CRUD/create.h
+        CRUD/read.h
+        CRUD/delete.h
+        CRUD/update.h
+        MASTER/kasir.h
+        MASTER/manajer.h
+        MASTER/staff.h
 )

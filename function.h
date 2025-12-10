@@ -126,6 +126,13 @@ void fixConsoleBuffer() {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleScreenBufferSize(hOut, (COORD){ width, height });
 }
+void warna()
+{
+    RGBColor red = {202, 40, 44};
+    RGBColor cream = {251, 255, 199};
+    setRGBColor(red.R, red.G, red.B, 1);
+    setRGBColor(cream.R, cream.G, cream.B, 0);
+}
 
 void startupSequence() {
     enableANSI();
@@ -139,14 +146,14 @@ void startupSequence() {
 }
 
 //PERULANGAN GARIS DARI UJUNG KE UJUNG
-void garisx(int y)
+void garisx(int x, int y)
 {
     HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE); //akses cursor (posisi text nya)
     int width = consoleW();
 
-    for (int x = 0; x < width; x++)
+    for (int i = x; i < width; i++)
     {
-        COORD kor = {x, y}; //kordinat cursornya
+        COORD kor = {i, y}; //kordinat cursornya
         SetConsoleCursorPosition(move, kor); //buat mulai posisi nya sesuai kordinat
         printf("█");
     }
@@ -154,14 +161,14 @@ void garisx(int y)
     COORD reset = {0, 7};
     SetConsoleCursorPosition(move, reset);
 }
-void garisy(int x)
+void garisy(int x, int y)
 {
     HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE); //akses cursor (posisi text nya)
     int height = consoleH();
 
-    for (int y = 0; y < height; y++)
+    for (int i = y; i < height; i++)
     {
-        COORD kor = {x, y}; //kordinat cursornya
+        COORD kor = {x, i}; //kordinat cursornya
         SetConsoleCursorPosition(move, kor); //buat mulai posisi nya sesuai kordinat
         printf("██");
     }
@@ -171,10 +178,11 @@ void garisy(int x)
 void clearinput(int x, int y, int l) // membersihkan input yang salah
 {
     gotoxy(x, y);
+    warna();
     for (int i = 0; i < l; i++)
         printf(" ");
 }
-void inputpass(char pass[]) //fungsi untuk password
+void inputpasslog(char pass[], int x, int y, char *ouput) //fungsi untuk password
 {
     char ch;
     int i = 0, visible = 0;
@@ -194,8 +202,8 @@ void inputpass(char pass[]) //fungsi untuk password
         {
             visible = !visible;
 
-            gotoxy(42, 22);
-            printf("Kata Sandi\t: ");
+            gotoxy(x, y);
+            printf("%s\t: ", ouput);
             for (int j = 0; j < i; j++)
                 printf(visible ? "%c" : "*", pass[j]);
         }
@@ -207,14 +215,54 @@ void inputpass(char pass[]) //fungsi untuk password
                 printf("\b \b"); //fungsi untuk backspace
             }
         }
-        else
+        else if (ch >= 33 && ch <= 126)
         {
             pass[i++] = ch;
             printf(visible ? "%c" : "*", ch);
         }
     }
 }
-void inputtext(char input[])
+void inputpass(char pass[], int x, int y, char *ouput) //fungsi untuk password
+{
+    char ch;
+    int i = 0, visible = 0;
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        // if (ch == 27)exit(0);
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            pass[i] = '\0'; //biar ENTER g masuk ke array
+            break;
+        }
+        else if (ch == 9) // baca input ketika TAB (show/hide)
+        {
+            visible = !visible;
+
+            gotoxy(x, y);
+            printf("%s: ", ouput);
+            for (int j = 0; j < i; j++)
+                printf(visible ? "%c" : "*", pass[j]);
+        }
+        else if (ch == 8) // baca input ketika BACKSPACE
+        {
+            if (i > 0)
+            {
+                i--;
+                printf("\b \b"); //fungsi untuk backspace
+            }
+        }
+        else if (ch >= 33 && ch <= 126)
+        {
+            pass[i++] = ch;
+            printf(visible ? "%c" : "*", ch);
+        }
+    }
+}
+void inputusname(char input[])
 {
     char ch;
     int i = 0;
@@ -235,89 +283,188 @@ void inputtext(char input[])
             i--;
             printf("\b \b"); //fungsi untuk backspace
         }
-        else if (ch >= 32 && ch <= 126) {
+        else if (ch >= 33 && ch <= 126) {
+            input[i++] = ch;
+            printf("%c", ch);
+        }
+    }
+}
+void inputtext(char input[])
+{
+    char ch;
+    int i = 0;
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        // if (ch == 27)exit(0);
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            input[i] = '\0'; //biar ENTER g masuk ke array
+            break;
+        }
+        if (ch == 8 && i > 0) // baca input ketika BACKSPACE
+        {
+            i--;
+            printf("\b \b"); //fungsi untuk backspace
+        }
+        else if (ch >= 33 && ch <= 126) {
+            input[i++] = ch;
+            printf("%c", ch);
+        }
+    }
+}
+void inputid(char input[])
+{
+    char ch;
+    int i = 0;
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        if (ch == 27)return;;
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            input[i] = '\0'; //biar ENTER g masuk ke array
+            break;
+        }
+        if (ch == 8 && i > 0) // baca input ketika BACKSPACE
+        {
+            i--;
+            printf("\b \b"); //fungsi untuk backspace
+        }
+        else if (ch >= 33 && ch <= 126) {
             input[i++] = ch;
             printf("%c", ch);
         }
     }
 }
 
-void supadm(char nama[50])
+char *cutname(char nama[])
 {
-    HANDLE move = GetStdHandle(STD_OUTPUT_HANDLE);
-    system("cls");
+    static char tampil[20]; // pakai static biar ga hilang setelah return
 
-    SetConsoleCursorPosition(move, (COORD){7,2});
-    printf("EATBOX");
+    strncpy(tampil, nama, 15);
+    tampil[15] = '\0';
 
-    garisx(5);
-    garisy(25);
+    if (strlen(nama) > 15)
+        strcat(tampil, "..");
 
-    SetConsoleCursorPosition(move, (COORD){30,2});
-    printf("Halo, %s", nama);
+    return tampil;
+}
+int onlyNum(char *s)
+{
+    int len = strlen(s);
 
-    int left = 30;
-    int right = 105;
-    int top = 7;
-    int bot = 28;
-
-    for (int x = left; x < right; x++)
-    {
-        SetConsoleCursorPosition(move, (COORD){x, top});
-        printf("─");
-        SetConsoleCursorPosition(move, (COORD){x, bot});
-        printf("─");
+    if (len <= 10 || len >15) return 0;
+    for (int i = 0; s[i] != '\0'; i++)
+        if (!isdigit(s[i])) return 0; //CEK KHUSUS ANGKA
+    return 1;
+}
+int cekEmail(char *s)
+{
+    char *at = strchr(s, '@');
+    return at != NULL && at != s && at[1] != '\0'; //CEK ADA @ GK, CEK @ G DI AWAL, CEK @ G DI AKHIR
+}
+int cekrole(char *r)
+{
+    if (
+        strcmp(r, "superadmin") == 0 ||
+        strcmp(r, "staff") == 0 ||
+        strcmp(r, "manajer") == 0 ||
+        strcmp(r, "kasir") == 0 ||
+        strcmp(r, "member") == 0 ||
+        strcmp(r, "supplier") == 0
+    ) {
+        return 1;
     }
-
-    for (int y = top; y < bot; y++)
-    {
-        SetConsoleCursorPosition(move, (COORD){left, y});
-        printf("│");
-        SetConsoleCursorPosition(move, (COORD){right, y});
-        printf("│");
+    return 0;
+}
+void frame(int left, int top, int right, int bot)
+{
+    for (int x = left; x <= right; x++) {
+        gotoxy(x, top); printf("─");
+        gotoxy(x, bot); printf("─");
     }
-
-    for (int y = top; y < bot-1; y++)
-    {
-        SetConsoleCursorPosition(move, (COORD){left+23, y+1});
-        printf("│");
-        SetConsoleCursorPosition(move, (COORD){left+43, y+1});
-        printf("│");
-        SetConsoleCursorPosition(move, (COORD){left+63, y+1});
-        printf("│");
+    for (int y = top; y <= bot; y++) {
+        gotoxy(left, y); printf("│");
+        gotoxy(right, y); printf("│");
     }
+    gotoxy(left, top); printf("┌");
+    gotoxy(right, top);printf("┐");
+    gotoxy(left, bot); printf("└");
+    gotoxy(right, bot);printf("┘");
+}
 
-    SetConsoleCursorPosition(move, (COORD){left, top}); printf("┌");
-    SetConsoleCursorPosition(move, (COORD){right, top}); printf("┐");
-    SetConsoleCursorPosition(move, (COORD){left, bot}); printf("└");
-    SetConsoleCursorPosition(move, (COORD){right, bot}); printf("┘");
+//MENU
+extern void setRGBColor(int r, int g, int b, int isBackground);
+void resetColor() {
+    printf("\x1b[0m");
+}
+int menuSelect(int x, int y, char *menu[], int count)
+{
+    int pos = 0;
+    int key;
 
-    int yhead = top + 1;
+    //matiin kursor
+    CONSOLE_CURSOR_INFO info;
+    info.bVisible = FALSE;
+    info.dwSize = 20;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 
-    SetConsoleCursorPosition(move, (COORD){left + 3, yhead});
-    printf("Nama Admin");
-
-    SetConsoleCursorPosition(move, (COORD){left + 25, yhead});
-    printf("No. telp");
-
-    SetConsoleCursorPosition(move, (COORD){left + 45, yhead});
-    printf("Email");
-
-    SetConsoleCursorPosition(move, (COORD){left + 65, yhead});
-    printf("Status");
-
-    for (int x = left+1; x < right; x++)
+    while (1)
     {
-        SetConsoleCursorPosition(move, (COORD){x, yhead + 1});
-        printf("─");
-    }
+        // DRAW MENU
+        for (int i = 0; i < count; i++)
+        {
+            gotoxy(x, y + i);
 
-    SetConsoleCursorPosition(move, (COORD){1,10}); printf("1. Tambah Admin");
-    SetConsoleCursorPosition(move, (COORD){1,11}); printf("2. Ubah Admin");
-    SetConsoleCursorPosition(move, (COORD){1,12}); printf("3. Hapus Admin");
-    SetConsoleCursorPosition(move, (COORD){1,13}); printf("0. Keluar");
-    SetConsoleCursorPosition(move, (COORD){1,15}); printf("Masukan Pilihan Anda :");
-    int n; while (n < 0 || n > 3){scanf("%d", &n);}
+            if (i == pos) {
+                setRGBColor(251, 255, 199, 1);
+                setRGBColor(202, 40, 44, 0);
+                printf("➤ %-18s", menu[i]);
+                resetColor();
+            } else {
+                setRGBColor(202, 40, 44, 1);
+                setRGBColor(251, 255, 199, 0);
+                printf("  %-18s", menu[i]);
+                resetColor();
+            }
+        }
+
+        key = _getch();
+
+        // panah
+        if (key == -32 || key == 224) {
+            key = _getch();
+            if (key == 72) pos--; // UP
+            if (key == 80) pos++; // DOWN
+            if (key == 75) return -1; //LEFT
+            if (key == 77) return -2; //RIGHT
+        }
+
+        // w/s
+        if (key == 'w' || key == 'W') pos--;
+        if (key == 's' || key == 'S') pos++;
+
+        // enter
+        if (key == 13) return pos;
+
+        // WRAP
+        if (pos < 0) pos = count - 1;
+        if (pos >= count) pos = 0;
+    }
+}
+void showcurs()
+{
+    CONSOLE_CURSOR_INFO info;
+    info.bVisible = TRUE;
+    info.dwSize = 20;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
 
 #endif //EATBOX_FUNCTION_H

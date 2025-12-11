@@ -34,9 +34,9 @@ void createKaryawan(Karyawan a)
         return;
     }
 
-    fprintf(file, "%s|%s|%s|%s|%s|%s|%s|%d|%d\n",
+    fprintf(file, "%s|%s|%s|%s|%s|%s|%s|%d\n",
             a.id, a.username, a.password, a.telp,
-            a.email, a.role, a.alamat, a.status, a.poin);
+            a.email, a.role, a.alamat, a.status);
 
     fclose(file);
 }

@@ -34,12 +34,12 @@ int dataKaryawan(int left, int startY, int page)
         str[strcspn(str, "\n")] = 0;
 
         // Cek apakah parsing berhasil membaca 9 data?
-        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d|%d",
+        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
                a.id, a.username, a.password, a.telp, a.email, a.role,
-               a.alamat, &a.status, &a.poin);
+               a.alamat, &a.status);
 
         // Jika jumlah data yang terbaca kurang dari 9 (misal cuma 7 kayak data lama), skip baris ini
-        if (parsed < 9) {
+        if (parsed < 8) {
             continue;
         }
 
@@ -75,5 +75,7 @@ int dataKaryawan(int left, int startY, int page)
     fclose(f);
     return totalData; // Kembalikan jumlah total data agar supadm tau max page nya
 }
+
+int dataMenu(int left, int startY, int page){}
 
 #endif //EATBOX_READ_H

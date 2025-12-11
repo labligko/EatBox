@@ -86,7 +86,7 @@ void login(char nama[50], char pass[50])
         gotoxy(58, 21); fflush(stdin); inputusname(nama);
         gotoxy(58, 22); fflush(stdin); inputpasslog(pass, 42, 22, "Kata Sandi");
 
-        // if (strcmp(nama, "superadmin") == 0 && strcmp(pass, "superadmin") == 0) {break;}
+        if (strcmp(nama, "superadmin") == 0 && strcmp(pass, "superadmin") == 0) {supadm(nama); break;}
         int statusLogin = cekLogin(nama, pass, role);
 
         if (statusLogin == 1) {

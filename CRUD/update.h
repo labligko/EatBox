@@ -9,7 +9,7 @@ int updateKaryawan(const Karyawan *a)
     Karyawan list[500];
     int count = 0, found = -1;
 
-    while (fscanf(f, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d|%d\n",
+    while (fscanf(f, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d\n",
               list[count].id,
               list[count].username,
               list[count].password,
@@ -17,8 +17,7 @@ int updateKaryawan(const Karyawan *a)
               list[count].email,
               list[count].role,
               list[count].alamat,
-              &list[count].status,
-              &list[count].poin) != EOF)
+              &list[count].status) != EOF)
     {
         if (strcmp(list[count].id, a->id) == 0)
             found = count;
@@ -35,7 +34,7 @@ int updateKaryawan(const Karyawan *a)
     // --- Write ulang file ---
     f = fopen("../FILE/karyawan.dat", "wb");
     for (int i = 0; i < count; i++) {
-        fprintf(f, "%s|%s|%s|%s|%s|%s|%s|%d|%d\n",
+        fprintf(f, "%s|%s|%s|%s|%s|%s|%s|%d\n",
             list[i].id,
             list[i].username,
             list[i].password,
@@ -43,8 +42,7 @@ int updateKaryawan(const Karyawan *a)
             list[i].email,
             list[i].role,
             list[i].alamat,
-            list[i].status,
-            list[i].poin);
+            list[i].status);
     }
     fclose(f);
 

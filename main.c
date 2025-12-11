@@ -13,9 +13,6 @@ int main(void)
 
     login(nama, pass);
 
-    // if (nama[0] != '\0' && pass[0] != '\0')
-    // {
-    // }
     printf("\x1b[0m");
     getchar();
     return 0;

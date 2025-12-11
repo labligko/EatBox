@@ -316,7 +316,7 @@ void inputtext(char input[])
         }
     }
 }
-void inputid(char input[])
+int inputid(char input[])
 {
     char ch;
     int i = 0;
@@ -325,12 +325,12 @@ void inputid(char input[])
     {
         ch = _getch(); // buat baca input langsung dari keyboard
 
-        if (ch == 27)return;;
+        if (ch == 27)return 0;
 
         if (ch == 13) // baca input ketika ENTER
         {
-            input[i] = '\0'; //biar ENTER g masuk ke array
-            break;
+            input[i] = '\0';
+            return 1;
         }
         if (ch == 8 && i > 0) // baca input ketika BACKSPACE
         {
@@ -465,6 +465,20 @@ void showcurs()
     info.bVisible = TRUE;
     info.dwSize = 20;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+}
+
+void clearArea(int x, int y, int width, int height)
+{
+    setRGBColor(202, 40, 44, 1);   // Background Merah
+    setRGBColor(251, 255, 199, 0); // Text Cream
+
+    for (int i = 0; i < height; i++)
+    {
+        gotoxy(x, y + i);
+        for(int j = 0; j < width; j++) {
+            printf(" ");
+        }
+    }
 }
 
 #endif //EATBOX_FUNCTION_H

@@ -10,17 +10,19 @@
 #include "../CRUD/delete.h"
 #include "../CRUD/update.h"
 
-void createAdmin(char nama[50]);
-void updateAdmin(char nama[50]);
-void hapusAdmin(char nama[50]);
+void createKar(char nama[50]);
+void updateKar(char nama[50]);
+void hapusKar(char nama[50]);
+void berandaKar(char nama[50]);
 void supadm(char nama[50]);
 
-void createAdmin(char nama[50])
+// Variable global/static untuk menyimpan posisi halaman terakhir
+static int currentPage = 1;
+
+void createKar(char nama[50])
 {
     Karyawan a;
     memset(&a, 0, sizeof(a)); //ngisi buffer di a jadi 0 semua
-
-    system("cls");
 
     int filled_username = 0;
     int filled_password = 0;
@@ -32,14 +34,11 @@ void createAdmin(char nama[50])
 
     while (1)
     {
-        applyColors();
-        appname(43, 1);
-        garisx(0,8);
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
 
-        int left = 30;
-        int top  = 9;
-        int right = 105;
-        int bot   = 35;
+        int left = 30, top  = 10, right = 105, bot   = 35;
 
         frame(left, top, right, bot);
         int y = top + 2;
@@ -77,29 +76,16 @@ void createAdmin(char nama[50])
         printf("Status   : %s", filled_status ? (a.status == 1 ? "1" : "0") : "");
 
         char *opsi[] = {
-            " Username",
-            " Password",
-            " Telp",
-            " Email",
-            " Role",
-            " Alamat",
-            " Status",
-            " Simpan",
-            " Batal"
+            " Username"," Password"," Telp"," Email",
+            " Role"," Alamat"," Status"," Simpan"," Batal"
         };
 
-        gotoxy(right+5, top+4);
-        setRGBColor(251, 255, 199, 1);
-        setRGBColor(202, 40, 44, 0);
-        printf(" [↕] Pilih Input    ");
-
-        gotoxy(right+5, top+5);
-        setRGBColor(251, 255, 199, 1);
-        setRGBColor(202, 40, 44, 0);
-        printf(" [ENTER] Lanjut     ");
+        gotoxy(1,10); printf("TAMBAH DATA KARYAWAN");
+        gotoxy(1, 22);printf(" [↕] Pilih Input    ");
+        gotoxy(1, 23);printf(" [ENTER] Lanjut     ");
         resetColor();
 
-        int pilih = menuSelect(right+5, top+7, opsi, 9);
+        int pilih = menuSelect(1, 12, opsi, 9);
 
         switch (pilih)
         {
@@ -116,11 +102,13 @@ void createAdmin(char nama[50])
             case 1:
                 gotoxy(left+13, top+4);
                 clearinput(left+13, top+4, 40);
+                gotoxy(1, 25);printf(" [TAB] Lihat/Sembunyi");
 
                 gotoxy(left+13, top+4);
                 showcurs();
                 inputpass(a.password, left+2, top+4, "Password ");
                 filled_password = strlen(a.password) > 0;
+                clearinput(1,25, 24);
                 break;
 
             case 2:
@@ -199,24 +187,13 @@ void createAdmin(char nama[50])
                 break;
 
             case 6:
-                gotoxy(left+13, top+14);
-                clearinput(left+13, top+14, 40);
-
-                gotoxy(left+13, top+14);
-                showcurs();
-                scanf("%d", &a.status); getchar();
-                a.status = (a.status != 1 ? 0 : 1);
+                a.status = (a.status == 1) ? 0 : 1;
                 filled_status = 1;
                 break;
 
             case 7:
-                if (filled_username &&
-                    filled_password &&
-                    filled_telp &&
-                    filled_email &&
-                    filled_role &&
-                    filled_alamat &&
-                    filled_status)
+                if (filled_username && filled_password && filled_telp &&
+                    filled_email && filled_role && filled_alamat && filled_status)
                 {
                     createKaryawan(a);
                     gotoxy(right-30, bot-1);
@@ -225,7 +202,7 @@ void createAdmin(char nama[50])
                     printf("Data berhasil ditambahkan!");
                     resetColor();
                     Sleep(1500);
-                    supadm(nama);
+                    berandaKar(nama);
                 }
                 else {
                     gotoxy(right-30, bot-1);
@@ -238,24 +215,21 @@ void createAdmin(char nama[50])
                 break;
 
             case 8:
-                return;
+                berandaKar(nama);
         }
     }
 }
-void updateAdmin(char nama[50])
+void updateKar(char nama[50])
 {
-    system("cls");
-    applyColors();
-    appname(43, 1);
-    garisx(0,8);
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
 
     char targetID[20];
-    gotoxy(30, 11);
-    printf(" [ESC] Kembali      ");
-    gotoxy(50, 11);
-    printf(" [ENTER] Lanjut     ");
-    gotoxy(30,10);
-    printf("Masukkan ID Karyawan yang ingin diedit: ");
+    gotoxy(1,10); printf("UBAH DATA KARYAWAN");
+    gotoxy(1,21); printf(" [ESC] Kembali      ");
+    gotoxy(1,22); printf(" [ENTER] Lanjut     ");
+    gotoxy(30,10);printf("Masukkan ID Karyawan yang ingin diedit: ");
     showcurs(); inputid(targetID);
 
     FILE *f = fopen("../FILE/karyawan.dat", "rb");
@@ -267,9 +241,9 @@ void updateAdmin(char nama[50])
 
     while (fgets(str, sizeof(str), f)) {
         Karyawan temp;
-        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d|%d",
+        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
                temp.id, temp.username, temp.password, temp.telp,
-               temp.email, temp.role, temp.alamat, &temp.status, &temp.poin);
+               temp.email, temp.role, temp.alamat, &temp.status);
 
         if(strcmp(temp.id, targetID) == 0) {
             a = temp;
@@ -281,8 +255,8 @@ void updateAdmin(char nama[50])
 
     if (!found) {
         gotoxy(30,13); printf("ID '%s' tidak ditemukan!", targetID);
-        Sleep(1500);
-        supadm(nama);
+        Sleep(100);
+        berandaKar(nama);
     }
 
     int filled_username = 1, filled_password = 1, filled_telp = 1;
@@ -290,9 +264,9 @@ void updateAdmin(char nama[50])
 
     while (1)
     {
-        applyColors();
-        appname(43, 1);
-        garisx(0,8);
+        clearArea(27, 9, clearW, clearH);
+        clearinput(1, 21, 24);
+        clearinput(1, 22, 24);
 
         int left = 30, top = 9, right = 105, bot = 35;
 
@@ -303,7 +277,7 @@ void updateAdmin(char nama[50])
         // Username
         gotoxy(left+2, y);
         printf("Username : %-30s", filled_username ? a.username : "");
-        // %-30s gunanya buat 'padding' spasi biar tulisan lama ketimpa
+        // %-30s buat 'padding' spasi biar tulisan lama ketimpa
 
         y+=2;
         gotoxy(left+2, y);
@@ -341,18 +315,12 @@ void updateAdmin(char nama[50])
             " Role", " Alamat", " Status", " Simpan", " Batal"
         };
 
-        gotoxy(right+5, top+4);
-        setRGBColor(251, 255, 199, 1); setRGBColor(202, 40, 44, 0);
-        printf(" [↕] Pilih Input    ");
-
-        gotoxy(right+5, top+5);
-        setRGBColor(251, 255, 199, 1); setRGBColor(202, 40, 44, 0);
-        printf(" [ENTER] Lanjut     ");
+        gotoxy(1, 22);printf(" [↕] Pilih Input    ");
+        gotoxy(1, 23);printf(" [ENTER] Lanjut     ");
         resetColor();
 
-        int pilih = menuSelect(right+5, top+7, opsi, 9);
+        int pilih = menuSelect(1, 12, opsi, 9);
 
-        // --- LOGIKA INPUT (Update Logic) ---
         switch (pilih)
         {
             case 0: // Username
@@ -448,167 +416,151 @@ void updateAdmin(char nama[50])
                 break;
 
             case 8: // Batal
-                return;
+                berandaKar(nama);
         }
     }
 }
-void hapusAdmin(char nama[50])
+void hapusKar(char nama[50])
 {
     while (1)
     {
-        system("cls");
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
 
-        applyColors();
-        appname(43, 1);
-        garisx(0,8);
-
-        int left = 30;
-        int top  = 9;
-        int right = 105;
-        int bot   = 35;
+        int left = 30, top  = 10, right = 105, bot   = 35;
 
         char id[20];
-        gotoxy(left, top);
-        printf("Masukkan ID yang ingin dihapus: ");
-        gotoxy(left+35, top);
-        scanf("%s", id);
-        getchar();
+        gotoxy(1,21); printf(" [ESC] Kembali      ");
+        gotoxy(1,22); printf(" [ENTER] Lanjut     ");
+        gotoxy(left, top); printf("Masukkan ID yang ingin dihapus: ");
+        gotoxy(left+35, top); showcurs();
 
-        // MENU KONFIRMASI
-        char *opsi[] = { " Hapus", " Batal" };
-
-        gotoxy(right+5, top+4);
-        printf(" [↕] Pilih Input    ");
-        gotoxy(right+5, top+5);
-        printf(" [ENTER] Lanjut     ");
-
-        int pilih = menuSelect(right+5, top+7, opsi, 2);
-
-        if (pilih == 0)   // HAPUS
-        {
-            if (deleteKaryawan(id))
-            {
-                gotoxy(right-20, bot-1);
-                printf("Data berhasil dihapus!");
-                Sleep(1500);
-                break;
-            }
-            else
-            {
-                gotoxy(right-20, bot-1);
-                printf("ID tidak ditemukan!");
-                Sleep(1500);
-                break;
-            }
-        }
-        else if (pilih == 1)
+        if (inputid(id) == 0)
         {
             return;
         }
+        if (strlen(id)==0)
+        {
+            gotoxy(left, top+3); printf("ID tidak boleh kosong!");
+            continue;
+        }
+
+        gotoxy(left, top+3);
+        clearinput(left, top+3, 30);
+        printf("Menghapus ID %s...", id);
+        Sleep(500);
+
+        if (deleteKaryawan(id))
+        {
+            clearinput(left, top+3, 30);
+            gotoxy(left, top+3);
+            printf("Data berhasil dihapus!");
+            Sleep(1500);
+        }
+        else
+        {
+            gotoxy(left, top+3);
+            printf("ID tidak ditemukan!");
+            Sleep(1500);
+        }
     }
-
-    supadm(nama);
+    berandaKar(nama);
 }
+void berandaKar(char nama[50])
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(1, 10, 20, 30);
 
-// Variable global/static untuk menyimpan posisi halaman terakhir
-static int currentPage = 1;
+    gotoxy(1,10); printf("Halo, %s", cutname(nama));
+    gotoxy(1,20); printf(" [↕] Pilih Menu");
 
+    while(1)
+    {
+        clearArea(27, 9, clearW, clearH);
+
+        int left = 28, right = 131, top = 11, bot = 34;
+
+        gotoxy(60, 10); printf("DATA KARYAWAN");
+
+        frame(left, top, right, bot);
+
+        for (int y = top; y < bot-1; y++) {
+            gotoxy(left+8, y+1);  printf("│");
+            gotoxy(left+25, y+1); printf("│");
+            gotoxy(left+42, y+1); printf("│");
+            gotoxy(left+58, y+1); printf("│");
+            gotoxy(left+78, y+1); printf("│");
+            gotoxy(left+88, y+1); printf("│");
+        }
+        gotoxy(left, top); printf("┌"); gotoxy(right,top); printf("┐");
+        gotoxy(left, bot); printf("└"); gotoxy(right,bot); printf("┘");
+
+        int yhead = top + 1;
+        gotoxy(left+2, yhead);  printf("Id");
+        gotoxy(left+10, yhead); printf("Nama Karyawan");
+        gotoxy(left+27, yhead); printf("No. telp");
+        gotoxy(left+44, yhead); printf("Email");
+        gotoxy(left+60, yhead); printf("Alamat");
+        gotoxy(left+80, yhead); printf("Posisi");
+        gotoxy(left+90, yhead); printf("Status");
+
+        for (int x = left+1; x < right; x++) {
+            gotoxy(x, yhead+1); printf("─");
+        }
+
+        int totalData = dataKaryawan(left, yhead + 2, currentPage);
+        int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
+
+        if (currentPage > maxPage) currentPage = maxPage;
+        if (currentPage < 1) currentPage = 1;
+
+        gotoxy(left+1, bot+1);
+        printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
+
+        char *menuSup[] = {
+            " Data Karyawan", " Tambah Karyawan", " Ubah Karyawan", " Hapus Karyawan", " Keluar"
+        };
+
+
+        int pilih = menuSelect(1, 12, menuSup, 5);
+        if (pilih == -1) { if (currentPage > 1) currentPage--; }
+        else if (pilih == -2) { if (currentPage < maxPage) currentPage++; }
+        else if (pilih == 0) { currentPage = 1; }
+
+        else if (pilih == 1) {
+            createKar(nama);
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,10); printf("Halo, %s", cutname(nama));
+            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 2) {
+            updateKar(nama);
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,10); printf("Halo, %s", cutname(nama));
+            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 3) {
+            hapusKar(nama);
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,10); printf("Halo, %s", cutname(nama));
+            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 4) {
+             exit(0);
+        }
+    }
+}
 void supadm(char nama[50])
 {
-    system("cls");
     applyColors();
 
     appname(43, 1);
     garisx(0,8);
     garisy(25,8);
 
-    gotoxy(60, 10);
-    printf("DATA KARYAWAN");
-
-    int left = 28, right = 131, top = 11, bot = 34;
-
-    frame(left, top, right, bot);
-
-    for (int y = top; y < bot-1; y++) {
-        gotoxy(left+8, y+1);  printf("│");
-        gotoxy(left+25, y+1); printf("│");
-        gotoxy(left+42, y+1); printf("│");
-        gotoxy(left+58, y+1); printf("│");
-        gotoxy(left+78, y+1); printf("│");
-        gotoxy(left+88, y+1); printf("│");
-    }
-    gotoxy(left, top); printf("┌"); gotoxy(right,top); printf("┐");
-    gotoxy(left, bot); printf("└"); gotoxy(right,bot); printf("┘");
-
-    int yhead = top + 1;
-    gotoxy(left+2, yhead);  printf("Id");
-    gotoxy(left+10, yhead); printf("Nama Karyawan");
-    gotoxy(left+27, yhead); printf("No. telp");
-    gotoxy(left+44, yhead); printf("Email");
-    gotoxy(left+60, yhead); printf("Alamat");
-    gotoxy(left+80, yhead); printf("Posisi");
-    gotoxy(left+90, yhead); printf("Status");
-
-    for (int x = left+1; x < right; x++) {
-        gotoxy(x, yhead+1); printf("─");
-    }
-
-    // Panggil fungsi read dan tampung total datanya
-    int totalData = dataKaryawan(left, yhead + 2, currentPage);
-
-    // Hitung Maksimal Halaman (Rumus: (Total-1) / 20 + 1)
-    int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
-
-    // Validasi agar page tidak error saat data dihapus habis
-    if (currentPage > maxPage) currentPage = maxPage;
-    if (currentPage < 1) currentPage = 1;
-
-    // Tampilkan Info Halaman di bawah tabel
-    gotoxy(left+1, bot+1);
-    printf("Halaman: %d / %d (Total: %d)   [<] Sebelumnya  [>] Selanjutnya", currentPage, maxPage, totalData);
-
-
-    // array menu
-    char *menuSup[] = {
-        " Data Karyawan",
-        " Tambah Karyawan",
-        " Ubah Karyawan",
-        " Hapus Karyawan",
-        " Keluar"
-    };
-
-    // Tampilan Kiri
-    gotoxy(1,10); printf("Halo, %s", cutname(nama));
-    gotoxy(1,20); printf(" [↕] Pilih Menu");
-
-    // Panggil menuSelect dengan jumlah index yang dinamis
-    int pilih = menuSelect(1,12, menuSup, 5);
-
-    if (pilih == -1)
-    {
-        if (currentPage > 1)
-        {
-            currentPage--;
-        }
-        supadm(nama);
-    }
-    else if (pilih == -2)
-    {
-        if (currentPage < maxPage)
-        {
-            currentPage++;
-        }
-        supadm(nama);
-    }
-    else if (pilih == 0)
-    {
-        currentPage = 1;
-        supadm(nama);
-    }
-    else if (pilih == 1) createAdmin(nama);
-    else if (pilih == 2) updateAdmin(nama);
-    else if (pilih == 3) hapusAdmin(nama);
-    else if (pilih == 4) exit(0);
+    berandaKar(nama);
 }
 
 void injectDummyData()
@@ -628,31 +580,22 @@ void injectDummyData()
     {
         Karyawan k;
 
-        // 1. Username dan Password acak
         int name_index = rand() % num_names;
         sprintf(k.username, "%s%d", names[name_index], rand() % 99);
         sprintf(k.password, "pass%d", i + 100);
 
-        // 2. Telepon (10 digit, harusnya 12-15 digit sesuai onlyNum, kita buat 12)
-        // Note: Asumsi field telp di struct Karyawan cukup menampung 12 karakter.
         sprintf(k.telp, "0812345%05d", rand() % 100000);
 
-        // 3. Email acak
         int domain_index = rand() % num_domain;
         sprintf(k.email, "%s%d@%s", names[name_index], rand() % 50, domain[domain_index]);
 
-        // 4. Role acak (kasir, staff, manajer)
         int role_index = rand() % num_roles;
         strcpy(k.role, roles[role_index]);
 
-        // 5. Alamat acak
         sprintf(k.alamat, "Jl. Dummy No. %d, Kota Test", i + 1);
 
-        // 6. Status dan Poin default
         k.status = 1; // Aktif
-        k.poin = 0;
 
-        // 7. Panggil fungsi yang kamu buat untuk menyimpan dan membuat ID
         createKaryawan(k);
     }
     printf("Injeksi dummy data selesai! 50 data baru ditambahkan.\n");

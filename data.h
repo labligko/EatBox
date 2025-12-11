@@ -26,7 +26,6 @@ typedef struct
     char role[20];
     text alamat;
     int status;
-    int poin;
 }Karyawan;
 
 typedef struct
@@ -46,7 +45,7 @@ typedef struct
     int stok;
     char satuan[20];
     int minimal_stok;
-};
+}BahanBaku;
 
 typedef struct
 {
@@ -54,7 +53,7 @@ typedef struct
     int nomor_meja;
     int kapasitas;
     char status[20];
-};
+}Meja;
 
 //TRANSAKSI
 typedef struct
@@ -66,7 +65,7 @@ typedef struct
     double total;
     double subtotal;
     DateTime tanggal;
-};
+}Pesanan;
 
 typedef struct
 {

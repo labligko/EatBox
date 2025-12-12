@@ -360,15 +360,21 @@ int onlyNum(char *s)
 {
     int len = strlen(s);
 
-    if (len <= 10 || len >15) return 0;
+    if (len <= 10 || len >13) return 0;
+    if (s[0] != '0' || s[1] != '8') return 0;
     for (int i = 0; s[i] != '\0'; i++)
         if (!isdigit(s[i])) return 0; //CEK KHUSUS ANGKA
     return 1;
 }
 int cekEmail(char *s)
 {
+    if (strlen(s) <5) return 0;
     char *at = strchr(s, '@');
-    return at != NULL && at != s && at[1] != '\0'; //CEK ADA @ GK, CEK @ G DI AWAL, CEK @ G DI AKHIR
+    if (at == NULL || at == s) return 0; //CEK ADA @ GK, CEK @ G DI AWAL
+    if (strchr(at + 1, '@') != NULL) return 0; //cek @ g double
+    char *dot = strchr(at + 1, '.'); //deklarasi . setelah @
+    if (dot == NULL || dot == at + 1 || dot[1] == '\0') {return 0;} // cek ada . gk, cek . g setelah @, cek .g diakhir
+    return 1;
 }
 int cekrole(char *r)
 {

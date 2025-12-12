@@ -1,52 +1,55 @@
 #ifndef EATBOX_UPDATE_H
 #define EATBOX_UPDATE_H
+#include <stdio.h>
+#include <string.h>
+#include "../data.h"
 
-int updateKaryawan(const Karyawan *a)
+int updateKaryawan(const Karyawan *dataBaru)
 {
     FILE *f = fopen("../FILE/karyawan.dat", "rb");
-    if (!f) return 0;
+    FILE *temp = fopen("../FILE/temp.dat", "wb");
 
-    Karyawan list[500];
-    int count = 0, found = -1;
+    if (!f || !temp) {
+        if(f) fclose(f);
+        if(temp) fclose(temp);
+        return 0;
+    }
 
-    while (fscanf(f, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d\n",
-              list[count].id,
-              list[count].username,
-              list[count].password,
-              list[count].telp,
-              list[count].email,
-              list[count].role,
-              list[count].alamat,
-              &list[count].status) != EOF)
+    char str[512];
+    Karyawan a;
+    int found = 0;
+
+    while (fgets(str, sizeof(str), f))
     {
-        if (strcmp(list[count].id, a->id) == 0)
-            found = count;
+        str[strcspn(str, "\n")] = 0;
 
-        count++;
+        // Baca data lama
+        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, &a.status);
+
+        // Jika ID cocok, tulis DATA BARU ke file temp
+        if (strcmp(a.id, dataBaru->id) == 0)
+        {
+            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%d\n",
+                dataBaru->id, dataBaru->username, dataBaru->password,
+                dataBaru->telp, dataBaru->email, dataBaru->role,
+                dataBaru->alamat, dataBaru->status);
+            found = 1;
+        }
+        else
+        {
+            // Jika tidak cocok, tulis DATA LAMA (copy paste)
+            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%d\n",
+                a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, a.status);
+        }
     }
+
     fclose(f);
+    fclose(temp);
 
-    if (found == -1) return 0;
+    remove("../FILE/karyawan.dat");
+    rename("../FILE/temp.dat", "../FILE/karyawan.dat");
 
-    // --- Update data lama ---
-    list[found] = *a;
-
-    // --- Write ulang file ---
-    f = fopen("../FILE/karyawan.dat", "wb");
-    for (int i = 0; i < count; i++) {
-        fprintf(f, "%s|%s|%s|%s|%s|%s|%s|%d\n",
-            list[i].id,
-            list[i].username,
-            list[i].password,
-            list[i].telp,
-            list[i].email,
-            list[i].role,
-            list[i].alamat,
-            list[i].status);
-    }
-    fclose(f);
-
-    return 1;
+    return found;
 }
-
 #endif

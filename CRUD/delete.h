@@ -2,7 +2,6 @@
 #define EATBOX_DELETE_H
 #include <stdio.h>
 #include <string.h>
-
 #include "../data.h"
 
 int deleteKaryawan(char idTarget[])
@@ -10,43 +9,42 @@ int deleteKaryawan(char idTarget[])
     FILE *f = fopen("../FILE/karyawan.dat", "rb");
     FILE *temp = fopen("../FILE/temp.dat", "wb");
 
-    if (!f||!temp)
-    {
-        printf("Error membuka file!");
+    if (!f || !temp) {
+        // printf("Error membuka file!"); // Opsional
+        if(f) fclose(f);
+        if(temp) fclose(temp);
         return 0;
     }
-    char str[300];
+
+    char str[512]; // Buffer digedein dikit biar aman
     Karyawan a;
-    int found =0;
-    while (fgets(str,300,f))
+    int found = 0;
+
+    while (fgets(str, sizeof(str), f))
     {
-        sscanf(str,
-            "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
-            a.id, a.username, a.telp, a.email, a.alamat, a.role, &a.status
-        );
+        str[strcspn(str, "\n")] = 0; // Hapus newline
+
+        // [FIX] Tambahkan PASSWORD (total 8 kolom)
+        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, &a.status);
 
         if (strcmp(idTarget, a.id) == 0)
         {
             found = 1;
-            continue;
+            continue; // Skip (Data dihapus)
         }
-        fprintf(temp, "%s|%s|%s|%s|%s|%s|%d\n",
-                a.id, a.username, a.telp, a.email, a.alamat, a.role, a.status);
+
+        // [FIX] Tulis ulang lengkap 8 kolom
+        fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%d\n",
+                a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, a.status);
     }
 
     fclose(f);
     fclose(temp);
+
     remove("../FILE/karyawan.dat");
     rename("../FILE/temp.dat", "../FILE/karyawan.dat");
 
-    if (found)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    return found;
 }
-
-#endif //EATBOX_DELETE_H
+#endif

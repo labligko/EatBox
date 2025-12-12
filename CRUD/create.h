@@ -26,9 +26,7 @@ void autoID(char *output, const char *format) {
 void createKaryawan(Karyawan a)
 {
     autoID(a.id, "KY%03d");
-
     FILE *file = fopen("../FILE/karyawan.dat", "ab+");
-
     if (!file) {
         printf("Gagal membuka file!\n");
         return;

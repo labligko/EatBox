@@ -10,27 +10,44 @@
 #include "../CRUD/delete.h"
 #include "../CRUD/update.h"
 
-void createKar(char nama[50]);
-void updateKar(char nama[50]);
-void hapusKar(char nama[50]);
-void berandaKar(char nama[50]);
+void createKar();
+void updateKar();
+void hapusKar();
+int lihatKar();
+void dashboard(char *nama);
 void supadm(char nama[50]);
+int findIDByVisualNo(int targetNo, char *destID);
 
 // Variable global/static untuk menyimpan posisi halaman terakhir
 static int currentPage = 1;
 
-void createKar(char nama[50])
+void dashboard(char *nama)
+{
+    int left = 28, right = 131, top = 11, bot = 34;
+    frame(left, top, right, bot);
+
+    gotoxy(left + 5, top + 2);printf("DASHBOARD SUPERADMIN");
+    gotoxy(left + 5, top + 3);for(int i=0; i<95; i++) printf("─");
+
+    gotoxy(left + 5, top + 6);printf("Selamat Datang, %s!", cutname(nama));
+    gotoxy(left + 5, top + 7);printf("Silakan pilih menu di samping.");
+
+    int box1_x = left + 5, box_y = top + 10;
+    frame(box1_x, box_y, box1_x + 30, box_y + 6);
+    gotoxy(box1_x + 2, box_y + 1); printf("STATUS SISTEM");
+    gotoxy(box1_x + 2, box_y + 3); printf("Database: Karyawan");
+
+    gotoxy(left+2, bot-2); printf(" Role: SUPERADMIN");
+}
+void createKar()
 {
     Karyawan a;
     memset(&a, 0, sizeof(a)); //ngisi buffer di a jadi 0 semua
 
-    int filled_username = 0;
-    int filled_password = 0;
-    int filled_telp = 0;
-    int filled_email = 0;
-    int filled_role = 0;
-    int filled_alamat = 0;
-    int filled_status = 0;
+    int filled_username=0, filled_password=0, filled_telp=0;
+    int filled_email=0, filled_role=0, filled_alamat=0, filled_status=0;
+
+    int left = 30, top  = 10, right = 105, bot   = 35;
 
     while (1)
     {
@@ -38,529 +55,334 @@ void createKar(char nama[50])
         int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
 
-        int left = 30, top  = 10, right = 105, bot   = 35;
-
         frame(left, top, right, bot);
-        int y = top + 2;
-
-        // BUAT FORM PENGISIAN NYA
-        gotoxy(left+2, y);
-        printf("Username : %s", filled_username ? a.username : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Password : ");
-        if (filled_password) {
-            int len = strlen(a.password);
-            for (int i = 0; i < len; i++) {printf("*");}
-        } else {printf("");}
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Telp     : %s", filled_telp ? a.telp : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Email    : %s", filled_email ? a.email : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Role     : %s", filled_role ? a.role : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Alamat   : %s", filled_alamat ? a.alamat : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Status   : %s", filled_status ? (a.status == 1 ? "1" : "0") : "");
-
-        char *opsi[] = {
-            " Username"," Password"," Telp"," Email",
-            " Role"," Alamat"," Status"," Simpan"," Batal"
-        };
-
         gotoxy(1,10); printf("TAMBAH DATA KARYAWAN");
-        gotoxy(1, 22);printf(" [↕] Pilih Input    ");
-        gotoxy(1, 23);printf(" [ENTER] Lanjut     ");
-        resetColor();
-
-        int pilih = menuSelect(1, 12, opsi, 9);
-
-        switch (pilih)
-        {
-            case 0:
-                gotoxy(left+13, top+2);
-                clearinput(left+13, top+2, 40);
-
-                gotoxy(left+13, top+2);
-                showcurs();
-                inputtext(a.username);
-                filled_username = strlen(a.username) > 0;
-                break;
-
-            case 1:
-                gotoxy(left+13, top+4);
-                clearinput(left+13, top+4, 40);
-                gotoxy(1, 25);printf(" [TAB] Lihat/Sembunyi");
-
-                gotoxy(left+13, top+4);
-                showcurs();
-                inputpass(a.password, left+2, top+4, "Password ");
-                filled_password = strlen(a.password) > 0;
-                clearinput(1,25, 24);
-                break;
-
-            case 2:
-                do {
-                    gotoxy(left+13, top+6);
-                    clearinput(left+13, top+6, 20);
-
-                    gotoxy(left+13, top+6);
-                    showcurs();
-                    inputtext(a.telp);
-
-                    if (onlyNum(a.telp)) {
-                        filled_telp = 1;
-                    } else {
-                        gotoxy(left+13, top+7);
-                        printf("Nomor tidak valid!");
-                    }
-                } while (!filled_telp);
-                clearinput(left+13, top+7, 20);
-                break;
-
-            case 3:
-                do {
-                    gotoxy(left+13, top+8);
-                    clearinput(left+13, top+8, 30);
-
-                    gotoxy(left+13, top+8);
-                    showcurs();
-                    inputtext(a.email);
-
-                    if (cekEmail(a.email)) {
-                        filled_email = 1;
-                    } else {
-                        gotoxy(left+13, top+9);
-                        printf("Email tidak valid!");
-                    }
-                } while (!filled_email);
-                clearinput(left+13, top+9, 30);
-                break;
-
-        case 4:
-            do {
-                filled_role = 0;
-
-                gotoxy(left+13, top+10);
-                clearinput(left+13, top+10, 20);
-
-                gotoxy(left+13, top+10);
-                showcurs();
-                inputtext(a.role);
-
-                //buat biar g ada enter yang ikut masuk ke array
-                a.role[19] = '\0';
-                a.role[strcspn(a.role, "\n")] = '\0';
-
-                if (cekrole(a.role)) {
-                    filled_role = 1;
-                } else {
-                    gotoxy(left+13, top+11);
-                    printf("Role tidak valid! hanya (manajer, staff, kasir)");
-                }
-
-            } while (!filled_role);
-
-            clearinput(left+13, top+11, 20);
-            break;
-
-            case 5:
-                gotoxy(left+13, top+12);
-                clearinput(left+13, top+12, 40);
-
-                gotoxy(left+13, top+12);
-                showcurs();
-                inputtext(a.alamat);
-                filled_alamat = strlen(a.alamat) > 0;
-                break;
-
-            case 6:
-                a.status = (a.status == 1) ? 0 : 1;
-                filled_status = 1;
-                break;
-
-            case 7:
-                if (filled_username && filled_password && filled_telp &&
-                    filled_email && filled_role && filled_alamat && filled_status)
-                {
-                    createKaryawan(a);
-                    gotoxy(right-30, bot-1);
-                    setRGBColor(251, 255, 199, 1);
-                    setRGBColor(202, 40, 44, 0);
-                    printf("Data berhasil ditambahkan!");
-                    resetColor();
-                    Sleep(1500);
-                    berandaKar(nama);
-                }
-                else {
-                    gotoxy(right-30, bot-1);
-                    setRGBColor(251, 255, 199, 1);
-                    setRGBColor(202, 40, 44, 0);
-                    printf("Lengkapi semua data!");
-                    Sleep(1500);
-                    resetColor();
-                }
-                break;
-
-            case 8:
-                berandaKar(nama);
-        }
-    }
-}
-void updateKar(char nama[50])
-{
-    int clearW = consoleW() - 27;
-    int clearH = consoleH() - 9;
-    clearArea(27, 9, clearW, clearH);
-
-    char targetID[20];
-    gotoxy(1,10); printf("UBAH DATA KARYAWAN");
-    gotoxy(1,21); printf(" [ESC] Kembali      ");
-    gotoxy(1,22); printf(" [ENTER] Lanjut     ");
-    gotoxy(30,10);printf("Masukkan ID Karyawan yang ingin diedit: ");
-    showcurs(); inputid(targetID);
-
-    FILE *f = fopen("../FILE/karyawan.dat", "rb");
-    if (!f) { printf("File tidak ditemukan!\n"); Sleep(1500); return; }
-
-    Karyawan a;
-    int found = 0;
-    char str[255];
-
-    while (fgets(str, sizeof(str), f)) {
-        Karyawan temp;
-        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
-               temp.id, temp.username, temp.password, temp.telp,
-               temp.email, temp.role, temp.alamat, &temp.status);
-
-        if(strcmp(temp.id, targetID) == 0) {
-            a = temp;
-            found = 1;
-            break;
-        }
-    }
-    fclose(f);
-
-    if (!found) {
-        gotoxy(30,13); printf("ID '%s' tidak ditemukan!", targetID);
-        Sleep(100);
-        berandaKar(nama);
-    }
-
-    int filled_username = 1, filled_password = 1, filled_telp = 1;
-    int filled_email = 1, filled_role = 1, filled_alamat = 1, filled_status = 1;
-
-    while (1)
-    {
-        clearArea(27, 9, clearW, clearH);
-        clearinput(1, 21, 24);
-        clearinput(1, 22, 24);
-
-        int left = 30, top = 9, right = 105, bot = 35;
-
-        frame(left, top, right, bot);
 
         int y = top + 2;
+        gotoxy(left+2, y); printf("Username : %s", filled_username ? a.username : "");
+        y+=2; gotoxy(left+2, y); printf("Password : "); if(filled_password) { for(int i=0;i<strlen(a.password);i++) printf("*"); }
+        y+=2; gotoxy(left+2, y); printf("Telp     : %s", filled_telp ? a.telp : "");
+        y+=2; gotoxy(left+2, y); printf("Email    : %s", filled_email ? a.email : "");
+        y+=2; gotoxy(left+2, y); printf("Role     : %s", filled_role ? a.role : "");
+        y+=2; gotoxy(left+2, y); printf("Alamat   : %s", filled_alamat ? a.alamat : "");
+        y+=2; gotoxy(left+2, y); printf("Status   : %s", filled_status ? (a.status == 1 ? "1" : "0") : "");
 
-        // Username
-        gotoxy(left+2, y);
-        printf("Username : %-30s", filled_username ? a.username : "");
-        // %-30s buat 'padding' spasi biar tulisan lama ketimpa
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Password : ");
-        if (filled_password) {
-            int len = strlen(a.password);
-            for (int i = 0; i < len; i++) printf("*");
-            printf("               "); // Timpa sisa karakter lama kalau password memendek
-        }
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Telp     : %-20s", filled_telp ? a.telp : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Email    : %-30s", filled_email ? a.email : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Role     : %-20s", filled_role ? a.role : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Alamat   : %-40s", filled_alamat ? a.alamat : "");
-
-        y+=2;
-        gotoxy(left+2, y);
-        printf("Status   : %-10s", filled_status ? (a.status == 1 ? "Aktif" : "Non-Aktif") : "");
-
-
-        // --- MENU NAVIGASI ---
-        char *opsi[] = {
-            " Username", " Password", " Telp", " Email",
-            " Role", " Alamat", " Status", " Simpan", " Batal"
-        };
-
-        gotoxy(1, 22);printf(" [↕] Pilih Input    ");
-        gotoxy(1, 23);printf(" [ENTER] Lanjut     ");
-        resetColor();
-
+        char *opsi[] = {" Username"," Password"," Telp"," Email"," Role"," Alamat"," Status"," Simpan"," Batal"};
         int pilih = menuSelect(1, 12, opsi, 9);
 
         switch (pilih)
         {
             case 0: // Username
-                gotoxy(left+13, top+2); clearinput(left+13, top+2, 40);
-                gotoxy(left+13, top+2); showcurs();
-                inputtext(a.username);
-                filled_username = strlen(a.username) > 0;
+                gotoxy(left+13, top+2); clearinput(left+13, top+2, 40); showcurs();
+                inputtext(a.username); filled_username = strlen(a.username)>0;
                 break;
-
             case 1: // Password
-                gotoxy(left+13, top+4); clearinput(left+13, top+4, 40);
-                gotoxy(left+13, top+4); showcurs();
-                inputpass(a.password, left+2, top+4, "Password ");
-                filled_password = strlen(a.password) > 0;
+                gotoxy(left+13, top+4); clearinput(left+13, top+4, 40); showcurs();
+                inputpass(a.password, left+2, top+4, "Password "); filled_password = strlen(a.password)>0;
                 break;
-
-            case 2: // Telp (Looping Validation)
-                do {
-                    gotoxy(left+13, top+6); clearinput(left+13, top+6, 20);
-                    gotoxy(left+13, top+6); showcurs();
+            case 2: // Telp
+                 do {
+                    gotoxy(left+13, top+6); clearinput(left+13, top+6, 20); showcurs();
                     inputtext(a.telp);
-
-                    if (onlyNum(a.telp) && strlen(a.telp)>0) {
-                        filled_telp = 1;
-                        clearinput(left+13, top+7, 20); // Hapus error msg
-                    } else {
-                        gotoxy(left+13, top+7); printf("Nomor tidak valid!");
-                    }
+                    if (onlyNum(a.telp)) filled_telp = 1;
+                    else { gotoxy(left+13, top+7); printf("Nomor tidak valid!"); }
                 } while (!filled_telp);
+                clearinput(left+13, top+7, 20);
                 break;
-
-            case 3: // Email (Looping Validation)
-                do {
-                    gotoxy(left+13, top+8); clearinput(left+13, top+8, 30);
-                    gotoxy(left+13, top+8); showcurs();
+            case 3: // Email
+                 do {
+                    gotoxy(left+13, top+8); clearinput(left+13, top+8, 30); showcurs();
                     inputtext(a.email);
-
-                    if (cekEmail(a.email)) {
-                        filled_email = 1;
-                        clearinput(left+13, top+9, 30);
-                    } else {
-                        gotoxy(left+13, top+9); printf("Email tidak valid!");
-                    }
+                    if (cekEmail(a.email)) filled_email = 1;
+                    else { gotoxy(left+13, top+9); printf("Email tidak valid!"); }
                 } while (!filled_email);
+                clearinput(left+13, top+9, 30);
                 break;
-
-            case 4: // Role (Looping Validation)
-                do {
-                    gotoxy(left+13, top+10); clearinput(left+13, top+10, 20);
-                    gotoxy(left+13, top+10); showcurs();
-                    inputtext(a.role);
-                    a.role[strcspn(a.role, "\n")] = 0;
-
-                    if (cekrole(a.role)) {
-                        filled_role = 1;
-                        clearinput(left+13, top+11, 20);
-                    } else {
-                        gotoxy(left+13, top+11); printf("Role: manajer/staff/kasir");
-                    }
-                } while (!filled_role); // Perbaiki logika loop
+            case 4: // Role
+                 do {
+                    gotoxy(left+13, top+10); clearinput(left+13, top+10, 20); showcurs();
+                    inputtext(a.role); a.role[strcspn(a.role, "\n")] = 0;
+                    if (cekrole(a.role)) filled_role = 1;
+                    else { gotoxy(left+13, top+11); printf("Role: manajer/staff/kasir"); }
+                } while (!filled_role);
+                clearinput(left+13, top+11, 20);
                 break;
-
             case 5: // Alamat
-                gotoxy(left+13, top+12); clearinput(left+13, top+12, 40);
-                gotoxy(left+13, top+12); showcurs();
-                inputtext(a.alamat);
-                filled_alamat = strlen(a.alamat) > 0;
+                gotoxy(left+13, top+12); clearinput(left+13, top+12, 40); showcurs();
+                inputtext(a.alamat); filled_alamat = strlen(a.alamat)>0;
                 break;
-
-            case 6: // Status
-                a.status = (a.status == 1) ? 0 : 1;
-                filled_status = 1;
+            case 6: // Status (Toggle)
+                a.status = (a.status == 1) ? 0 : 1; filled_status = 1;
                 break;
-
             case 7: // Simpan
-                if (filled_username && filled_password && filled_telp &&
-                    filled_email && filled_role && filled_alamat)
-                {
-                    if(updateKaryawan(&a)){
-                        gotoxy(right-30, bot-1);
-                        setRGBColor(251, 255, 199, 1); setRGBColor(202, 40, 44, 0);
-                        printf("Data berhasil diperbarui!");
-                        resetColor();
-                    } else {
-                        gotoxy(right-30, bot-1); printf("Gagal update data!");
-                    }
-                    Sleep(1500);
-                    return; // Selesai
-                }
-                else {
-                    gotoxy(right-30, bot-1); printf("Lengkapi semua data!"); Sleep(1500);
+                if (filled_username && filled_password && filled_telp && filled_email && filled_role && filled_alamat && filled_status) {
+                    createKaryawan(a);
+                    gotoxy(right-30, bot-1); printf("Data berhasil ditambahkan!"); Sleep(1000);
+                    return; // KEMBALI KE SUPADM
+                } else {
+                    gotoxy(right-30, bot-1); printf("Lengkapi data!"); Sleep(1000);
                 }
                 break;
-
             case 8: // Batal
-                berandaKar(nama);
+                return; // KEMBALI KE SUPADM
         }
     }
 }
-void hapusKar(char nama[50])
-{
-    while (1)
-    {
-        int clearW = consoleW() - 27;
-        int clearH = consoleH() - 9;
-        clearArea(27, 9, clearW, clearH);
-
-        int left = 30, top  = 10, right = 105, bot   = 35;
-
-        char id[20];
-        gotoxy(1,21); printf(" [ESC] Kembali      ");
-        gotoxy(1,22); printf(" [ENTER] Lanjut     ");
-        gotoxy(left, top); printf("Masukkan ID yang ingin dihapus: ");
-        gotoxy(left+35, top); showcurs();
-
-        if (inputid(id) == 0)
-        {
-            return;
-        }
-        if (strlen(id)==0)
-        {
-            gotoxy(left, top+3); printf("ID tidak boleh kosong!");
-            continue;
-        }
-
-        gotoxy(left, top+3);
-        clearinput(left, top+3, 30);
-        printf("Menghapus ID %s...", id);
-        Sleep(500);
-
-        if (deleteKaryawan(id))
-        {
-            clearinput(left, top+3, 30);
-            gotoxy(left, top+3);
-            printf("Data berhasil dihapus!");
-            Sleep(1500);
-        }
-        else
-        {
-            gotoxy(left, top+3);
-            printf("ID tidak ditemukan!");
-            Sleep(1500);
-        }
-    }
-    berandaKar(nama);
-}
-void berandaKar(char nama[50])
+void updateKar()
 {
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
-    clearArea(1, 10, 20, 30);
+    clearArea(27, 9, clearW, clearH);
+
+    char inputNoStr[10];
+    char realID[20]; // Ini buat nampung ID asli (KY00..)
+    gotoxy(1,10); printf("UBAH DATA KARYAWAN");
+    gotoxy(30,10);printf("Masukkan No. Urut: "); showcurs();
+    if(inputid(inputNoStr) == 0) return;
+
+    int noUrut = atoi(inputNoStr); // Convert string ke angka
+
+    // CARI ID ASLI DARI NOMOR TERSEBUT
+    if (findIDByVisualNo(noUrut, realID) == 0) {
+        gotoxy(30,12); printf("Nomor %d tidak ditemukan!", noUrut);
+        Sleep(1000); return;
+    }
+
+    FILE *f = fopen("../FILE/karyawan.dat", "rb");
+    if (!f) { return; }
+
+    Karyawan a;
+    int found = 0;
+    char str[255];
+    // Parsing manual agar aman
+    while (fgets(str, sizeof(str), f)) {
+        str[strcspn(str, "\n")] = 0;
+        Karyawan temp;
+        int p = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               temp.id, temp.username, temp.password, temp.telp,
+               temp.email, temp.role, temp.alamat, &temp.status);
+        if(p < 8) continue;
+
+        // Bandingkan dengan ID asli yang sudah didapat
+        if(strcmp(temp.id, realID) == 0) { a = temp; found = 1; break; }
+    }
+    fclose(f);
+
+    if (!found) { gotoxy(30,12); printf("ID tidak ditemukan!"); Sleep(1000); return; }
+
+    int left = 30, top = 9, right = 105, bot = 35;
+    while (1)
+    {
+        clearArea(27, 9, clearW, clearH);
+        frame(left, top, right, bot);
+        int y = top + 2;
+
+        gotoxy(left+2, y); printf("Username : %s", a.username);
+        y+=2; gotoxy(left+2, y); printf("Password : "); for(int i=0;i<strlen(a.password);i++) printf("*");
+        y+=2; gotoxy(left+2, y); printf("Telp     : %s", a.telp);
+        y+=2; gotoxy(left+2, y); printf("Email    : %s", a.email);
+        y+=2; gotoxy(left+2, y); printf("Role     : %s", a.role);
+        y+=2; gotoxy(left+2, y); printf("Alamat   : %s", a.alamat);
+        y+=2; gotoxy(left+2, y); printf("Status   : %s", (a.status == 1 ? "1" : "0"));
+
+        char *opsi[] = {" Username"," Password"," Telp"," Email"," Role"," Alamat"," Status"," Simpan"," Batal"};
+        int pilih = menuSelect(1, 12, opsi, 9);
+
+        switch (pilih)
+        {
+            case 0: gotoxy(left+13, top+2); clearinput(left+13, top+2, 40); showcurs(); inputtext(a.username); break;
+            case 1: gotoxy(left+13, top+4); clearinput(left+13, top+4, 40); showcurs(); inputpass(a.password, left+2, top+4, "Password "); break;
+            case 2:
+                do { gotoxy(left+13, top+6); clearinput(left+13, top+6, 20); showcurs(); inputtext(a.telp);
+                } while (!onlyNum(a.telp)); break;
+            case 3:
+                do { gotoxy(left+13, top+8); clearinput(left+13, top+8, 30); showcurs(); inputtext(a.email);
+                } while (!cekEmail(a.email)); break;
+            case 4:
+                do { gotoxy(left+13, top+10); clearinput(left+13, top+10, 20); showcurs(); inputtext(a.role);
+                } while (!cekrole(a.role)); break;
+            case 5: gotoxy(left+13, top+12); clearinput(left+13, top+12, 40); showcurs(); inputtext(a.alamat); break;
+            case 6: a.status = !a.status; break;
+            case 7: if(updateKaryawan(&a))
+            {
+                gotoxy(right-30, bot-1); printf("Berhasil!"); Sleep(1000); return;
+            } break;
+            case 8: return;
+        }
+    }
+}
+void hapusKar()
+{
+    while (1) {
+        int clearW = consoleW() - 27; int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
+
+        char inputNoStr[10];
+        char realID[20];
+
+        gotoxy(1,10); printf("HAPUS DATA KARYAWAN ");
+        gotoxy(30,10); printf("Masukkan No. Urut : "); // Minta Nomor
+
+        showcurs();
+        inputtext(inputNoStr);
+        if (strlen(inputNoStr) == 0) return;
+
+        int noUrut = atoi(inputNoStr);
+
+        // Convert No -> ID
+        if (findIDByVisualNo(noUrut, realID) == 0) {
+            gotoxy(30, 12); printf("Nomor %d tidak ditemukan!", noUrut);
+            Sleep(1000); continue;
+        }
+
+        gotoxy(30, 13); printf("Menghapus No %d (ID: %s)...", noUrut, realID);
+        Sleep(500);
+
+        // Hapus berdasarkan ID Asli
+        if(deleteKaryawan(realID)) {
+            gotoxy(30, 13); printf("Data berhasil dihapus!           "); Sleep(1000); return;
+        } else {
+            gotoxy(30, 13); printf("Gagal menghapus database!        "); Sleep(1000);
+        }
+    }
+}
+int lihatKar()
+{
+    int left = 28, right = 131, top = 11, bot = 34;
+    gotoxy(60, 10); printf("DATA KARYAWAN");
+    frame(left, top, right, bot);
+
+    int yhead = top + 1;
+    gotoxy(left+2, yhead);  printf("No");
+    gotoxy(left+10, yhead); printf("Nama Karyawan");
+    gotoxy(left+27, yhead); printf("No. telp");
+    gotoxy(left+44, yhead); printf("Email");
+    gotoxy(left+60, yhead); printf("Alamat");
+    gotoxy(left+80, yhead); printf("Posisi");
+    gotoxy(left+90, yhead); printf("Status");
+
+    for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
+
+    int Data = dataKaryawan(left, yhead + 2, currentPage);
+    return Data;
+}
+void supadm(char nama[50])
+{
+    system("cls");
+    applyColors();appname(43, 1);
+    garisx(0,8);
+    garisy(25,8); // Garis Sidebar
 
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
     gotoxy(1,20); printf(" [↕] Pilih Menu");
 
+    int currentView = 0;
+
+    char *menuSup[] = {
+        " Data Karyawan", " Tambah Karyawan", " Ubah Karyawan", " Hapus Karyawan", " Keluar"
+    };
+
     while(1)
     {
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
+        clearinput(1,10,24);
 
-        int left = 28, right = 131, top = 11, bot = 34;
+        int totalData = 0;
+        int maxPage = 1;
 
-        gotoxy(60, 10); printf("DATA KARYAWAN");
-
-        frame(left, top, right, bot);
-
-        for (int y = top; y < bot-1; y++) {
-            gotoxy(left+8, y+1);  printf("│");
-            gotoxy(left+25, y+1); printf("│");
-            gotoxy(left+42, y+1); printf("│");
-            gotoxy(left+58, y+1); printf("│");
-            gotoxy(left+78, y+1); printf("│");
-            gotoxy(left+88, y+1); printf("│");
+        if (currentView == 0) {
+            dashboard(nama);
         }
-        gotoxy(left, top); printf("┌"); gotoxy(right,top); printf("┐");
-        gotoxy(left, bot); printf("└"); gotoxy(right,bot); printf("┘");
+        else if (currentView == 1) {
+            totalData = lihatKar(); // Render tabel & dapatkan total data
+            maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
 
-        int yhead = top + 1;
-        gotoxy(left+2, yhead);  printf("Id");
-        gotoxy(left+10, yhead); printf("Nama Karyawan");
-        gotoxy(left+27, yhead); printf("No. telp");
-        gotoxy(left+44, yhead); printf("Email");
-        gotoxy(left+60, yhead); printf("Alamat");
-        gotoxy(left+80, yhead); printf("Posisi");
-        gotoxy(left+90, yhead); printf("Status");
-
-        for (int x = left+1; x < right; x++) {
-            gotoxy(x, yhead+1); printf("─");
+            // Render Footer Paging
+            int bot = 34; // Sesuaikan dengan bot di lihatKar
+            gotoxy(29, bot+1);
+            setRGBColor(202, 40, 44, 1);
+            setRGBColor(251, 255, 199,0);
+            printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
         }
 
-        int totalData = dataKaryawan(left, yhead + 2, currentPage);
-        int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
+        // 4. Handle Sidebar Title (Biar balik lagi kalo abis diganti submenu)
+        if(currentView == 0) { gotoxy(1,10); printf("Halo, %s", cutname(nama)); }
+        else if(currentView == 1) { gotoxy(1,10); printf("DATA KARYAWAN"); }
 
-        if (currentPage > maxPage) currentPage = maxPage;
-        if (currentPage < 1) currentPage = 1;
-
-        gotoxy(left+1, bot+1);
-        printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
-
-        char *menuSup[] = {
-            " Data Karyawan", " Tambah Karyawan", " Ubah Karyawan", " Hapus Karyawan", " Keluar"
-        };
-
-
+        // 5. Menu Select (Program Pauses Here)
         int pilih = menuSelect(1, 12, menuSup, 5);
-        if (pilih == -1) { if (currentPage > 1) currentPage--; }
-        else if (pilih == -2) { if (currentPage < maxPage) currentPage++; }
-        else if (pilih == 0) { currentPage = 1; }
 
-        else if (pilih == 1) {
-            createKar(nama);
-            clearArea(1, 10, 24, 30);
-            gotoxy(1,10); printf("Halo, %s", cutname(nama));
-            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        // 6. Logic Navigasi
+        if (pilih == -1) { // Prev Page (Hanya jika di View Tabel)
+            if (currentView == 1 && currentPage > 1) currentPage--;
         }
-        else if (pilih == 2) {
-            updateKar(nama);
-            clearArea(1, 10, 24, 30);
-            gotoxy(1,10); printf("Halo, %s", cutname(nama));
-            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        else if (pilih == -2) { // Next Page (Hanya jika di View Tabel)
+            if (currentView == 1 && currentPage < maxPage) currentPage++;
         }
-        else if (pilih == 3) {
-            hapusKar(nama);
-            clearArea(1, 10, 24, 30);
-            gotoxy(1,10); printf("Halo, %s", cutname(nama));
-            gotoxy(1,20); printf(" [↕] Pilih Menu");
+        else if (pilih == 0) { // DATA KARYAWAN
+            currentView = 1;
+            currentPage = 1;
         }
-        else if (pilih == 4) {
-             exit(0);
+        else if (pilih == 1) { // TAMBAH
+            createKar(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
+            currentView = 1; // Setelah tambah, tampilkan tabel
+            // Fix Sidebar (karena createKar pakai sidebar buat helper)
+            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 2) { // UBAH
+            updateKar();
+            currentView = 1;
+            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 3) { // HAPUS
+            hapusKar();
+            currentView = 1;
+            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 4) { // KELUAR
+            exit(0);
         }
     }
 }
-void supadm(char nama[50])
+
+int findIDByVisualNo(int targetNo, char *destID)
 {
-    applyColors();
+    FILE *f = fopen("../FILE/karyawan.dat", "rb");
+    if (!f) return 0;
 
-    appname(43, 1);
-    garisx(0,8);
-    garisy(25,8);
+    Karyawan list[500], temp;
+    char str[512];
+    int totalData = 0;
 
-    berandaKar(nama);
+    // 1. Load data persis seperti di read.h
+    while (fgets(str, sizeof(str), f)) {
+        str[strcspn(str, "\n")] = 0;
+        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               list[totalData].id, list[totalData].username, list[totalData].password,
+               list[totalData].telp, list[totalData].email, list[totalData].role,
+               list[totalData].alamat, &list[totalData].status);
+        if (parsed < 8) continue;
+        totalData++;
+    }
+    fclose(f);
+
+    // 2. Sorting persis seperti di read.h (Aktif diatas)
+    for (int i = 0; i < totalData - 1; i++) {
+        for (int j = 0; j < totalData - i - 1; j++) {
+            if (list[j].status < list[j+1].status) {
+                temp = list[j]; list[j] = list[j+1]; list[j+1] = temp;
+            }
+        }
+    }
+
+    // 3. Ambil ID berdasarkan index (targetNo - 1)
+    if (targetNo > 0 && targetNo <= totalData) {
+        strcpy(destID, list[targetNo - 1].id); // Copy ID asli ke variable tujuan
+        return 1;
+    }
+    return 0; // Nomor tidak ada
 }
 
 void injectDummyData()

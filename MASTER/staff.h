@@ -130,8 +130,8 @@ void staff(char nama[50])
         int centerX = left + (right - left) / 2;
         gotoxy(centerX - 15, top + 6);
         printf("Selamat Datang, %s!", cutname(nama));
-        gotoxy(centerX - 20, top + 7);
-        printf("Silakan pilih menu di samping untuk bekerja.");
+        gotoxy(centerX - 18, top + 7);
+        printf("Silakan pilih menu di samping.");
 
         int box1_x = left + 15;
         int box_y = top + 10;

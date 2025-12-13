@@ -222,46 +222,6 @@ void inputpasslog(char pass[], int x, int y, char *ouput) //fungsi untuk passwor
         }
     }
 }
-void inputpass(char pass[], int x, int y, char *ouput) //fungsi untuk password
-{
-    char ch;
-    int i = 0, visible = 0;
-
-    while (1)
-    {
-        ch = _getch(); // buat baca input langsung dari keyboard
-
-        // if (ch == 27)exit(0);
-
-        if (ch == 13) // baca input ketika ENTER
-        {
-            pass[i] = '\0'; //biar ENTER g masuk ke array
-            break;
-        }
-        else if (ch == 9) // baca input ketika TAB (show/hide)
-        {
-            visible = !visible;
-
-            gotoxy(x, y);
-            printf("%s: ", ouput);
-            for (int j = 0; j < i; j++)
-                printf(visible ? "%c" : "*", pass[j]);
-        }
-        else if (ch == 8) // baca input ketika BACKSPACE
-        {
-            if (i > 0)
-            {
-                i--;
-                printf("\b \b"); //fungsi untuk backspace
-            }
-        }
-        else if (ch >= 33 && ch <= 126)
-        {
-            pass[i++] = ch;
-            printf(visible ? "%c" : "*", ch);
-        }
-    }
-}
 void inputusname(char input[])
 {
     char ch;
@@ -289,21 +249,63 @@ void inputusname(char input[])
         }
     }
 }
-void inputtext(char input[])
+int inputpass(char pass[], int x, int y, char *ouput) //fungsi untuk password
 {
     char ch;
-    int i = 0;
+    int i = 0, visible = 0;
+    pass[0] = '\0';
 
     while (1)
     {
         ch = _getch(); // buat baca input langsung dari keyboard
 
-        // if (ch == 27)exit(0);
+        if (ch == 27)return 0;
+
+        if (ch == 13) // baca input ketika ENTER
+        {
+            pass[i] = '\0'; //biar ENTER g masuk ke array
+            return 1;
+        }
+        else if (ch == 9) // baca input ketika TAB (show/hide)
+        {
+            visible = !visible;
+
+            gotoxy(x, y);
+            printf("%s: ", ouput);
+            for (int j = 0; j < i; j++)
+                printf(visible ? "%c" : "*", pass[j]);
+        }
+        else if (ch == 8) // baca input ketika BACKSPACE
+        {
+            if (i > 0)
+            {
+                i--;
+                printf("\b \b"); //fungsi untuk backspace
+            }
+        }
+        else if (ch >= 33 && ch <= 126)
+        {
+            pass[i++] = ch;
+            printf(visible ? "%c" : "*", ch);
+        }
+    }
+}
+int inputtext(char input[])
+{
+    char ch;
+    int i = 0;
+    input[0] = '\0'; //hapus buffer string
+
+    while (1)
+    {
+        ch = _getch(); // buat baca input langsung dari keyboard
+
+        if (ch == 27)return 0;
 
         if (ch == 13) // baca input ketika ENTER
         {
             input[i] = '\0'; //biar ENTER g masuk ke array
-            break;
+            return 1;
         }
         if (ch == 8 && i > 0) // baca input ketika BACKSPACE
         {

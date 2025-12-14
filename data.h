@@ -35,7 +35,7 @@ typedef struct
     char nama_menu[100];
     double harga;
     text deskripsi;
-    char status[20];
+    int status;
 }Menu;
 
 typedef struct
@@ -77,4 +77,7 @@ typedef struct
     char metode_bayar[20];
     char status[20];
 }Pembayaran;
+
+extern Menu daftarMenu[100];
+extern int jumlahMenu;
 #endif //EATBOX_DATA_H

@@ -5,104 +5,107 @@
 #include "../CRUD/delete.h"
 #include "../CRUD/update.h"
 #include "../CRUD/create.h"
+#include "menu.h"
+#include "bahanbaku.h"
 
-void showMenu(char nama[50]);
-void showBahan(char nama[50]);
 void staff(char nama[50]);
+void showBahan(char nama[50]);
+
+int renderTabelMenu(int left, int top, int right, int bot) {
+    gotoxy(60, 10); printf("DATA MENU MAKANAN");
+    frame(left, top, right, bot);
+
+    int yhead = top + 1;
+    gotoxy(left+2, yhead);  printf("ID");
+    gotoxy(left+10, yhead); printf("Nama Menu");
+    gotoxy(left+27, yhead); printf("Kategori");
+    gotoxy(left+44, yhead); printf("Harga");
+    gotoxy(left+60, yhead); printf("Deskripsi");
+    gotoxy(left+85, yhead); printf("Status");
+
+    for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
+
+    // Panggil Data
+    return dataMenu(left, yhead + 2, currentPage);
+}
 
 void showMenu(char nama[50])
 {
-    system("cls");
-    applyColors();
+    // Load data awal
+    loadMenu();
 
+    // Menu Sidebar
+    char *opsiMenu[] = {
+        " Refresh Data",
+        " Tambah Menu",
+        " Ubah Menu",
+        " Hapus Menu",
+        " Cari Menu",
+        " Kembali"
+    };
+
+    // Setup Static UI
+    system("cls");
+    applyColors(); // Warna awal
     appname(43, 1);
     garisx(0,8);
     garisy(25,8);
 
-    printf("DATA MENU");
+    while(1) {
+        // --- BERSIHKAN AREA KONTEN ---
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
 
-    int left = 28, right = 131, top = 11, bot = 34;
+        // --- RENDER TABEL ---
+        int left = 28, right = 131, top = 11, bot = 34;
+        int totalData = renderTabelMenu(left, top, right, bot);
 
-    frame(left, top, right, bot);
+        // --- FOOTER PAGING ---
+        int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
+        if (currentPage > maxPage) currentPage = maxPage;
+        if (currentPage < 1) currentPage = 1;
 
-    for (int y = top; y < bot-1; y++) {
-        gotoxy(left+8, y+1);  printf("│");
-        gotoxy(left+25, y+1); printf("│");
-        gotoxy(left+42, y+1); printf("│");
-        gotoxy(left+58, y+1); printf("│");
-        gotoxy(left+78, y+1); printf("│");
-        gotoxy(left+88, y+1); printf("│");
-    }
-    gotoxy(left, top); printf("┌"); gotoxy(right,top); printf("┐");
-    gotoxy(left, bot); printf("└"); gotoxy(right,bot); printf("┘");
+        gotoxy(left+1, bot+1);
 
-    int yhead = top + 1;
-    gotoxy(left+2, yhead);  printf("Id");
-    gotoxy(left+10, yhead); printf("Nama Karyawan");
-    gotoxy(left+27, yhead); printf("No. telp");
-    gotoxy(left+44, yhead); printf("Email");
-    gotoxy(left+60, yhead); printf("Alamat");
-    gotoxy(left+80, yhead); printf("Posisi");
-    gotoxy(left+90, yhead); printf("Status");
+        printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
 
-    for (int x = left+1; x < right; x++) {
-        gotoxy(x, yhead+1); printf("─");
-    }
+        // --- SIDEBAR HEADER ---
+        clearinput(1,10,24);clearinput(1,12,24);
+        gotoxy(1,10); printf("KELOLA MENU     ");
+        gotoxy(1,20); printf(" [↕] Pilih Menu");
 
-    // Panggil fungsi read dan tampung total datanya
-    int totalData = dataMenu(left, yhead + 2, currentPage);
+        // --- Menu Select ---
+        int pilih = menuSelect(1, 12, opsiMenu, 6);
 
-    // Hitung Maksimal Halaman (Rumus: (Total-1) / 20 + 1)
-    int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
-
-    // Validasi agar page tidak error saat data dihapus habis
-    if (currentPage > maxPage) currentPage = maxPage;
-    if (currentPage < 1) currentPage = 1;
-
-    // Tampilkan Info Halaman di bawah tabel
-    gotoxy(left+1, bot+1);
-    printf("Halaman: %d / %d (Total: %d)   [<] Sebelumnya  [>] Selanjutnya", currentPage, maxPage, totalData);
-
-
-    // array menu
-    char *menuSup[] = {
-        " Data Karyawan",
-        " Tambah Karyawan",
-        " Ubah Karyawan",
-        " Hapus Karyawan",
-        " Kembali"
-    };
-
-    // Tampilan Kiri
-    gotoxy(1,10); printf("Halo, %s", cutname(nama));
-    gotoxy(1,20); printf(" [↕] Pilih Menu");
-
-    // Panggil menuSelect dengan jumlah index yang dinamis
-    int pilih = menuSelect(1,12, menuSup, 5);
-
-    if (pilih == -1)
-    {
-        if (currentPage > 1)
-        {
-            currentPage--;
+        if (pilih == -1) { // Prev Page
+            if (currentPage > 1) currentPage--;
         }
-        supadm(nama);
-    }
-    else if (pilih == -2)
-    {
-        if (currentPage < maxPage)
-        {
-            currentPage++;
+        else if (pilih == -2) { // Next Page
+            if (currentPage < maxPage) currentPage++;
         }
-        supadm(nama);
+        else if (pilih == 0) { // Refresh
+            loadMenu();
+        }
+        else if (pilih == 1) { // Tambah
+            tambahMenu();
+            loadMenu(); // Reload biar tabel update
+        }
+        else if (pilih == 2) { // Ubah
+            ubahMenu();
+            loadMenu();
+        }
+        else if (pilih == 3) { // Hapus
+            hapusMenu();
+            loadMenu();
+        }
+        else if (pilih == 4) { // Cari
+            cariMenu();
+        }
+        else if (pilih == 5) { // Kembali
+            return;
+        }
     }
-    else if (pilih == 0)
-    {
-        currentPage = 1;
-        staff(nama);
-    }
-    else if (pilih == 1) showMenu(nama);
-    else if (pilih == 2) showBahan(nama);
 }
 void showBahan(char nama[50])
 {
@@ -133,16 +136,15 @@ void staff(char nama[50])
         gotoxy(centerX - 18, top + 7);
         printf("Silakan pilih menu di samping.");
 
-        int box1_x = left + 15;
-        int box_y = top + 10;
-        frame(box1_x, box_y, box1_x + 30, box_y + 6); // Gambar kotak kecil
-        gotoxy(box1_x + 2, box_y + 1); printf("STATISTIK MENU");
-        gotoxy(box1_x + 2, box_y + 3); printf("Total Menu Tersedia");
+        int box1_x = left + 15, box_y = top + 10;
+        frame(box1_x, box_y, box1_x + 30, box_y + 6);
+        gotoxy(box1_x + 2, box_y + 1); printf("DATA MENU");
+        gotoxy(box1_x + 2, box_y + 3); printf("%d Item", jumlahMenu);
 
         int box2_x = box1_x + 40;
         frame(box2_x, box_y, box2_x + 30, box_y + 6); // Gambar kotak kecil
-        gotoxy(box2_x + 2, box_y + 1); printf("STATUS GUDANG");
-        gotoxy(box2_x + 2, box_y + 3); printf("Stok Bahan Baku");
+        gotoxy(box2_x + 2, box_y + 1); printf("PENGELOLAAN STOK BAHAN BAKU");
+        gotoxy(box2_x + 2, box_y + 3); printf("Database: BahanBaku");
 
         gotoxy(left + 2, bot - 2);printf(" Role: Staff");
 
@@ -153,12 +155,13 @@ void staff(char nama[50])
         };
 
         gotoxy(1,10); printf("Halo, %s", cutname(nama));
-        gotoxy(1,20); printf(" [↕] Pilih Menu");
+        gotoxy(1,12); printf("Menu Utama");
 
-        int pilih = menuSelect(1,12, menuSup, 3);
+        int pilih = menuSelect(1,13, menuSup, 3);
 
         if (pilih == 0) {
-            showMenu(nama);
+            currentPage = 1;
+            showMenu(nama); // Masuk ke UI Tabel Menu
         }
         else if (pilih == 1) {
             showBahan(nama);

@@ -76,6 +76,76 @@ int dataKaryawan(int left, int startY, int page)
     return totalData; // Kembalikan jumlah total data agar supadm tau max page nya
 }
 
-int dataMenu(int left, int startY, int page){}
 
+//Bagian MENU
+#define MAX_MENU 100
+#define FILENAME "../FILE/menu.dat"
+Menu daftarMenu[MAX_MENU];
+int jumlahMenu = 0;
+
+//membaca data menu ke file
+void loadMenu() {
+    FILE *file = fopen(FILENAME, "rb");
+
+    if (file == NULL) {
+        gotoxy(30, 14); printf("Belum terdia, membuat file baru.\n");
+        return;
+    }
+
+    jumlahMenu = 0;
+    char buffer[512];
+
+    while (fgets(buffer, sizeof(buffer), file)) {
+        if (sscanf(buffer, "%9[^|]|%19[^|]|%99[^|]|%lf|%199[^|]|%d",
+           daftarMenu[jumlahMenu].id_menu,
+           daftarMenu[jumlahMenu].kategori,
+           daftarMenu[jumlahMenu].nama_menu,
+           &daftarMenu[jumlahMenu].harga,
+           daftarMenu[jumlahMenu].deskripsi,
+           &daftarMenu[jumlahMenu].status) == 6)
+        {
+            jumlahMenu++;
+            if (jumlahMenu >= MAX_MENU) break;
+        }
+    }
+
+    fclose(file);
+    printf("\n[OK] Data menu berhasil dimuat (%d item)\n", jumlahMenu);
+}
+//tambahan buat penyesuaian
+int dataMenu(int left, int startY, int page)
+{
+    if (jumlahMenu == 0) loadMenu();
+
+    int limit = 20; // maksimal yang di tampilkan
+    int startIndex = (page - 1) * limit;
+    int printedCount = 0;
+
+    for (int i = startIndex; i < jumlahMenu; i++)
+    {
+        if (printedCount >= limit) break;
+
+        // Potong deskripsi biar gak kepanjangan
+        char desc_short[24];
+        if (strlen(daftarMenu[i].deskripsi) > 23) {
+            strncpy(desc_short, daftarMenu[i].deskripsi, 20);
+            strcat(desc_short, "...");
+        } else {
+            strcpy(desc_short, daftarMenu[i].deskripsi);
+        }
+
+        int y = startY + printedCount;
+
+        // Cetak pakai gotoxy (Sesuaikan koordinat X dengan showMenu kamu)
+        gotoxy(left+2, y);  printf("%s", daftarMenu[i].id_menu);
+        gotoxy(left+10, y); printf("%-15.15s", daftarMenu[i].nama_menu); // Nama Menu
+        gotoxy(left+27, y); printf("%-15.15s", daftarMenu[i].kategori);  // Kategori
+        gotoxy(left+44, y); printf("Rp %-10.0lf", daftarMenu[i].harga);   // Harga
+        gotoxy(left+60, y); printf("%-20.20s", desc_short);              // Deskripsi
+        gotoxy(left+85, y); printf("%s", (daftarMenu[i].status == 1 ? "Tersedia" : "Habis")); // Status
+
+        printedCount++;
+    }
+    return jumlahMenu; // Kembalikan total data untuk hitung paging
+}
 #endif //EATBOX_READ_H

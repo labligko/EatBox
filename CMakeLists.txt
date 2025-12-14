@@ -16,4 +16,6 @@ add_executable(eatBox
         MASTER/kasir.h
         MASTER/manajer.h
         MASTER/staff.h
+        MASTER/menu.h
+        MASTER/bahanbaku.h
 )

@@ -22,7 +22,6 @@ void autoID(char *output, const char *format) {
 
     sprintf(output, format, lastNum);
 }
-
 void createKaryawan(Karyawan a)
 {
     autoID(a.id, "KY%03d");

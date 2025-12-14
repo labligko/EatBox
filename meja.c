@@ -12,12 +12,13 @@ int jumlahMeja = 0;
 int currentpage = 1;
 
 void generateID(char *id);
-void CariMejaById(char *id);
+void cariMejaByID(char *id);
+
 void PilihanMenu();
-void TambahMeja();
-void LihatMeja();
-void UbahMeja();
-void HapusMeja();
+void tambahMeja();
+void lihatMeja();
+void ubahMeja();
+void hapusMeja();
 
 
 int main() {
@@ -63,118 +64,118 @@ void PilihanMenu() {
 
 }
 
-
-void TambahMeja() {
+void tambahMeja() {
     if (jumlahMeja >= MAX_MEJA) {
-        printf("Data Meja Penuh!");
+        printf("Data meja penuh!\n");
         return;
     }
+
     Meja m;
     generateID(m.id_meja);
 
+    printf("\n=== TAMBAH MEJA ===\n");
+    printf("ID Meja      : %s\n", m.id_meja);
 
-    printf("\n========== TAMBAH MEJA ==========\n");
-    printf("ID Meja     : %s\n", m.id_meja);
+    printf("Nomor Meja   : ");
+    scanf("%d", &m.nomor);
 
-    printf("Nomor Meja  :");
-    scanf("%d", &m.nomor_meja);
-
-    printf("Kapasitas   :");
+    printf("Kapasitas    : ");
     scanf("%d", &m.kapasitas);
     getchar();
 
-    printf("Status      :");
-    fgets(m.status_meja, sizeof(m.status), stdin);
-    m.status [strcspn(m.status, "\n")] = 0;
+    printf("Status       : ");
+    fgets(m.status, sizeof(m.status), stdin);
+    m.status[strcspn(m.status, "\n")] = 0;
 
-    daftarMeja[jumlahMeja ++] = m;
-    printf("Meja Berhasil ditambahkan!\n");
+    daftarMeja[jumlahMeja++] = m;
+    printf("Meja berhasil ditambahkan!\n");
 }
 
-
-void LihatMeja() {
+/* ================= READ ================= */
+void lihatMeja() {
     if (jumlahMeja == 0) {
-        printf("Belum ada Data Meja.\n");
+        printf("Belum ada data meja.\n");
         return;
     }
 
-
-    printf("\n========== DAFTAR MEJA =====================\n");
-    printf("ID\t\tNomor\tKapasitas\tStatus\n");
-    printf("==============================================\n");
+    printf("\n=== DAFTAR MEJA ===\n");
+    printf("ID\tNomor\tKapasitas\tStatus\n");
+    printf("-----------------------------------------\n");
 
     for (int i = 0; i < jumlahMeja; i++) {
-        printf("%s\t%d\t%d\t\t%s\n");
-        daftarMeja[i].id_meja,
-        daftarMeja[i].nomor_meja,
-        daftarMeja[i].kapasitas,
-        daftarMeja[i].status;
+        printf("%s\t%d\t%d\t\t%s\n",
+               daftarMeja[i].id_meja,
+               daftarMeja[i].nomor,
+               daftarMeja[i].kapasitas,
+               daftarMeja[i].status);
     }
 }
 
-
-void UbahMeja() {
-    char id[50];
-    printf("\nMasukkan ID Meja: ");
-    fgets(id, sizieof(id), stdin);
-    id[strcspn(id, "\n")] = 0;
-
-
-    int index = CariMejaById(id);
-    if (index == -1) {
-        printf("Meja Tidak Ditemukan!\n");
-        return;
-    }
-
-    printf("\n========== UBAH MEJA %s =========\n", id);
-
-    printf("Nomor Baru      :");
-    scanf("%d", &daftarMeja[index].nomor_meja);
-
-    printf("Kapasitas Baru  : ");
-    scanf("%d", &daftarMeja[index].kapasitas);
-    getchar();
-
-    printf("Status Baru     :");
-    fgets(daftarMeja[index].status, sizeof(daftarMeja[index].status),stdin);
-    daftarMeja[index], status[strcspn(daftarMeja[index].status,"n")] = 0;
-
-    printf("Data Meja Berhasil diubah!\n");
-}
-
-void hapusMeja() {
-    char id[50];
+/* ================= UPDATE ================= */
+void ubahMeja() {
+    char id[10];
     printf("\nMasukkan ID Meja: ");
     fgets(id, sizeof(id), stdin);
     id[strcspn(id, "\n")] = 0;
 
-    int index = CariMejaById(id);
+    int index = cariMejaByID(id);
     if (index == -1) {
-        printf("Meja Tidak Ditemukan!\n");
+        printf("Meja tidak ditemukan!\n");
         return;
     }
 
-    for (int i = 0; i < jumlahMeja; i++) {
-        daftarMeja[i] = daftarMeja[i + 1];
-    }
-    jumlahMeja --;
+    printf("\n=== UBAH MEJA %s ===\n", id);
 
-    printf("Meja Berhasil dihapus!\n");
+    printf("Nomor Baru    : ");
+    scanf("%d", &daftarMeja[index].nomor);
+
+    printf("Kapasitas Baru: ");
+    scanf("%d", &daftarMeja[index].kapasitas);
+    getchar();
+
+    printf("Status Baru   : ");
+    fgets(daftarMeja[index].status, sizeof(daftarMeja[index].status), stdin);
+    daftarMeja[index].status[strcspn(daftarMeja[index].status, "\n")] = 0;
+
+    printf("Data meja berhasil diubah!\n");
 }
 
+/* ================= DELETE ================= */
+void hapusMeja() {
+    char id[10];
+    printf("\nMasukkan ID Meja: ");
+    fgets(id, sizeof(id), stdin);
+    id[strcspn(id, "\n")] = 0;
+
+    int index = cariMejaByID(id);
+    if (index == -1) {
+        printf("Meja tidak ditemukan!\n");
+        return;
+    }
+
+    for (int i = index; i < jumlahMeja - 1; i++) {
+        daftarMeja[i] = daftarMeja[i + 1];
+    }
+    jumlahMeja--;
+
+    printf("Meja berhasil dihapus!\n");
+}
+
+/* ================= SUPPORT ================= */
 void generateID(char *id) {
     int max = 0, num;
     for (int i = 0; i < jumlahMeja; i++) {
-        if (sscanf(daftarMeja[i], &num) == 1) {
-            if (num < max) max = num;
+        if (sscanf(daftarMeja[i].id_meja, "MJ%d", &num) == 1) {
+            if (num > max) max = num;
         }
     }
-    sprintf(id, "MJ%03D", max + 1);
+    sprintf(id, "MJ%03d", max + 1);
 }
 
-int CariMejaById(char *id) {
+int cariMejaByID(char *id) {
     for (int i = 0; i < jumlahMeja; i++) {
         if (strcmp(daftarMeja[i].id_meja, id) == 0)
             return i;
     }
+    return -1;
 }

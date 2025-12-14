@@ -54,7 +54,7 @@ typedef struct
     int nomor_meja;
     int kapasitas;
     char status[20];
-};
+}Meja;
 
 //TRANSAKSI
 typedef struct

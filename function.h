@@ -345,6 +345,81 @@ int inputid(char input[])
         }
     }
 }
+int inputTelp08(char *input)
+{
+    // 1. Set Default "08"
+    strcpy(input, "08");
+    printf("08"); // Tampilkan langsung di layar
+
+    int i = 2; // Mulai ketik dari karakter ke-3 (index 2)
+    char ch;
+
+    while (1)
+    {
+        ch = _getch();
+
+        if (ch == 27) return 0; // ESC
+
+        if (ch == 13) { // ENTER
+            input[i] = '\0';
+            return 1;
+        }
+
+        if (ch == 8) { // BACKSPACE
+            // [PENTING] Cuma boleh hapus kalau i > 2
+            // Jadi "08" gak bakal bisa kehapus
+            if (i > 2) {
+                i--;
+                printf("\b \b");
+            }
+        }
+        // Input Angka (0-9)
+        else if (ch >= '0' && ch <= '9') {
+            if (i < 13) { // Batasi max 13 digit (termasuk 08)
+                input[i++] = ch;
+                printf("%c", ch);
+            }
+        }
+    }
+}
+int inputbebas(char input[])
+{
+    char ch;
+    int i = 0;
+    input[0] = '\0';
+
+    while (1)
+    {
+        ch = _getch();
+
+        if (ch == 27) return 0; // ESC
+
+        if (ch == 13) // ENTER
+        {
+            input[i] = '\0';
+            // Validasi tambahan: Kalau isinya cuma spasi doang, anggap kosong
+            if (i > 0 && input[0] == ' ') return 1;
+            return 1;
+        }
+
+        if (ch == 8) // BACKSPACE
+        {
+            if (i > 0) {
+                i--;
+                printf("\b \b");
+            }
+        }
+        // [PERUBAHAN DISINI]
+        // Ganti 33 jadi 32 agar Spasi dianggap karakter valid
+        else if (ch >= 32 && ch <= 126) {
+            // Tambah limit biar gak overflow array (misal max 99 char)
+            if (i < 99) {
+                input[i++] = ch;
+                printf("%c", ch);
+            }
+        }
+    }
+}
 
 char *cutname(char nama[])
 {
@@ -358,25 +433,42 @@ char *cutname(char nama[])
 
     return tampil;
 }
-int onlyNum(char *s)
-{
-    int len = strlen(s);
-
-    if (len <= 10 || len >13) return 0;
-    if (s[0] != '0' || s[1] != '8') return 0;
-    for (int i = 0; s[i] != '\0'; i++)
-        if (!isdigit(s[i])) return 0; //CEK KHUSUS ANGKA
-    return 1;
-}
 int cekEmail(char *s)
 {
-    if (strlen(s) <5) return 0;
-    char *at = strchr(s, '@');
-    if (at == NULL || at == s) return 0; //CEK ADA @ GK, CEK @ G DI AWAL
-    if (strchr(at + 1, '@') != NULL) return 0; //cek @ g double
-    char *dot = strchr(at + 1, '.'); //deklarasi . setelah @
-    if (dot == NULL || dot == at + 1 || dot[1] == '\0') {return 0;} // cek ada . gk, cek . g setelah @, cek .g diakhir
-    return 1;
+    // --- 1. UBAH SEMUA JADI HURUF KECIL (NORMALIZE) ---
+    // Ini bikin data di database jadi rapi juga
+    for(int i = 0; s[i]; i++){
+        s[i] = tolower(s[i]);
+    }
+
+    // --- 2. Validasi Dasar ---
+    if (strlen(s) < 10) return 0; // @gmail.com aja 10 huruf
+    if (strchr(s, ' ') != NULL) return 0; // gaboleh spasi
+
+    char *at = strchr(s, '@'); //cari @
+    if (at == NULL || at == s) return 0; // @ nya g ada, @ diawal
+    if (strchr(at + 1, '@') != NULL) return 0; //cek @ duplikat
+
+    char *dot = strchr(at + 1, '.'); //cari . setelah @
+    if (dot == NULL || dot == at + 1 || dot[1] == '\0') return 0; // . g ada, . nempel satelah @, . diakhir
+
+    // --- 3. VALIDASI DOMAIN ---
+    char *domain = at + 1;
+
+    const char *allowedDomains[] = {
+        "gmail.com","yahoo.com","outlook.com"
+    };
+
+    int totalDomains = sizeof(allowedDomains) / sizeof(allowedDomains[0]);
+
+    // Sekarang bisa pakai strcmp biasa karena input 's' sudah dikecilin semua
+    for (int i = 0; i < totalDomains; i++) {
+        if (strcmp(domain, allowedDomains[i]) == 0) {
+            return 1; // Valid
+        }
+    }
+
+    return 0; // Tidak ada di daftar
 }
 int cekrole(char *r)
 {
@@ -487,6 +579,107 @@ void clearArea(int x, int y, int width, int height)
             printf(" ");
         }
     }
+}
+
+int popupConfirm(char *msg)
+{
+    //matiin cursor
+    CONSOLE_CURSOR_INFO info;
+    info.bVisible = FALSE;
+    info.dwSize = 20;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+
+    // 1. Hitung Posisi Tengah Layar
+    int cw = consoleW();
+    int ch = consoleH();
+    int width = 50;
+    int height = 7;
+    int x = (cw - width) / 2;
+    int y = (ch - height) / 2;
+
+    // 2. Setup Warna (Biar beda dari background form)
+    setRGBColor(135, 30, 32, 1);
+    setRGBColor(251, 255, 199, 0);
+
+    // 3. Gambar Kotak Popup
+    // Hapus area dulu biar gak numpuk teks belakang
+    for(int i=0; i<=height; i++) {
+        gotoxy(x, y+i);
+        for(int j=0; j<=width; j++) printf(" ");
+    }
+
+    frame(x, y, x + width, y + height);
+
+    // 4. Cetak Pesan (Tengah Kotak)
+    int msgLen = strlen(msg);
+    int textX = x + (width - msgLen) / 2;
+    gotoxy(textX, y + 2);
+    printf("%s", msg);
+
+    // 5. Cetak Pilihan
+    gotoxy(x + 10, y + 4);
+    printf("[ENTER] Ya        [ESC] Batal");
+
+    // 6. Logic Input
+    while(1) {
+        char ch = _getch();
+        if (ch == 13) { // ENTER
+            resetColor(); // Balikin warna
+            return 1;
+        }
+        if (ch == 27) { // ESC
+            resetColor();
+            return 0;
+        }
+    }
+}
+
+// --- POPUP NOTIFIKASI (Void, cuma info) ---
+void popupAlert(char *msg)
+{
+    int cw = consoleW();
+    int ch = consoleH();
+    int width = 50;
+    int height = 7;
+    int x = (cw - width) / 2;
+    int y = (ch - height) / 2;
+
+    setRGBColor(46, 125, 86, 1);
+    setRGBColor(251, 255, 199, 0);
+
+    // Hapus area
+    for(int i=0; i<=height; i++) {
+        gotoxy(x, y+i);
+        for(int j=0; j<=width; j++) printf(" ");
+    }
+
+    frame(x, y, x + width, y + height);
+
+    int msgLen = strlen(msg);
+    int textX = x + (width - msgLen) / 2;
+    gotoxy(textX, y + 2);
+    printf("%s", msg);
+
+    // Tunggu enter/sembarang tombol
+    Sleep(1000);
+    resetColor();
+}
+
+int stringCek(char *mainStr, char *subStr) {
+    char lowerMain[255];
+    char lowerSub[255];
+
+    // Copy dan ubah ke lowercase biar pencarian tidak peduli huruf besar/kecil
+    strcpy(lowerMain, mainStr);
+    strcpy(lowerSub, subStr);
+    strlwr(lowerMain); // fungsi bawaan string.h (Windows)
+    strlwr(lowerSub);
+
+    // Cek apakah substring ada
+    if (strstr(lowerMain, lowerSub) != NULL) {
+        return 1; // Ketemu
+    }
+    return 0; // Gak ketemu
 }
 
 #endif //EATBOX_FUNCTION_H

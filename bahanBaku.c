@@ -78,7 +78,7 @@ void Menu() {
         drawBox(2,2,60,15);
 
 
-        gotoxy(4,4); printf("MENU BAHAN");
+        gotoxy(4,4); printf("MENU BAHAN BAKU");
         gotoxy(4,6); printf("1. Tambah Data");
         gotoxy(4,7); printf("2. ubah Data");
         gotoxy(4,8); printf("3. Hapus Data");

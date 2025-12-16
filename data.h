@@ -52,7 +52,7 @@ typedef struct
     char id_meja[10];
     int nomor_meja;
     int kapasitas;
-    char status[20];
+    int status;
 }Meja;
 
 //TRANSAKSI

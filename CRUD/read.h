@@ -76,6 +76,95 @@ int dataKaryawan(int left, int startY, int page)
     return totalData; // Kembalikan jumlah total data agar supadm tau max page nya
 }
 
+//MEJA
+Meja daftarMeja[50];
+int totalMeja=0;
+void loadMeja() {
+    FILE *f = fopen("../FILE/meja.dat", "rb");
+    if (!f) return;
+
+    totalMeja = 0;
+    char buffer[255];
+    while(fgets(buffer, sizeof(buffer), f)) {
+        if(totalMeja >= 50) break;
+
+        // Parsing sesuai format kamu
+        if(sscanf(buffer, "%[^|]|%d|%d|%d",
+           daftarMeja[totalMeja].id_meja,
+           &daftarMeja[totalMeja].nomor_meja,
+           &daftarMeja[totalMeja].kapasitas,
+           &daftarMeja[totalMeja].status) == 4)
+        {
+            totalMeja++;
+        }
+    }
+    fclose(f);
+}
+void saveMeja() {
+    FILE *f = fopen("../FILE/meja.dat", "wb");
+    if (!f) return;
+
+    for(int i=0; i<totalMeja; i++) {
+        fprintf(f, "%s|%d|%d|%d\n",
+            daftarMeja[i].id_meja,
+            daftarMeja[i].nomor_meja,
+            daftarMeja[i].kapasitas,
+            daftarMeja[i].status);
+    }
+    fclose(f);
+}
+void generateIDMeja(char *id) {
+    int max = 0, num;
+    for (int i = 0; i < totalMeja; i++) {
+        if (sscanf(daftarMeja[i].id_meja, "MJ%d", &num) == 1) {
+            if (num > max) max = num;
+        }
+    }
+    sprintf(id, "MJ%03d", max + 1);
+}
+int cariMejaIndex(char *id) {
+    for (int i = 0; i < totalMeja; i++) {
+        if (strcmp(daftarMeja[i].id_meja, id) == 0) return i;
+    }
+    return -1;
+}
+int renderTabelMeja(int left, int top, int right, int bot, int page) {
+    gotoxy(60, 10); printf("DATA MEJA RESTORAN");
+    frame(left, top, right, bot);
+
+    int yhead = top + 1;
+    gotoxy(left+2, yhead);  printf("ID");
+    gotoxy(left+15, yhead); printf("Nomor Meja");
+    gotoxy(left+35, yhead); printf("Kapasitas");
+    gotoxy(left+55, yhead); printf("Status");
+
+    for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
+
+    if(totalMeja == 0) loadMeja();
+
+    int limit = 20;
+    int start = (page - 1) * limit;
+    int printed = 0;
+
+    for(int i = start; i < totalMeja; i++) {
+        if(printed >= limit) break;
+        int y = yhead + 2 + printed;
+
+        char statTxt[20];
+        if(daftarMeja[i].status == 1) strcpy(statTxt, "Kosong (Ready)");
+        else if(daftarMeja[i].status == 2) strcpy(statTxt, "Terisi");
+        else strcpy(statTxt, "Rusak");
+
+        gotoxy(left+2, y);  printf("%s", daftarMeja[i].id_meja);
+        gotoxy(left+15, y); printf("Meja %02d", daftarMeja[i].nomor_meja);
+        gotoxy(left+35, y); printf("%d Orang", daftarMeja[i].kapasitas);
+        gotoxy(left+55, y); printf("%s", statTxt);
+
+        printed++;
+    }
+    return totalMeja;
+}
+
 
 //Bagian MENU
 #define MAX_MENU 100

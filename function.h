@@ -499,6 +499,11 @@ void frame(int left, int top, int right, int bot)
     gotoxy(left, bot); printf("└");
     gotoxy(right, bot);printf("┘");
 }
+int onlyNum(char *s) {
+    if (strlen(s) == 0) return 0;
+    for (int i = 0; s[i] != '\0'; i++) {if (!isdigit(s[i])) {return 0;}}
+    return 1;
+}
 
 //MENU
 extern void setRGBColor(int r, int g, int b, int isBackground);

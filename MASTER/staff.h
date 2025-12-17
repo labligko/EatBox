@@ -111,7 +111,80 @@ void showMenu(char nama[50])
 }
 void showBahan(char nama[50])
 {
+    loadBahan(); // Pastikan fungsi ini ada (untuk reload array dari file)
 
+    char *opsiMenu[] = {
+        " Refresh Data",
+        " Tambah Bahan",
+        " Ubah Bahan",
+        " Hapus Bahan",
+        " Kembali"
+    };
+
+    int currentPage = 1;
+
+    // UI Setup Awal (Sama persis biar transisi mulus)
+    system("cls");
+    applyColors();
+    appname(43, 1);
+    garisx(0,8); garisy(25,8);
+
+    while(1) {
+        // Clear area konten (tengah)
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
+
+        // RENDER TABEL BAHAN
+        // Asumsinya kamu punya fungsi 'renderTabelBahan' yang parameternya sama kayak Meja
+        int left = 28, right = 131, top = 11, bot = 34;
+        int totalData = renderTabelBahan(left, top, right, bot, currentPage);
+
+        // PAGING LOGIC (Logic halaman otomatis)
+        int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
+
+        // Safety check biar halaman gak error
+        if (currentPage > maxPage) currentPage = maxPage;
+        if (currentPage < 1) currentPage = 1;
+
+        // Footer Halaman
+        gotoxy(left+1, bot+1);
+        printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
+
+        // SIDEBAR
+        clearinput(1,10,24);
+        gotoxy(1,10); printf("KELOLA BAHAN    "); // Judul disesuaikan
+        gotoxy(1,20); printf(" [↕] Pilih Menu");
+
+        // MENU SELECT
+        int pilih = menuSelect(1, 12, opsiMenu, 5);
+
+        // LOGIKA NAVIGASI
+        if (pilih == -1) { // Tombol Kiri (Prev Page)
+            if (currentPage > 1) currentPage--;
+        }
+        else if (pilih == -2) { // Tombol Kanan (Next Page)
+            if (currentPage < maxPage) currentPage++;
+        }
+        else if (pilih == 0) { // Refresh
+            loadBahan();
+        }
+        else if (pilih == 1) { // Tambah
+            tambahBahan();
+            loadBahan(); // Reload biar data baru muncul
+        }
+        else if (pilih == 2) { // Ubah
+            ubahBahan();
+            loadBahan();
+        }
+        else if (pilih == 3) { // Hapus
+            hapusBahan();
+            loadBahan();
+        }
+        else if (pilih == 4) { // Kembali ke menu utama
+            return;
+        }
+    }
 }
 void showMeja(char nama[50])
 {
@@ -169,6 +242,7 @@ void showMeja(char nama[50])
 
 void staff(char nama[50])
 {
+    loadBahan();loadMenu();loadMeja();
     while(1) {
         system("cls");
         applyColors();
@@ -199,11 +273,11 @@ void staff(char nama[50])
         int box2_x = box1_x + 35;
         frame(box2_x, box_y, box2_x + 25, box_y + 6);
         gotoxy(box2_x + 2, box_y + 1); printf("DATA STOK BAHAN BAKU");
-        gotoxy(box2_x + 2, box_y + 3); printf("");
+        gotoxy(box2_x + 2, box_y + 3); printf("%d Item", totalBahan);
 
         int  box3_x = box2_x + 34;
         frame(box3_x, box_y, box3_x + 25, box_y + 6);
-        gotoxy(box3_x + 2, box_y + 1); printf("DATA MENU");
+        gotoxy(box3_x + 2, box_y + 1); printf("DATA MEJA");
         gotoxy(box3_x + 2, box_y + 3); printf("%d Item", totalMeja);
 
         gotoxy(left + 2, bot - 2);printf(" Role: Staff");
@@ -237,4 +311,132 @@ void staff(char nama[50])
     }
 }
 
+void generateDummyData() {
+    // --- 1. RESET DATA (Supaya bersih dari 0) ---
+    jumlahMenu = 0;
+    totalMeja = 0;
+    totalBahan = 0;
+
+    // --- 2. DATA DUMMY MEJA (20 Meja) ---
+    // Logika: Meja 1-10 (2 Orang), Meja 11-16 (4 Orang), Meja 17-20 (6 Orang)
+    for (int i = 0; i < 20; i++) {
+        sprintf(daftarMeja[i].id_meja, "MJ%03d", i + 1);
+        daftarMeja[i].nomor_meja = i + 1;
+
+        if (i < 10) daftarMeja[i].kapasitas = 2;
+        else if (i < 16) daftarMeja[i].kapasitas = 4;
+        else daftarMeja[i].kapasitas = 6;
+
+        daftarMeja[i].status = 1; // Kosong
+        totalMeja++;
+    }
+    saveMeja(); // Simpan ke file
+
+    // --- 3. DATA DUMMY BAHAN BAKU (20 Bahan) ---
+    // Bahan ini disiapkan untuk mendukung menu di bawah
+    char *namaBahan[] = {
+        "Beras Premium", "Telur Ayam", "Daging Ayam Fillet", "Daging Sapi Giling", "Bawang Merah",
+        "Bawang Putih", "Cabai Rawit", "Minyak Goreng", "Garam Halus", "Gula Pasir",
+        "Teh Celup", "Kopi Bubuk Robusta", "Susu UHT Full Cream", "Tepung Terigu", "Kentang Beku",
+        "Roti Burger", "Keju Slice", "Saus Tomat", "Kecap Manis", "Air Galon"
+    };
+    char *satuanBahan[] = {
+        "Kg", "Butir", "Kg", "Kg", "Kg",
+        "Kg", "Kg", "Liter", "Bungkus", "Kg",
+        "Kotak", "Kg", "Liter", "Kg", "Kg",
+        "Pcs", "Lembar", "Botol", "Botol", "Galon"
+    };
+    int stokAwal[] = {
+        50, 100, 20, 10, 5,
+        5, 3, 20, 10, 25,
+        50, 10, 24, 15, 30,
+        40, 50, 20, 20, 10
+    };
+
+    for (int i = 0; i < 20; i++) {
+        sprintf(daftarBahan[i].id_bahan, "BB%03d", i + 1);
+        strcpy(daftarBahan[i].nama_bahan, namaBahan[i]);
+        daftarBahan[i].stok = stokAwal[i];
+        strcpy(daftarBahan[i].satuan, satuanBahan[i]);
+        daftarBahan[i].minimal_stok = 5; // Default minimal stok
+        totalBahan++;
+    }
+    saveBahan();
+
+    // --- 4. DATA DUMMY MENU (20 Menu) ---
+    // Menu Makanan, Minuman, Snack
+    char *katMenu[] = {
+        "Makanan Utama", "Makanan Utama", "Makanan Utama", "Makanan Utama", "Makanan Utama",
+        "Makanan Utama", "Makanan Utama", "Makanan Utama", "Makanan Utama", "Western Food",
+        "Western Food", "Snack", "Snack", "Snack", "Minuman",
+        "Minuman", "Minuman", "Minuman", "Minuman", "Minuman"
+    };
+    char *nmMenu[] = {
+        "Nasi Goreng Spesial", "Mie Goreng Jawa", "Ayam Bakar Madu", "Sate Ayam Lontong", "Soto Ayam Lamongan",
+        "Nasi Uduk Komplit", "Gado-Gado Betawi", "Rendang Sapi", "Nasi Putih", "Burger Sapi Keju",
+        "Spaghetti Bolognese", "Kentang Goreng", "Roti Bakar Coklat", "Pisang Keju", "Es Teh Manis",
+        "Es Jeruk Peras", "Kopi Hitam Panas", "Es Kopi Susu", "Jus Alpukat", "Air Mineral"
+    };
+    double hrgMenu[] = {
+        25000, 22000, 28000, 30000, 20000,
+        18000, 18000, 35000, 5000, 35000,
+        30000, 15000, 12000, 12000, 5000,
+        8000, 10000, 18000, 15000, 4000
+    };
+    char *deskMenu[] = {
+        "Nasi goreng dengan telur dan ayam suwir", "Mie goreng bumbu desa pedas manis", "Ayam bakar bumbu madu + lalapan", "Sate ayam 10 tusuk dengan bumbu kacang", "Soto ayam kuah kuning segar",
+        "Nasi uduk dengan bihun dan tempe orek", "Sayuran rebus dengan bumbu kacang", "Daging sapi masak bumbu rempah padang", "Nasi putih pulen", "Burger daging sapi asli dengan keju",
+        "Pasta spaghetti saus daging tomat", "Kentang goreng renyah asin gurih", "Roti tawar bakar isi coklat lumer", "Pisang bakar tabur keju susu", "Teh manis dingin segar",
+        "Perasan jeruk murni dingin", "Kopi hitam robusta asli", "Kopi susu gula aren kekinian", "Jus alpukat kental dengan susu coklat", "Air mineral botol 600ml"
+    };
+
+    for (int i = 0; i < 20; i++) {
+        sprintf(daftarMenu[i].id_menu, "MN%03d", i + 1);
+        strcpy(daftarMenu[i].kategori, katMenu[i]);
+        strcpy(daftarMenu[i].nama_menu, nmMenu[i]);
+        daftarMenu[i].harga = hrgMenu[i];
+        strcpy(daftarMenu[i].deskripsi, deskMenu[i]);
+        daftarMenu[i].status = 1; // Tersedia
+        jumlahMenu++;
+    }
+    saveMenu();
+
+    // Notifikasi Selesai
+    popupAlert("Dummy Data Berhasil Dibuat!");
+}
+void injectbahan()
+{
+    totalBahan = 0;
+
+    // --- 3. DATA DUMMY BAHAN BAKU (20 Bahan) ---
+    // Bahan ini disiapkan untuk mendukung menu di bawah
+    char *namaBahan[] = {
+        "Beras Premium", "Telur Ayam", "Daging Ayam Fillet", "Daging Sapi Giling", "Bawang Merah",
+        "Bawang Putih", "Cabai Rawit", "Minyak Goreng", "Garam Halus", "Gula Pasir",
+        "Teh Celup", "Kopi Bubuk Robusta", "Susu UHT Full Cream", "Tepung Terigu", "Kentang Beku",
+        "Roti Burger", "Keju Slice", "Saus Tomat", "Kecap Manis", "Air Galon"
+    };
+    char *satuanBahan[] = {
+        "Kg", "Butir", "Kg", "Kg", "Kg",
+        "Kg", "Kg", "Liter", "Bungkus", "Kg",
+        "Kotak", "Kg", "Liter", "Kg", "Kg",
+        "Pcs", "Lembar", "Botol", "Botol", "Galon"
+    };
+    int stokAwal[] = {
+        50, 100, 20, 10, 5,
+        5, 3, 20, 10, 25,
+        50, 10, 24, 15, 30,
+        40, 50, 20, 20, 10
+    };
+
+    for (int i = 0; i < 20; i++) {
+        sprintf(daftarBahan[i].id_bahan, "BB%03d", i + 1);
+        strcpy(daftarBahan[i].nama_bahan, namaBahan[i]);
+        daftarBahan[i].stok = stokAwal[i];
+        strcpy(daftarBahan[i].satuan, satuanBahan[i]);
+        daftarBahan[i].minimal_stok = 5; // Default minimal stok
+        totalBahan++;
+    }
+    saveBahan();
+}
 #endif //EATBOX_STAFF_H

@@ -62,7 +62,7 @@ int dataKaryawan(int left, int startY, int page)
 
         setRGBColor(202, 40, 44, 1);
         gotoxy(left+2, y);  printf("%-4d", displayNo);
-        gotoxy(left+7, y); printf("%-18.18s", list[i].username);//siapin 18 kolom, maksimal cek 18
+        gotoxy(left+7, y); printf("%-18.18s", cutname(list[i].username));//siapin 18 kolom, maksimal cek 18
         gotoxy(left+25, y); printf("%-13.13s", list[i].telp);
         gotoxy(left+42, y); printf("%-18.18s", list[i].email);
         gotoxy(left+63, y); printf("%-18.18s", list[i].alamat);
@@ -199,7 +199,6 @@ void loadMenu() {
     }
 
     fclose(file);
-    printf("\n[OK] Data menu berhasil dimuat (%d item)\n", jumlahMenu);
 }
 //tambahan buat penyesuaian
 int dataMenu(int left, int startY, int page)

@@ -80,4 +80,7 @@ typedef struct
 
 extern Menu daftarMenu[100];
 extern int jumlahMenu;
+
+BahanBaku daftarBahan[100]; // Array global
+int totalBahan = 0;         // Counter global
 #endif //EATBOX_DATA_H

@@ -166,7 +166,7 @@ void hapusMeja() {
         if(inputtext(idTarget) == 0) return;
 
         int idx = cariMejaIndex(idTarget);
-        if(idx == -1) { popupAlert("ID Tidak Ditemukan!"); continue; }
+        if(idx == -1) { gotoxy(30, 12); printf("ID Tidak Ditemukan!"); Sleep(1000); continue; }
 
         gotoxy(30, 12); printf("Meja No %d (Kapasitas %d)", daftarMeja[idx].nomor_meja, daftarMeja[idx].kapasitas);
 

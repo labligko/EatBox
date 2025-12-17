@@ -333,6 +333,7 @@ void updateKar()
 }
 void hapusKar()
 {
+    Karyawan target;
     while (1) {
         int clearW = consoleW() - 27; int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
@@ -355,6 +356,40 @@ void hapusKar()
             gotoxy(30, 12); printf("Nomor %d tidak ditemukan!", noUrut);
             Sleep(1000); continue;
         }
+        
+        FILE *f = fopen("../FILE/karyawan.dat", "r");
+        char line[512];
+        int ketemu = 0;
+
+        if (f) {
+            while (fgets(line, sizeof(line), f)) {
+                Karyawan temp;
+                // Parse baris file ke struct temp (Sesuaikan format sscanf dengan datamu)
+                sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+                       temp.id, temp.username, temp.password,
+                       temp.telp, temp.email, temp.role,
+                       temp.alamat, &temp.status);
+
+                // Cek apakah ID-nya cocok
+                if (strcmp(temp.id, realID) == 0) {
+                    target = temp; // Salin data ke variabel target
+                    ketemu = 1;
+                    break;
+                }
+            }
+            fclose(f);
+        }
+
+        int y = 14;
+        gotoxy(30, y++); printf("ID         : %s", target.id);
+        gotoxy(30, y++); printf("Nama       : %s", target.username); // Pake nama asli saja biar jelas
+        gotoxy(30, y++); printf("No. Telp   : %s", target.telp);
+        gotoxy(30, y++); printf("Email      : %s", target.email);
+        gotoxy(30, y++); printf("Alamat     : %s", target.alamat);
+        gotoxy(30, y++); printf("Role       : %s", target.role);
+        // Tampilkan status text
+        gotoxy(30, y++); printf("Status     : %s", (target.status == 1) ? "Aktif" : "Non-Aktif");
+        gotoxy(30,y++);printf("ketik sembarang untuk lanjut..."); getchar();
 
         // --- KONFIRMASI SIMPAN ---
         if (popupConfirm("Hapus Data Ini?"))

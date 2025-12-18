@@ -61,7 +61,7 @@ void kasir(char nama[50])
             currentPage = 1;
         }
         else if (pilih == 1) { // CARI KARYAWAN
-            searchKar();
+            detailKar();
             // Setelah search selesai, kembalikan tampilan
             currentView = 0; // Atau 1 terserah mau balik kemana
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");

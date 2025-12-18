@@ -17,11 +17,11 @@ int dataKaryawan(int left, int startY, int page)
     {
         str[strcspn(str, "\n")] = 0;
         // Baca ke dalam index array 'totalData'
-        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+        int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
                list[totalData].id, list[totalData].username, list[totalData].password,
-               list[totalData].telp, list[totalData].email, list[totalData].role,
-               list[totalData].alamat, &list[totalData].status);
-        if (parsed < 8) continue;
+               list[totalData].nama, list[totalData].telp, list[totalData].email,
+               list[totalData].role, list[totalData].alamat, &list[totalData].status);
+        if (parsed < 9) continue;
         totalData++; // Data valid bertambah
     }
     fclose(f);
@@ -62,17 +62,17 @@ int dataKaryawan(int left, int startY, int page)
 
         setRGBColor(202, 40, 44, 1);
         gotoxy(left+2, y);  printf("%-4d", displayNo);
-        gotoxy(left+7, y); printf("%-18.18s", cutname(list[i].username));//siapin 18 kolom, maksimal cek 18
-        gotoxy(left+25, y); printf("%-13.13s", list[i].telp);
-        gotoxy(left+42, y); printf("%-18.18s", list[i].email);
-        gotoxy(left+63, y); printf("%-18.18s", list[i].alamat);
-        gotoxy(left+85, y); printf("%-8.8s", list[i].role);
-        gotoxy(left+95, y); printf("%s", stat);
+        gotoxy(left+7, y);  printf("%-18.18s", cutname(list[i].username));//siapin 18 kolom, maksimal cek 18
+        gotoxy(left+20, y); printf("%-15.15s", cutname(list[i].nama));
+        gotoxy(left+36, y); printf("%-13.13s", list[i].telp);
+        gotoxy(left+50, y); printf("%-15.15s", list[i].email);
+        gotoxy(left+66, y); printf("%-17.17s", list[i].alamat);
+        gotoxy(left+84, y); printf("%-8.8s", list[i].role);
+        gotoxy(left+93, y); printf("%s", stat);
 
         resetColor(); // Balikin warna normal jika tadi diubah
         printedCount++;
     }
-
     return totalData; // Kembalikan jumlah total data agar supadm tau max page nya
 }
 

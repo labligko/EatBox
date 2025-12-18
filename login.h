@@ -13,14 +13,14 @@ int cekLogin(const char *nama, const char *pass, char *role)
     if (!f) return 0;
 
     char line[1024];
-    char f_id[20], f_user[50], f_pass[50], f_telp[20], f_email[50], f_role[20], f_alamat[255];
+    char f_id[20], f_user[20], f_pass[50], f_nama[50], f_telp[20], f_email[50], f_role[20], f_alamat[255];
     int f_stat;
 
     while (fgets(line, sizeof(line), f))
     {
         line[strcspn(line, "\n")] = '\0'; //BUAT HAPUS NEWLINE
-        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
-               f_id, f_user, f_pass, f_telp, f_email, f_role, f_alamat, &f_stat);
+        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               f_id, f_user, f_pass, f_nama, f_telp, f_email, f_role, f_alamat, &f_stat);
 
         if (strcmp(nama, f_user) == 0 && strcmp(pass, f_pass) == 0)
         {

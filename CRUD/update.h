@@ -10,9 +10,7 @@ int updateKaryawan(const Karyawan *dataBaru)
     FILE *temp = fopen("../FILE/temp.dat", "wb");
 
     if (!f || !temp) {
-        if(f) fclose(f);
-        if(temp) fclose(temp);
-        return 0;
+        if(f) fclose(f); if(temp) fclose(temp); return 0;
     }
 
     char str[512];
@@ -22,34 +20,28 @@ int updateKaryawan(const Karyawan *dataBaru)
     while (fgets(str, sizeof(str), f))
     {
         str[strcspn(str, "\n")] = 0;
+        // Parsing 9 Kolom
+        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               a.id, a.username, a.password, a.nama, a.telp,
+               a.email, a.role, a.alamat, &a.status);
 
-        // Baca data lama
-        sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
-               a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, &a.status);
-
-        // Jika ID cocok, tulis DATA BARU ke file temp
-        if (strcmp(a.id, dataBaru->id) == 0)
-        {
-            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%d\n",
+        if (strcmp(a.id, dataBaru->id) == 0) {
+            //kalo cocok, rubah data lama
+            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%s|%d\n",
                 dataBaru->id, dataBaru->username, dataBaru->password,
-                dataBaru->telp, dataBaru->email, dataBaru->role,
-                dataBaru->alamat, dataBaru->status);
+                dataBaru->nama, dataBaru->telp, dataBaru->email,
+                dataBaru->role, dataBaru->alamat, dataBaru->status);
             found = 1;
-        }
-        else
-        {
-            // Jika tidak cocok, tulis DATA LAMA (copy paste)
-            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%d\n",
-                a.id, a.username, a.password, a.telp, a.email, a.role, a.alamat, a.status);
+        } else {
+            //kalo id tidak cocok, data di tulis ulang ke file baru
+            fprintf(temp, "%s|%s|%s|%s|%s|%s|%s|%s|%d\n",
+                a.id, a.username, a.password, a.nama, a.telp,
+                a.email, a.role, a.alamat, a.status);
         }
     }
-
-    fclose(f);
-    fclose(temp);
-
+    fclose(f); fclose(temp);
     remove("../FILE/karyawan.dat");
     rename("../FILE/temp.dat", "../FILE/karyawan.dat");
-
     return found;
 }
 #endif

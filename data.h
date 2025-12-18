@@ -19,8 +19,9 @@ typedef struct {
 typedef struct
 {
     char id[10];
-    char username[50];
+    char username[20];
     char password[35];
+    char nama[50];
     char telp[15];
     char email[50];
     char role[20];
@@ -35,6 +36,7 @@ typedef struct
     char nama_menu[100];
     double harga;
     text deskripsi;
+    int keterangan; //buat keterangan tersedia dll
     int status;
 }Menu;
 
@@ -45,6 +47,7 @@ typedef struct
     int stok;
     char satuan[20];
     int minimal_stok;
+    int status; // buat status aktif/gk
 }BahanBaku;
 
 typedef struct
@@ -52,6 +55,7 @@ typedef struct
     char id_meja[10];
     int nomor_meja;
     int kapasitas;
+    int keterangan;
     int status;
 }Meja;
 

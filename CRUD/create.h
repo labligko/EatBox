@@ -43,13 +43,11 @@ void createKaryawan(Karyawan a)
 {
     autoID(a.id, "KY%03d");
     FILE *file = fopen("../FILE/karyawan.dat", "ab+");
-    if (!file) {
-        printf("Gagal membuka file!\n");
-        return;
-    }
+    if (!file) return;
 
-    fprintf(file, "%s|%s|%s|%s|%s|%s|%s|%d\n",
-            a.id, a.username, a.password, a.telp,
+    // Format: ID|Username|Password|NAMA|Telp|Email|Role|Alamat|Status
+    fprintf(file, "%s|%s|%s|%s|%s|%s|%s|%s|%d\n",
+            a.id, a.username, a.password, a.nama, a.telp,
             a.email, a.role, a.alamat, a.status);
 
     fclose(file);

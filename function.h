@@ -504,6 +504,45 @@ int onlyNum(char *s) {
     for (int i = 0; s[i] != '\0'; i++) {if (!isdigit(s[i])) {return 0;}}
     return 1;
 }
+int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
+    FILE *f = fopen("../FILE/karyawan.dat", "r");
+    if (!f) return 0; // File belum ada, berarti aman
+
+    char line[512];
+    Karyawan temp;
+    int duplicate = 0;
+
+    while (fgets(line, sizeof(line), f)) {
+        // Parse data dari file
+        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               temp.id, temp.username, temp.password,
+               temp.telp, temp.email, temp.role,
+               temp.alamat, &temp.status);
+
+        // LOGIKA UPDATE:
+        // Jika ID di file SAMA dengan ID yang sedang diedit, SKIP (jangan dicek)
+        // idPengecualian kosong ("") berarti mode CREATE (cek semua)
+        if (strcmp(temp.id, idPengecualian) == 0) continue;
+
+        // CEK TELP
+        if (strcmp(jenis, "telp") == 0) {
+            if (strcmp(temp.telp, isiData) == 0) {
+                duplicate = 1;
+                break;
+            }
+        }
+        // CEK EMAIL
+        else if (strcmp(jenis, "email") == 0) {
+            // Email harus case-insensitive (huruf kecil semua dianggap sama)
+            if (strcmpi(temp.email, isiData) == 0) { // strcmpi atau stricmp untuk ignore case
+                duplicate = 1;
+                break;
+            }
+        }
+    }
+    fclose(f);
+    return duplicate;
+}
 
 //MENU
 extern void setRGBColor(int r, int g, int b, int isBackground);
@@ -571,7 +610,6 @@ void showcurs()
     info.dwSize = 20;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
-
 void clearArea(int x, int y, int width, int height)
 {
     setRGBColor(202, 40, 44, 1);   // Background Merah

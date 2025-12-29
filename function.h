@@ -222,7 +222,7 @@ void inputpasslog(char pass[], int x, int y, char *ouput) //fungsi untuk passwor
         }
     }
 }
-void inputusname(char input[])
+int inputusname(char input[])
 {
     char ch;
     int i = 0;
@@ -231,21 +231,27 @@ void inputusname(char input[])
     {
         ch = _getch(); // buat baca input langsung dari keyboard
 
-        if (ch == 27)exit(0);
+        if (ch == 27)return 0;
 
         if (ch == 13) // baca input ketika ENTER
         {
             input[i] = '\0'; //biar ENTER g masuk ke array
-            break;
+            return 1;
         }
         if (ch == 8 && i > 0) // baca input ketika BACKSPACE
         {
             i--;
             printf("\b \b"); //fungsi untuk backspace
         }
-        else if (ch >= 33 && ch <= 126) {
-            input[i++] = ch;
-            printf("%c", ch);
+        // Hanya menerima: Angka (0-9) ATAU Huruf Besar (A-Z) ATAU Huruf Kecil (a-z)
+        else if ((ch >= '0' && ch <= '9') ||
+                 (ch >= 'A' && ch <= 'Z') ||
+                 (ch >= 'a' && ch <= 'z'))
+        {
+            if (i < 20) { // limit buffer biar ga overflow
+                input[i++] = ch;
+                printf("%c", ch);
+            }
         }
     }
 }
@@ -420,6 +426,50 @@ int inputbebas(char input[])
         }
     }
 }
+int inputName(char input[])
+{
+    char ch;
+    int i = 0;
+    input[0] = '\0';
+
+    while (1)
+    {
+        ch = _getch();
+
+        if (ch == 27) return 0; // ESC
+
+        if (ch == 13) // ENTER
+        {
+            input[i] = '\0';
+            // Validasi: Tidak boleh kosong atau cuma spasi doang
+            if (i > 0 && input[0] != ' ') return 1;
+            // Kalau kosong/spasi doang, jangan return 1 dulu (tapi opsional, bisa dihandle di UI)
+            if (i == 0) return 1;
+        }
+
+        if (ch == 8) // BACKSPACE
+        {
+            if (i > 0) {
+                i--;
+                printf("\b \b");
+            }
+        }
+        // --- LOGIKA FILTER KARAKTER NAMA ---
+        else if (
+            (ch >= 'a' && ch <= 'z') || // Huruf Kecil
+            (ch >= 'A' && ch <= 'Z') || // Huruf Besar
+            ch == ' ' ||                // Spasi
+            ch == '.' ||                // Titik
+            ch == '\''||                // Petik (fungsi \ buat indikasi ' di anggap text bukan bungkus char)
+            ch == '-'                   // Strip
+        ) {
+            if (i < 49) { // Limit sesuai size struct nama[50]
+                input[i++] = ch;
+                printf("%c", ch);
+            }
+        }
+    }
+}
 
 char *cutname(char nama[])
 {
@@ -505,7 +555,7 @@ int onlyNum(char *s) {
     return 1;
 }
 int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
-    FILE *f = fopen("../FILE/karyawan.dat", "r");
+    FILE *f = fopen("../FILE/karyawan.dat", "rb");
     if (!f) return 0; // File belum ada, berarti aman
 
     char line[512];
@@ -513,19 +563,24 @@ int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
     int duplicate = 0;
 
     while (fgets(line, sizeof(line), f)) {
-        // Parse data dari file
         sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
                temp.id, temp.username, temp.password,
-               temp.telp, temp.email, temp.role,
+               temp.nama, temp.telp, temp.email, temp.role,
                temp.alamat, &temp.status);
 
-        // LOGIKA UPDATE:
-        // Jika ID di file SAMA dengan ID yang sedang diedit, SKIP (jangan dicek)
-        // idPengecualian kosong ("") berarti mode CREATE (cek semua)
+        // Skip jika ID sama (Logic Update)
         if (strcmp(temp.id, idPengecualian) == 0) continue;
 
+        // CEK USERNAME (Baru)
+        if (strcmp(jenis, "username") == 0) {
+            // strcmpi = String Compare Ignore Case (Admin == admin)
+            if (strcmpi(temp.username, isiData) == 0) {
+                duplicate = 1;
+                break;
+            }
+        }
         // CEK TELP
-        if (strcmp(jenis, "telp") == 0) {
+        else if (strcmp(jenis, "telp") == 0) {
             if (strcmp(temp.telp, isiData) == 0) {
                 duplicate = 1;
                 break;
@@ -533,8 +588,7 @@ int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
         }
         // CEK EMAIL
         else if (strcmp(jenis, "email") == 0) {
-            // Email harus case-insensitive (huruf kecil semua dianggap sama)
-            if (strcmpi(temp.email, isiData) == 0) { // strcmpi atau stricmp untuk ignore case
+            if (strcmpi(temp.email, isiData) == 0) {
                 duplicate = 1;
                 break;
             }
@@ -706,6 +760,12 @@ void popupAlert(char *msg)
     // Tunggu enter/sembarang tombol
     Sleep(1000);
     resetColor();
+}
+void drawGantiPassBox(int x, int y, int w, int h) {
+    clearArea(x, y, w, h);
+    frame(x, y, x+w, y+h);
+    gotoxy(x+15, y+2); printf("GANTI PASSWORD");
+    gotoxy(x+2, y+4);  printf("[ESC] Batal");
 }
 
 int stringCek(char *mainStr, char *subStr) {

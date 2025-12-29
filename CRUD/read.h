@@ -62,7 +62,7 @@ int dataKaryawan(int left, int startY, int page)
 
         setRGBColor(202, 40, 44, 1);
         gotoxy(left+2, y);  printf("%-4d", displayNo);
-        gotoxy(left+7, y);  printf("%-18.18s", cutname(list[i].username));//siapin 18 kolom, maksimal cek 18
+        gotoxy(left+6, y);  printf("%-18.18s", cutname(list[i].username));//siapin 18 kolom, maksimal cek 18
         gotoxy(left+20, y); printf("%-15.15s", cutname(list[i].nama));
         gotoxy(left+36, y); printf("%-13.13s", list[i].telp);
         gotoxy(left+50, y); printf("%-15.15s", list[i].email);

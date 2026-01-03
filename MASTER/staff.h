@@ -42,7 +42,7 @@ void showMenu(char nama[50])
         " Tambah Menu",
         " Ubah Menu",
         " Hapus Menu",
-        " Cari Menu",
+        " Detail Menu",
         " Kembali"
     };
 
@@ -102,7 +102,7 @@ void showMenu(char nama[50])
             loadMenu();
         }
         else if (pilih == 4) { // Cari
-            cariMenu();
+            detailMenu();
         }
         else if (pilih == 5) { // Kembali
             return;

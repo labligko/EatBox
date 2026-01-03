@@ -190,7 +190,8 @@ int dataMenu(int left, int startY, int page)
         int y = startY + printedCount;
 
         // Cetak pakai gotoxy (Sesuaikan koordinat X dengan showMenu kamu)
-        gotoxy(left+2, y);  printf("%s", daftarMenu[i].id_menu);
+        // gotoxy(left+2, y);  printf("%s", daftarMenu[i].id_menu);
+        gotoxy(left+2, y);  printf("%d", i+1);
         gotoxy(left+10, y); printf("%-15.15s", daftarMenu[i].nama_menu); // Nama Menu
         gotoxy(left+27, y); printf("%-15.15s", daftarMenu[i].kategori);  // Kategori
         gotoxy(left+44, y); printf("Rp %-10.0lf", daftarMenu[i].harga);   // Harga

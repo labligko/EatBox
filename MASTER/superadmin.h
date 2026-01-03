@@ -392,7 +392,7 @@ void hapusKar(){
         gotoxy(30, y++); printf("Role         : %s", target.role);
         // Tampilkan status text
         gotoxy(30, y++); printf("Status     : %s", (target.status == 1) ? "Aktif" : "Non-Aktif");
-        gotoxy(30,y++);printf("ketik ENTER untuk lanjut..."); getchar();
+        gotoxy(30,y++);printf("tekan ENTER untuk lanjut..."); getchar();
 
         // --- KONFIRMASI SIMPAN ---
         if (popupConfirm("Non-aktifkan karyawan Ini?"))

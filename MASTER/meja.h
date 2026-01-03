@@ -184,7 +184,8 @@ void ubahMeja() {
         clearArea(27, 9, clearW, clearH);
 
         gotoxy(1, 10); printf("UBAH DATA MEJA      ");
-        gotoxy(30, 10); printf("Masukkan No Urut : ");
+        gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
+        gotoxy(30, 11); printf("Masukkan No Urut : ");
         showcurs();
         if (inputtext(buffer) == 0) return;
         noUrut = atoi(buffer);
@@ -244,7 +245,8 @@ void hapusMeja() {
     int clearH = consoleH() - 9;
     clearArea(27, 9, clearW, clearH);
 
-    gotoxy(30, 10); printf("Masukkan No Urut : ");
+    gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(30, 11); printf("Masukkan No Urut : ");
     showcurs();
     if (inputtext(buffer) == 0) return;
     noUrut = atoi(buffer);
@@ -273,7 +275,7 @@ void hapusMeja() {
     y+=2; gotoxy(left+2, y); printf("Kapasitas  : %d Orang", m->kapasitas);
     y+=2; gotoxy(left+2, y); printf("Keterangan : %s", m->keterangan==1?"Kosong":"Terisi");
 
-    y+=2;gotoxy(left+2,y);printf("ketik ENTER untuk lanjut..."); getchar();
+    y+=2;gotoxy(left+2,y);printf("tekan ENTER untuk lanjut..."); getchar();
 
     if (popupConfirm("Nonaktifkan Meja Ini?")) {
         daftarMeja[idx].status = 0; // Rusak

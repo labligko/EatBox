@@ -1,7 +1,6 @@
 #ifndef EATBOX_BAHANBAKU_H
 #define EATBOX_BAHANBAKU_H
 
-
 #define FILE_BAHAN "../FILE/bahan.dat"
 
 void gotoxy(int x, int y);
@@ -253,7 +252,7 @@ void tambahBahan() {
         if(popupConfirm("Simpan Bahan Ini?")) {
             daftarBahan[totalBahan++] = b;
             saveBahan();
-            popupAlert("Bahan Berhasil Ditambahkan!");
+            popupAlert(1,"Bahan Berhasil Ditambahkan!");
             return;
         }
     }
@@ -298,7 +297,7 @@ void ubahBahan() {
         if(inputtext(idTarget) == 0) return;
 
         int idx = cariIndexByID(idTarget);
-        if(idx == -1) { popupAlert("ID Tidak Ditemukan!"); continue; }
+        if(idx == -1) { popupAlert(0, "ID Tidak Ditemukan!"); continue; }
 
         BahanBaku *b = &daftarBahan[idx];
 
@@ -349,7 +348,7 @@ void ubahBahan() {
 
         if(popupConfirm("Simpan Perubahan?")) {
             saveBahan();
-            popupAlert("Data Bahan Diperbarui!");
+            popupAlert(1,"Data Bahan Diperbarui!");
             return;
         }
     }
@@ -387,7 +386,7 @@ void hapusBahan() {
         if(inputtext(idTarget) == 0) return;
 
         int idx = cariIndexByID(idTarget);
-        if(idx == -1) { popupAlert("ID Tidak Ditemukan!"); continue; }
+        if(idx == -1) { popupAlert(0,"ID Tidak Ditemukan!"); continue; }
 
         // Preview
         gotoxy(30, 12); printf("Bahan  : %s", daftarBahan[idx].nama_bahan);
@@ -399,7 +398,7 @@ void hapusBahan() {
             }
             totalBahan--;
             saveBahan();
-            popupAlert("Bahan Berhasil Dihapus!");
+            popupAlert(1,"Bahan Berhasil Dihapus!");
             return;
         }
     }

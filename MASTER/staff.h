@@ -402,7 +402,7 @@ void generateDummyData() {
     saveMenu();
 
     // Notifikasi Selesai
-    popupAlert("Dummy Data Berhasil Dibuat!");
+    popupAlert(1,"Dummy Data Berhasil Dibuat!");
 }
 void injectbahan()
 {
@@ -438,5 +438,32 @@ void injectbahan()
         totalBahan++;
     }
     saveBahan();
+}
+
+void injectDummyMeja() {
+    srand(time(NULL)); //biar tiap run beda
+
+    for (int i = 0; i < 20; i++) {
+        Meja m;
+
+        // ID otomatis MJ001 dst
+        sprintf(m.id_meja, "MJ%03d", i + 1);
+
+        m.nomor_meja = i + 1;
+
+        // Kapasitas random: 2 - 8 orang
+        m.kapasitas = (rand() % 4 + 1) * 2;
+
+        // Keterangan random: 1=Kosong, 2=Terisi
+        m.keterangan = (rand() % 2) + 1;
+
+        // Status: mayoritas aktif, dikit rusak
+        m.status = (rand() % 10 < 8) ? 1 : 0;
+
+        daftarMeja[totalMeja++] = m;
+    }
+
+    saveMeja();
+    popupAlert(1, "Dummy Data Meja Berhasil Diinject!");
 }
 #endif //EATBOX_STAFF_H

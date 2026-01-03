@@ -732,7 +732,7 @@ int popupConfirm(char *msg)
 }
 
 // --- POPUP NOTIFIKASI (Void, cuma info) ---
-void popupAlert(char *msg)
+void popupAlert(int code, char *msg)
 {
     int cw = consoleW();
     int ch = consoleH();
@@ -741,7 +741,8 @@ void popupAlert(char *msg)
     int x = (cw - width) / 2;
     int y = (ch - height) / 2;
 
-    setRGBColor(46, 125, 86, 1);
+    if (code == 1) setRGBColor(46, 125, 86, 1);
+    else setRGBColor(180, 40, 40, 1);
     setRGBColor(251, 255, 199, 0);
 
     // Hapus area

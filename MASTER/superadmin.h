@@ -151,7 +151,7 @@ void createKar()
         // --- PROSES SIMPAN ---
         a.status = 1;
         createKaryawan(a);
-        popupAlert("Data berhasil ditambahkan!");
+        popupAlert(1,"Data berhasil ditambahkan!");
         Sleep(1000);
         return;
     }
@@ -245,7 +245,7 @@ void updateKar()
 
                     if (gantiPass(a.password)) {
                         // SUKSES: Alert DULU, baru bersihkan layar
-                        popupAlert("Password Berhasil Diubah!");
+                        popupAlert(1, "Password Berhasil Diubah!");
 
                         // [FIX] Redraw form SETELAH alert biar alertnya ilang
                         formEdit(&a);
@@ -319,10 +319,10 @@ void updateKar()
         {
             // User pilih ENTER (Ya)
             if(updateKaryawan(&a)) {
-                popupAlert("Data Berhasil Diupdate!");
+                popupAlert(1,"Data Berhasil Diupdate!");
                 return; // Keluar dari menu update
             } else {
-                popupAlert("Gagal Perbarui Data!");
+                popupAlert(0,"Gagal Perbarui Data!");
             }
         }
         else
@@ -380,7 +380,7 @@ void hapusKar(){
             }
             fclose(f);
         }
-        if(!ketemu) { popupAlert("Error: Data ID tidak sinkron."); continue; }
+        if(!ketemu) { popupAlert(0,"Error: Data ID tidak sinkron."); continue; }
 
         int y = 14;
         gotoxy(30, y++); printf("ID           : %s", target.id);
@@ -403,10 +403,10 @@ void hapusKar(){
                 setRGBColor(251, 255, 199,0);
                 gotoxy(30, 13); printf("Mengubah Data No %d (ID: %s)...", noUrut, realID);
                 Sleep(500);
-                popupAlert("Status Berhasil Diubah!");
+                popupAlert(1,"Status Berhasil Diubah!");
                 return; // Keluar dari menu update
             } else {
-                popupAlert("Gagal mengubah data!");
+                popupAlert(0,"Gagal mengubah data!");
             }
         }
         else
@@ -462,7 +462,7 @@ void detailKar(){
         fclose(f);
 
         if (!found) {
-            popupAlert("Database Error: ID Hilang."); continue;
+            popupAlert(0,"Database Error: ID Hilang."); continue;
         }
 
         // --- 5. TAMPILKAN OVERLAY (KOTAK DETAIL) ---
@@ -672,7 +672,7 @@ int finID(int targetNo, char *destID){
         str[strcspn(str, "\n")] = 0;
         int parsed = sscanf(str, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
                list[totalData].id, list[totalData].username, list[totalData].password,
-               list[totalData].nama, // <--- TAMBAH INI
+               list[totalData].nama,
                list[totalData].telp, list[totalData].email, list[totalData].role,
                list[totalData].alamat, &list[totalData].status);
 

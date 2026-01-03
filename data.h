@@ -53,10 +53,10 @@ typedef struct
 typedef struct
 {
     char id_meja[10];
-    int nomor_meja;
+    int nomor_meja; // nomor fisik meja
     int kapasitas;
-    int keterangan;
-    int status;
+    int keterangan; // 1=Kosong, 2=Terisi
+    int status;     // 1=Aktif, 0=Rusak
 }Meja;
 
 //TRANSAKSI

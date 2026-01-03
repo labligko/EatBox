@@ -139,7 +139,7 @@ void tambahMenu() {
         if (popupConfirm("Simpan Menu Ini?")) {
             daftarMenu[jumlahMenu++] = m;
             saveMenu();
-            popupAlert("Menu Berhasil Ditambahkan!");
+            popupAlert(1,"Menu Berhasil Ditambahkan!");
             return; // Keluar setelah simpan
         }
 
@@ -323,7 +323,7 @@ void ubahMenu() {
         //simpan data
         if (popupConfirm("Simpan Perubahan Menu?")) {
             saveMenu();
-            popupAlert("Data Menu Berhasil Diubah!");
+            popupAlert(1,"Data Menu Berhasil Diubah!");
             return;
         }
     }
@@ -369,7 +369,7 @@ void hapusMenu() {
                 jumlahMenu--;
 
                 saveMenu();
-                popupAlert("Menu Berhasil Dihapus!");
+                popupAlert(1,"Menu Berhasil Dihapus!");
                 return;
             }
         }

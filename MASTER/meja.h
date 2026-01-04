@@ -159,7 +159,7 @@ int renderTabelMeja(int left, int top, int right, int bot, int page) {
             skipped++;
             continue;
         }
-
+        setRGBColor(210, 212, 200, 0);
         y = yhead + 2 + printed;
 
         gotoxy(left+2, y);  printf("%d", start + printed + 1);

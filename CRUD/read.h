@@ -78,7 +78,7 @@ int dataKaryawan(int left, int startY, int page)
 
 //MEJA
 extern Meja daftarMeja[50];
-extern int totalMeja = 0;
+extern int totalMeja;
 void loadMeja() {
     FILE *f = fopen("../FILE/meja.dat", "rb");
     if (!f) return;
@@ -135,7 +135,20 @@ int cariMejaNorut(int noUrut) {
 #define MAX_MENU 100
 #define FILENAME "../FILE/menu.dat"
 Menu daftarMenu[MAX_MENU];
-int jumlahMenu = 0;
+extern int jumlahMenu;
+
+void sortMenuByStatus() {
+    Menu temp;
+    for (int i = 0; i < jumlahMenu - 1; i++) {
+        for (int j = 0; j < jumlahMenu - i - 1; j++) {
+            if (daftarMenu[j].status < daftarMenu[j + 1].status) {
+                temp = daftarMenu[j];
+                daftarMenu[j] = daftarMenu[j + 1];
+                daftarMenu[j + 1] = temp;
+            }
+        }
+    }
+}
 
 //membaca data menu ke file
 void loadMenu() {
@@ -146,7 +159,6 @@ void loadMenu() {
         return;
     }
 
-    jumlahMenu = 0;
     char buffer[512];
 
     while (fgets(buffer, sizeof(buffer), file)) {
@@ -164,6 +176,7 @@ void loadMenu() {
     }
 
     fclose(file);
+    sortMenuByStatus();
 }
 //tambahan buat penyesuaian
 int dataMenu(int left, int startY, int page)
@@ -186,6 +199,8 @@ int dataMenu(int left, int startY, int page)
         } else {
             strcpy(desc_short, daftarMenu[i].deskripsi);
         }
+
+        if (daftarMenu[i].status != 1) setRGBColor(210, 212, 200, 0);
 
         int y = startY + printedCount;
 

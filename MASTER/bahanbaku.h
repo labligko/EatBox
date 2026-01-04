@@ -1,9 +1,8 @@
 #ifndef EATBOX_BAHANBAKU_H
 #define EATBOX_BAHANBAKU_H
 
+#include "../data.h"
 #define FILE_BAHAN "../FILE/bahan.dat"
-
-void gotoxy(int x, int y);
 void drawBox(int x, int y, int w, int h);
 
 void loadBahan();
@@ -15,8 +14,7 @@ void Tambah();
 void Ubah();
 void Hapus();
 
-int cariIndexByID(char id[]);
-
+// ================= FILE HANDLING =================
 void saveBahan() {
     FILE *f = fopen(FILE_BAHAN, "wb");
     if (!f) return;
@@ -30,15 +28,10 @@ void loadBahan() {
     if (!fp) return;
 
     fread(&totalBahan,sizeof(int),1,fp);
-    fread(daftarBahan,sizeof(BahanBaku),1,fp);
+    fread(daftarBahan,sizeof(BahanBaku),totalBahan,fp);
     fclose(fp);
 }
-int cariIndexByID(char id[]) {
-    for (int i = 0; i < totalBahan; i++) {
-        if (strcmp(daftarBahan[i].id_bahan, id) == 0)return i;
-    }
-    return -1;
-}
+
 //TAMBAHAN
 void generateIDBahan(char *output) {
     int max = 0, num;
@@ -49,8 +42,22 @@ void generateIDBahan(char *output) {
     }
     sprintf(output, "BB%03d", max + 1);
 }
+int getIndexByNoUrut(int no) {
+    int count = 0;
+    for (int i = 0; i < totalBahan; i++) {
+        if (daftarBahan[i].status == 1) {
+            count++;
+            if (count == no) return i;
+        }
+    }
+    return -1;
+}
 
+// ================= TABEL =================
 int renderTabelBahan(int left, int top, int right, int bot, int page) {
+    int limit = 20; //max per page
+    int start = (page - 1) * limit; //awal tiap page
+
     // Header Tabel
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
@@ -58,41 +65,59 @@ int renderTabelBahan(int left, int top, int right, int bot, int page) {
     frame(left, top, right, bot);
 
     gotoxy(left + 2, top + 1);
-    printf("%-8s %-25s %-10s %-10s %-10s %-12s",
-    "ID", "Nama Bahan", "Stok", "Min.Stok", "Satuan", "Status");
+    printf("%-4s %-25s %-8s %-8s %-8s %-10s",
+       "No", "Nama Bahan", "Stok", "Min", "Satuan", "Status");;
 
     // Garis
     gotoxy(left + 1, top + 2);
     for (int k = left + 1; k < right; k++) printf("─");
 
     // Loop Data (Paging Logic)
-    int limit = 20; // 20 baris per halaman
-    int startIndex = (page - 1) * limit;
     int y = top + 3;
-    int count = 0;
+    int shown = 0;
+    int no = 0;
 
-    for (int i = startIndex; i < totalBahan; i++) {
-        if (count >= limit) break;
+    // === AKTIF DULU ===
+    for (int i = 0; i < totalBahan; i++) {
+        if (daftarBahan[i].status != 1) continue;
+        no++;
+        if (no <= start) continue;
+        if (shown >= limit) break;
 
-        // Cek Status Stok
-        char status[20];
-        if (daftarBahan[i].stok <= daftarBahan[i].minimal_stok) {
-            strcpy(status, "MENIPIS"); // Warning jika stok sedikit
-        } else {
-            strcpy(status, "AMAN");
-        }
+        char status[10];
+        strcpy(status,
+            daftarBahan[i].stok <= daftarBahan[i].minimal_stok
+            ? "MENIPIS" : "AMAN");
 
-        gotoxy(left + 2, y);
-        printf("%-8s %-25.25s %-10d %-10d %-10s %-12s",
-               daftarBahan[i].id_bahan,
-               daftarBahan[i].nama_bahan,
-               daftarBahan[i].stok,
-               daftarBahan[i].minimal_stok,
-               daftarBahan[i].satuan,
-               status);
+        gotoxy(left + 2, y++);
+        printf("%-4d %-25.25s %-8d %-8d %-8s %-10s",
+            no,
+            daftarBahan[i].nama_bahan,
+            daftarBahan[i].stok,
+            daftarBahan[i].minimal_stok,
+            daftarBahan[i].satuan,
+            status);
 
-        y++;
-        count++;
+        shown++;
+    }
+
+    // === HABIS DI BAWAH ===
+    for (int i = 0; i < totalBahan && shown < limit; i++) {
+        if (daftarBahan[i].status != 0) continue;
+        no++;
+        if (no <= start) continue;
+
+        setRGBColor(210, 212, 200, 0);
+        gotoxy(left + 2, y++);
+        printf("%-4d %-25.25s %-8d %-8d %-8s %-10s",
+            no,
+            daftarBahan[i].nama_bahan,
+            daftarBahan[i].stok,
+            daftarBahan[i].minimal_stok,
+            daftarBahan[i].satuan,
+            "HABIS");
+
+        shown++;
     }
     return totalBahan;
 }
@@ -193,6 +218,7 @@ void tambahBahan() {
     int inputX = left + 18;
 
     generateIDBahan(b.id_bahan);
+    b.status = 1;
 
     while(1) {
         // UI Setup
@@ -281,7 +307,8 @@ void tambahBahan() {
 //         scanf(" %[^\n]", bahan[idx].satuan);
 //     }
 void ubahBahan() {
-    char idTarget[20];
+    // char idTarget[20];  g pake ini
+    int no;
     char buffer[50];
     int left = 30, top = 11, right = 90, bot = 28;
     int inputX = left + 18;
@@ -291,13 +318,14 @@ void ubahBahan() {
         clearArea(27, 9, clearW, clearH);
 
         gotoxy(1, 10); printf("UBAH DATA BAHAN");
-        gotoxy(left, 10); printf("Masukkan ID Bahan : ");
+        gotoxy(left, 10); printf("Masukkan No Bahan : ");
         showcurs();
 
-        if(inputtext(idTarget) == 0) return;
+        if(inputtext(buffer) == 0) return;
+        no = atoi(buffer);
 
-        int idx = cariIndexByID(idTarget);
-        if(idx == -1) { popupAlert(0, "ID Tidak Ditemukan!"); continue; }
+        int idx = getIndexByNoUrut(no);
+        if(idx == -1) { popupAlert(0, "No Tidak Ditemukan!"); continue; }
 
         BahanBaku *b = &daftarBahan[idx];
 
@@ -374,29 +402,30 @@ void ubahBahan() {
 //     jumlah--;
 // }
 void hapusBahan() {
-    char idTarget[20];
+    // char idTarget[20]; g pake ini
+    char buf[20];
+    int no;
     while(1) {
         int clearW = consoleW() - 27; int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
 
         gotoxy(1, 10); printf("HAPUS DATA BAHAN");
-        gotoxy(30, 10); printf("Masukkan ID Bahan : ");
+        gotoxy(30, 10); printf("Masukkan No Bahan : ");
         showcurs();
 
-        if(inputtext(idTarget) == 0) return;
+        if(inputtext(buf) == 0) return;
+        no = atoi(buf);
 
-        int idx = cariIndexByID(idTarget);
-        if(idx == -1) { popupAlert(0,"ID Tidak Ditemukan!"); continue; }
+        int idx = getIndexByNoUrut(no);
+        if(idx == -1) { popupAlert(0,"No Tidak Ditemukan!"); continue; }
 
         // Preview
         gotoxy(30, 12); printf("Bahan  : %s", daftarBahan[idx].nama_bahan);
         gotoxy(30, 13); printf("Stok   : %d %s", daftarBahan[idx].stok, daftarBahan[idx].satuan);
+        gotoxy(30,14);printf("tekan ENTER untuk lanjut..."); getchar();
 
         if(popupConfirm("Yakin Hapus Bahan Ini?")) {
-            for(int i = idx; i < totalBahan - 1; i++) {
-                daftarBahan[i] = daftarBahan[i+1];
-            }
-            totalBahan--;
+            daftarBahan[idx].status = 0;
             saveBahan();
             popupAlert(1,"Bahan Berhasil Dihapus!");
             return;

@@ -83,7 +83,8 @@ typedef struct
 }Pembayaran;
 
 extern Menu daftarMenu[100];
-extern int jumlahMenu;
+int
+jumlahMenu = 0;
 
 BahanBaku daftarBahan[100]; // Array global
 int totalBahan = 0;         // Counter global

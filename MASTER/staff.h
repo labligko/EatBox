@@ -404,24 +404,27 @@ void generateDummyData() {
     // Notifikasi Selesai
     popupAlert(1,"Dummy Data Berhasil Dibuat!");
 }
-void injectbahan()
+void injectBahan()
 {
+    // reset dulu
     totalBahan = 0;
+    memset(daftarBahan, 0, sizeof(daftarBahan));
 
-    // --- 3. DATA DUMMY BAHAN BAKU (20 Bahan) ---
-    // Bahan ini disiapkan untuk mendukung menu di bawah
+    // DATA DUMMY (20 BAHAN)
     char *namaBahan[] = {
         "Beras Premium", "Telur Ayam", "Daging Ayam Fillet", "Daging Sapi Giling", "Bawang Merah",
         "Bawang Putih", "Cabai Rawit", "Minyak Goreng", "Garam Halus", "Gula Pasir",
         "Teh Celup", "Kopi Bubuk Robusta", "Susu UHT Full Cream", "Tepung Terigu", "Kentang Beku",
         "Roti Burger", "Keju Slice", "Saus Tomat", "Kecap Manis", "Air Galon"
     };
+
     char *satuanBahan[] = {
         "Kg", "Butir", "Kg", "Kg", "Kg",
         "Kg", "Kg", "Liter", "Bungkus", "Kg",
         "Kotak", "Kg", "Liter", "Kg", "Kg",
         "Pcs", "Lembar", "Botol", "Botol", "Galon"
     };
+
     int stokAwal[] = {
         50, 100, 20, 10, 5,
         5, 3, 20, 10, 25,
@@ -429,14 +432,22 @@ void injectbahan()
         40, 50, 20, 20, 10
     };
 
-    for (int i = 0; i < 20; i++) {
+    int jumlahDummy = sizeof(stokAwal) / sizeof(int);
+    int max = sizeof(daftarBahan) / sizeof(BahanBaku);
+
+    if (jumlahDummy > max)
+        jumlahDummy = max;
+
+    for (int i = 0; i < jumlahDummy; i++) {
         sprintf(daftarBahan[i].id_bahan, "BB%03d", i + 1);
         strcpy(daftarBahan[i].nama_bahan, namaBahan[i]);
         daftarBahan[i].stok = stokAwal[i];
+        daftarBahan[i].minimal_stok = 5;
         strcpy(daftarBahan[i].satuan, satuanBahan[i]);
-        daftarBahan[i].minimal_stok = 5; // Default minimal stok
+        daftarBahan[i].status = 1;   // AKTIF
         totalBahan++;
     }
+
     saveBahan();
 }
 

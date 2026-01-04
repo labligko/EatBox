@@ -2,11 +2,13 @@
 #define EATBOX_CREATE_H
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>   // isdigit
+#include <stdlib.h>  // atoi
 
 #include "../data.h"
 
 void autoID(char *output, const char *format) {
-    FILE *f = fopen("../FILE/karyawan.dat", "r"); // Mode read text
+    FILE *f = fopen("../FILE/karyawan.dat", "rb+"); // Mode read text
     int max = 0;
     char line[512];
     char tempID[50];

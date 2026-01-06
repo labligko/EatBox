@@ -19,4 +19,6 @@ add_executable(eatBox
         MASTER/menu.h
         MASTER/bahanbaku.h
         MASTER/meja.h
+        TRANSAKSI/pesanan.h
+        TRANSAKSI/pembayaran.h
 )

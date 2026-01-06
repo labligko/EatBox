@@ -284,4 +284,24 @@ void hapusMeja() {
     }
 }
 
+void kosongkanMeja(int no_meja)
+{
+    FILE *f = fopen("../FILE/meja.dat", "rb+");
+    if (!f) return;
+
+    Meja m;
+
+    while (fread(&m, sizeof(Meja), 1, f))
+    {
+        if (m.nomor_meja == no_meja)
+        {
+            m.status = 0; // kosong
+            fseek(f, -sizeof(Meja), SEEK_CUR);
+            fwrite(&m, sizeof(Meja), 1, f);
+            break;
+        }
+    }
+    fclose(f);
+}
+
 #endif //EATBOX_MEJA_H

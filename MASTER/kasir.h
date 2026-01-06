@@ -1,12 +1,63 @@
 #ifndef EATBOX_KASIR_H
 #define EATBOX_KASIR_H
 
+#include <stdio.h>
+#include "../function.h"
+#include "../data.h"
+#include "../TRANSAKSI/pembayaran.h"
+#include "../TRANSAKSI/pesanan.h"
+
+void tambahPesan();
+void selesaiPesan();
+int lihatPesan();
+int pembayaran(char *id_pesan, double total);
+
+char currentKasirID[10];
+char currentKasir[50] = ""; //deklarasi kasir saat ini
+
+int getIDAkunByUsername(const char *username, char *outID)
+{
+    FILE *f = fopen("../FILE/karyawan.dat", "r");
+    if (!f) return 0;
+
+    char line[1024];
+    char f_id[20], f_user[20], f_pass[50], f_nama[50];
+    char f_telp[20], f_email[50], f_role[20], f_alamat[255];
+    int f_stat;
+
+    while (fgets(line, sizeof(line), f))
+    {
+        line[strcspn(line, "\n")] = 0;
+
+        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+               f_id, f_user, f_pass, f_nama, f_telp, f_email, f_role, f_alamat, &f_stat);
+
+        if (strcmp(username, f_user) == 0)
+        {
+            strcpy(outID, f_id);
+            fclose(f);
+            return 1;
+        }
+    }
+
+    fclose(f);
+    return 0;
+}
+
 void kasir(char nama[50])
 {
+    if (!getIDAkunByUsername(nama, currentKasirID))
+    {
+        printf("Akun tidak valid!");
+        getch();
+        return;
+    }
     system("cls");
     applyColors();appname(43, 1);
     garisx(0,8);
     garisy(25,8); // Garis Sidebar
+
+    strcpy(currentKasir, nama); // kasir saat ini berdasarkan login
 
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
     gotoxy(1,20); printf(" [↕] Pilih Menu");
@@ -14,7 +65,7 @@ void kasir(char nama[50])
     int currentView = 0;
 
     char *menuSup[] = {
-        " Data Karyawan", " Cari Karyawan", " Tambah Karyawan", " Ubah Karyawan", " Hapus Karyawan", " Keluar"
+        " Pesanan Baru", " Selesaikan Pesanan", " Keluar"
     };
 
     while(1)
@@ -24,30 +75,47 @@ void kasir(char nama[50])
         clearArea(27, 9, clearW, clearH);
         clearinput(1,10,24);
 
-        int totalData = 0;
+        int totalPesan = 0;
         int maxPage = 1;
+        char tgl[20];
+        formatTanggal(now(), tgl); // ambil tanggal
 
         if (currentView == 0) {
-            dashboard(nama);
+            int left = 28, right = 131, top = 11, bot = 34;
+            gotoxy(60, 10); printf("DATA PESANAN"); //HARI INI
+            gotoxy(80, 10); printf("(%s)", tgl);
+            frame(left, top, right, bot);
+
+            int yhead = top + 1;
+            gotoxy(left+2, yhead);  printf("No");
+            gotoxy(left+6, yhead);  printf("Nama Kasir");
+            gotoxy(left+20, yhead); printf("No. Meja");
+            gotoxy(left+36, yhead); printf("total");
+            gotoxy(left+50, yhead); printf("Status");
+            gotoxy(left+66, yhead); printf("Waktu");
+
+            for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
+
+            int Data = lihatPesan();
         }
         else if (currentView == 1) {
-            totalData = lihatKar(); // Render tabel & dapatkan total data
-            maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
+            totalPesan = lihatPesan(); // Render tabel & dapatkan total data
+            maxPage = (totalPesan == 0) ? 1 : (totalPesan - 1) / 20 + 1;
 
             // Render Footer Paging
             int bot = 34;
             gotoxy(29, bot+1);
             setRGBColor(202, 40, 44, 1);
             setRGBColor(251, 255, 199,0);
-            printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalData);
+            printf("Halaman: %d / %d (Total Pesanan: %d)   [<] Prev  [>] Next", currentPage, maxPage, totalPesan);
         }
 
         // 4. Handle Sidebar Title (Biar balik lagi kalo abis diganti submenu)
         if(currentView == 0) { gotoxy(1,10); printf("Halo, %s", cutname(nama)); }
-        else if(currentView == 1) { gotoxy(1,10); printf("DATA KARYAWAN"); }
+        else if(currentView == 1) { gotoxy(1,10); printf("DATA PESANAN"); gotoxy(72, 10); printf("(%s)", tgl); }
 
         // 5. Menu Select (Program Pauses Here)
-        int pilih = menuSelect(1, 12, menuSup, 6);
+        int pilih = menuSelect(1, 12, menuSup, 3);
 
         // 6. Logic Navigasi
         if (pilih == -1) { // Prev Page (Hanya jika di View Tabel)
@@ -56,33 +124,19 @@ void kasir(char nama[50])
         else if (pilih == -2) { // Next Page (Hanya jika di View Tabel)
             if (currentView == 1 && currentPage < maxPage) currentPage++;
         }
-        else if (pilih == 0) { // DATA KARYAWAN
-            currentView = 1;
-            currentPage = 1;
-        }
-        else if (pilih == 1) { // CARI KARYAWAN
-            detailKar();
+        else if (pilih == 0) { // tambah pesanan
+            tambahPesan();
             // Setelah search selesai, kembalikan tampilan
             currentView = 0; // Atau 1 terserah mau balik kemana
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
-        else if (pilih == 2) { // TAMBAH
-            createKar(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
+        else if (pilih == 1) { // selesaikan status pesanan
+            selesaiPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
             currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
-        else if (pilih == 3) { // UBAH
-            updateKar();
-            currentView = 1;
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
-        }
-        else if (pilih == 4) { // HAPUS
-            hapusKar();
-            currentView = 1;
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
-        }
-        else if (pilih == 5) { // KELUAR
+        else if (pilih == 2) { // KELUAR
             exit(0);
         }
     }

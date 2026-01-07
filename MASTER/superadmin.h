@@ -315,7 +315,7 @@ void updateKar()
         gotoxy(left+17, top+14); printf("%-40s", a.alamat);
 
         // --- KONFIRMASI SIMPAN ---
-        if (popupConfirm("Simpan Perubahan Data Ini?"))
+        if (popupConfirm("Simpan Perubahan Data Ini?", "Ya", "Batal"))
         {
             // User pilih ENTER (Ya)
             if(updateKaryawan(&a)) {
@@ -395,7 +395,7 @@ void hapusKar(){
         gotoxy(30,y++);printf("tekan ENTER untuk lanjut..."); getchar();
 
         // --- KONFIRMASI SIMPAN ---
-        if (popupConfirm("Non-aktifkan karyawan Ini?"))
+        if (popupConfirm("Non-aktifkan karyawan Ini?", "Ya", "Batal"))
         {
             // User pilih ENTER (Ya)
             if(deleteKaryawan(realID)) {

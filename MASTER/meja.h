@@ -89,7 +89,7 @@ void tambahMeja() {
         clearinput(left+2, bot-2, 40);
 
         // SIMPAN
-        if(popupConfirm("Simpan Meja Ini?")) {
+        if(popupConfirm("Simpan Meja Ini?", "Ya", "Batal")) {
             daftarMeja[totalMeja] = m;
             totalMeja++;
             saveMeja();
@@ -225,7 +225,7 @@ void ubahMeja() {
             if (strlen(buffer) > 0) m->keterangan = atoi(buffer);
             gotoxy(left+15, top+8); printf("%d", m->keterangan);
 
-            if(popupConfirm("Simpan Perubahan?")) {
+            if(popupConfirm("Simpan Perubahan?", "Ya", "batal")) {
                 saveMeja();
                 popupAlert(1,"Data Berhasil Diubah!");
                 return;
@@ -277,31 +277,11 @@ void hapusMeja() {
 
     y+=2;gotoxy(left+2,y);printf("tekan ENTER untuk lanjut..."); getchar();
 
-    if (popupConfirm("Nonaktifkan Meja Ini?")) {
+    if (popupConfirm("Nonaktifkan Meja Ini?", "ya", "Batal")) {
         daftarMeja[idx].status = 0; // Rusak
         saveMeja();
         popupAlert(1, "Meja Dinonaktifkan");
     }
-}
-
-void kosongkanMeja(int no_meja)
-{
-    FILE *f = fopen("../FILE/meja.dat", "rb+");
-    if (!f) return;
-
-    Meja m;
-
-    while (fread(&m, sizeof(Meja), 1, f))
-    {
-        if (m.nomor_meja == no_meja)
-        {
-            m.status = 0; // kosong
-            fseek(f, -sizeof(Meja), SEEK_CUR);
-            fwrite(&m, sizeof(Meja), 1, f);
-            break;
-        }
-    }
-    fclose(f);
 }
 
 #endif //EATBOX_MEJA_H

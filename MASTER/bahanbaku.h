@@ -275,7 +275,7 @@ void tambahBahan() {
         } while(1);
 
         // Simpan
-        if(popupConfirm("Simpan Bahan Ini?")) {
+        if(popupConfirm("Simpan Bahan Ini?", "Ya", "Batal")) {
             daftarBahan[totalBahan++] = b;
             saveBahan();
             popupAlert(1,"Bahan Berhasil Ditambahkan!");
@@ -374,7 +374,7 @@ void ubahBahan() {
             if(onlyNum(buffer)) { b->minimal_stok = atoi(buffer); break; }
         } while(1);
 
-        if(popupConfirm("Simpan Perubahan?")) {
+        if(popupConfirm("Simpan Perubahan?", "Ya", "Batal")) {
             saveBahan();
             popupAlert(1,"Data Bahan Diperbarui!");
             return;
@@ -424,7 +424,7 @@ void hapusBahan() {
         gotoxy(30, 13); printf("Stok   : %d %s", daftarBahan[idx].stok, daftarBahan[idx].satuan);
         gotoxy(30,14);printf("tekan ENTER untuk lanjut..."); getchar();
 
-        if(popupConfirm("Yakin Hapus Bahan Ini?")) {
+        if(popupConfirm("Yakin Hapus Bahan Ini?", "Ya", "Batal")) {
             daftarBahan[idx].status = 0;
             saveBahan();
             popupAlert(1,"Bahan Berhasil Dihapus!");

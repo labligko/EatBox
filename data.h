@@ -84,9 +84,10 @@ typedef struct
 {
     char id_pesan[10];   // ORDER NUMBER
     char id_akun[10];    // kasir
+    char id_meja[10];    // ambil data meja nya
     int no_meja;         // 0 = take away
     double total;        // hasil akumulasi detail
-    char status[20];     // OPEN / PAID / DONE
+    char status[20];     // Menunggu Bayar / Lunas / Selesai
     DateTime tanggal;
 }Pesanan;
 

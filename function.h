@@ -470,6 +470,38 @@ int inputName(char input[])
         }
     }
 }
+int inputField(char input[]) {
+    char ch;
+    int i = 0;
+    input[0] = '\0';
+
+    while (1)
+    {
+        ch = _getch();
+
+        if (ch == 27) return 0; // ESC
+
+        if (ch == 13) // ENTER
+        {
+            input[i] = '\0';
+            // Validasi tambahan: Kalau isinya cuma spasi doang, anggap kosong
+            if (i > 0 && input[0] == ' ') return 1;
+            return 1;
+        }
+
+        if (ch == 8) // BACKSPACE
+        {
+            if (i > 0) {
+                i--;
+                printf("\b \b");
+            }
+        }
+        else if (ch >= '0' && ch <= '9' && i < 9) {
+            input[i++] = ch;
+            printf("%c", ch);
+        }
+    }
+}
 
 char *cutname(char nama[])
 {
@@ -678,7 +710,7 @@ void clearArea(int x, int y, int width, int height)
     }
 }
 
-int popupConfirm(char *msg)
+int popupConfirm(char *msg, char *pesan1, char *pesan2)
 {
     //matiin cursor
     CONSOLE_CURSOR_INFO info;
@@ -715,7 +747,7 @@ int popupConfirm(char *msg)
 
     // 5. Cetak Pilihan
     gotoxy(x + 10, y + 4);
-    printf("[ENTER] Ya        [ESC] Batal");
+    printf("[ENTER] %s        [ESC] %s", pesan1, pesan2);
 
     // 6. Logic Input
     while(1) {

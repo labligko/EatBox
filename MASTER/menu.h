@@ -137,7 +137,7 @@ void tambahMenu() {
         } while (1);
 
         // --- 3. KONFIRMASI SIMPAN ---
-        if (popupConfirm("Simpan Menu Ini?")) {
+        if (popupConfirm("Simpan Menu Ini?", "Ya", "Batal")) {
             daftarMenu[jumlahMenu++] = m;
             saveMenu();
             popupAlert(1,"Menu Berhasil Ditambahkan!");
@@ -233,7 +233,7 @@ void ubahMenu() {
         {m->status = (strcmp(buffer, "1") == 0) ? 1 : 0;}
 
         //simpan data
-        if (popupConfirm("Simpan Perubahan Menu?")) {
+        if (popupConfirm("Simpan Perubahan Menu?", "Ya", "Batal")) {
             saveMenu();
             popupAlert(1,"Data Menu Berhasil Diubah!");
             return;
@@ -272,7 +272,7 @@ void hapusMenu() {
             gotoxy(30, 16);printf("tekan ENTER untuk lanjut..."); getchar();
 
             //melakukan konfirmasi
-            if (popupConfirm("Apakah ingin menghapus menu ini?")) {
+            if (popupConfirm("Apakah ingin menghapus menu ini?", "Ya", "Batal")) {
 
                 //menggeser array
                 for (int i = noMenu; i < jumlahMenu - 1; i++) {

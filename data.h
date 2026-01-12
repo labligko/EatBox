@@ -106,7 +106,8 @@ typedef struct
     char id_akun[10];
     DateTime tanggal;
     double jumlah;
-    char metode_bayar[20];
+    double bayar;
+    int metode_bayar;
     char status[20];
 }Pembayaran;
 

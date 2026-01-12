@@ -11,6 +11,7 @@ extern Meja daftarMeja[50];
 extern int totalMeja;
 extern Menu daftarMenu[100];
 extern int jumlahMenu;
+char namaKasir[50];
 
 /* =====================================================
    UTIL
@@ -26,44 +27,6 @@ void autoIDPesan(char *out) {
         fclose(f);
     }
     sprintf(out, "ORD%03d", last + 1);
-}
-
-double getHargaMenu(const char *id) {
-    FILE *f = fopen("../FILE/menu.dat", "rb");
-    Menu m;
-    if (!f) return 0;
-
-    while (fread(&m, sizeof(Menu), 1, f)) {
-        if (strcmp(m.id_menu, id) == 0) {
-            fclose(f);
-            return m.harga;
-        }
-    }
-    fclose(f);
-    return 0;
-}
-
-int getNamaKasir(const char* id, char* outNama)
-{
-    FILE* f = fopen("../FILE/karyawan.dat", "r");
-    if (!f) return 0;
-    char line[512];
-    char fid[20], user[20], pass[50], nama[50];
-    char telp[20], email[50], role[20], alamat[255];
-    int stat;
-    while (fgets(line, sizeof(line), f))
-    {
-        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
-            fid, user, pass, nama, telp, email, role, alamat, &stat);
-        if (strcmp(fid, id) == 0)
-        {
-            strcpy(outNama, nama);
-            fclose(f);
-            return 1;
-        }
-    }
-    fclose(f);
-    return 0;
 }
 
 int findMejaByNomor(int nomor) {
@@ -164,7 +127,7 @@ void tambahPesan() {
     Pesanan p;
     autoIDPesan(p.id_pesan);
     strcpy(p.id_akun, currentKasirID);
-    strcpy(p.status, "Menunggu Pembayaran");
+    strcpy(p.status, "MENUNGGU PEMBAYARAN");
     p.total = 0;
     p.tanggal = now();
     gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
@@ -302,7 +265,7 @@ void tambahPesan() {
     }
     fclose(fr);
 
-    pembayaran(p.id_pesan, p.total);
+    showbayar(p.id_pesan, namaKasir, p.total);
 }
 
 /* =====================================================
@@ -337,18 +300,20 @@ void selesaiPesan()
 
         counter++;
 
-        if (counter == targetNo &&
-            strstr(p.status, "Menunggu") != NULL)
-        {
-            strcpy(p.status, "Selesai");
+        if (counter != targetNo) continue;
 
-            fseek(f, -sizeof(Pesanan), SEEK_CUR);
-            fwrite(&p, sizeof(Pesanan), 1, f);
+        if (strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL)
+            strcpy(p.status, "BATAL");
+        else
+            strcpy(p.status, "PESANAN SELESAI");
 
-            if (strcmp(p.id_meja, "-") != 0)
-                setMeja(p.id_meja, 1); // KOSONG
-            break;
-        }
+        fseek(f, -sizeof(Pesanan), SEEK_CUR);
+        fwrite(&p, sizeof(Pesanan), 1, f);
+
+        if (strcmp(p.id_meja, "-") != 0)
+            setMeja(p.id_meja, 1); // KOSONG
+
+        break;
     }
 
     fclose(f);
@@ -361,7 +326,6 @@ int lihatPesan()
     Pesanan p;
     int total = 0;
     int left = 28, top = 11;
-    char namaKasir[50];
     char jam[10];
     int x = left;
     int y = top + 3;

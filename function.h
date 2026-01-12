@@ -818,4 +818,62 @@ int stringCek(char *mainStr, char *subStr) {
     return 0; // Gak ketemu
 }
 
+int getNamaKasir(const char* id, char* outNama)
+{
+    FILE* f = fopen("../FILE/karyawan.dat", "r");
+    if (!f) return 0;
+    char line[512];
+    char fid[20], user[20], pass[50], nama[50];
+    char telp[20], email[50], role[20], alamat[255];
+    int stat;
+    while (fgets(line, sizeof(line), f))
+    {
+        sscanf(line, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+            fid, user, pass, nama, telp, email, role, alamat, &stat);
+        if (strcmp(fid, id) == 0)
+        {
+            strcpy(outNama, nama);
+            fclose(f);
+            return 1;
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
+int getMenuByID(const char *id, Menu *out)
+{
+    FILE *f = fopen("../FILE/menu.dat", "rb");
+    if (!f) return 0;
+    char line[512];
+
+    Menu m;
+    // while (fread(&m, sizeof(Menu), 1, f)) {
+    //     if (strcmp(m.id_menu, id) == 0) {
+    //         *out = m;
+    //         fclose(f);
+    //         return 1;
+    //     }
+    // }
+    while (fgets(line, sizeof(line), f)) {
+        sscanf(line,
+            "%[^|]|%[^|]|%[^|]|%lf|%[^|]|%d",
+            m.id_menu,
+            m.kategori,
+            m.nama_menu,
+            &m.harga,
+            m.deskripsi,
+            &m.status
+        );
+
+        if (strcmp(m.id_menu, id) == 0) {
+            *out = m;
+            fclose(f);
+            return 1;
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
 #endif //EATBOX_FUNCTION_H

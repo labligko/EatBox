@@ -10,7 +10,6 @@
 void tambahPesan();
 void selesaiPesan();
 int lihatPesan();
-int pembayaran(char *id_pesan, double total);
 
 char currentKasirID[10];
 char currentKasir[50] = ""; //deklarasi kasir saat ini

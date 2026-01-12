@@ -17,7 +17,43 @@ void autoIDBayar(char *out) {
     }
     sprintf(out, "PAY%03d", last + 1);
 }
-void tampilDetailPesanan(const char *idPesan, int xLeft, int yTop)
+void SetMeja(const char *id, int ket)
+{
+    FILE *f = fopen("../FILE/meja.dat", "r");
+    FILE *tmp = fopen("../FILE/meja.tmp", "w");
+
+    Meja m;
+    char line[255];
+
+    while (fgets(line, sizeof(line), f)) {
+        sscanf(line, "%[^|]|%d|%d|%d|%d",
+            m.id_meja,
+            &m.nomor_meja,
+            &m.kapasitas,
+            &m.keterangan,
+            &m.status
+        );
+
+        if (strcmp(m.id_meja, id) == 0) {
+            m.keterangan = ket;
+        }
+
+        fprintf(tmp, "%s|%d|%d|%d|%d\n",
+            m.id_meja,
+            m.nomor_meja,
+            m.kapasitas,
+            m.keterangan,
+            m.status
+        );
+    }
+
+    fclose(f);
+    fclose(tmp);
+
+    remove("../FILE/meja.dat");
+    rename("../FILE/meja.tmp", "../FILE/meja.dat");
+}
+void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yTop)
 {
     FILE *fpDetail = fopen("../FILE/detail_pesanan.dat", "rb");
     FILE *fpPesan  = fopen("../FILE/pesanan.dat", "rb");
@@ -39,33 +75,56 @@ void tampilDetailPesanan(const char *idPesan, int xLeft, int yTop)
         return;
     }
 
-
     // Header tabel
-    printf("DETAIL PESANAN");
+    int headY = yTop;
 
-    printf("-------------------------------");
+    gotoxy(xLeft, headY++); printf("-------------------------------");
+    gotoxy(xLeft, headY++); printf("ID Pesanan : %s", p.id_pesan);
+    gotoxy(xLeft, headY++); printf("Kasir      : %s", kasirName);
+    gotoxy(xLeft, headY++); printf(
+        "Waktu      : %02d-%02d-%04d, %02d:%02d",
+        p.tanggal.hari, p.tanggal.bulan, p.tanggal.tahun,
+        p.tanggal.jam, p.tanggal.menit
+    );
+    gotoxy(xLeft, headY++); printf("Meja       : %d", p.no_meja);
 
-    printf("ID Pesanan : %s", p.id_pesan);
-    printf("Tanggal    : %02d-%02d-%04d", p.tanggal.hari, p.tanggal.bulan, p.tanggal.tahun);
-    printf("Jam        : %02d:%02d", p.tanggal.jam, p.tanggal.menit);
-    printf("Meja       : %d", p.no_meja);
+    /* HEADER DETAIL */
+    headY++; // 🔥 KASIH JEDA 1 BARIS
+    gotoxy(xLeft, headY++); printf("-------------------------------");
+    gotoxy(xLeft, headY++); printf("Nama Menu        Qty   Total");
+    gotoxy(xLeft, headY++); printf("-------------------------------");
 
-
+    /* DETAIL START DI SINI */
+    int detilY = headY;
     DetailPesanan d;
+    Menu m;
 
     fseek(fpDetail, 0, SEEK_SET);
     while (fread(&d, sizeof(DetailPesanan), 1, fpDetail)) {
-        if (strcmp(d.id_pesan, idPesan) == 0) {
-            printf("%-12s %-5d Rp%.0f",d.id_menu, d.jumlah,d.subtotal);
+
+        if (strcmp(d.id_pesan, idPesan) != 0)
+            continue;
+
+        if (!getMenuByID(d.id_menu, &m)) {
+            gotoxy(xLeft, detilY++);
+            printf("[MENU %s TIDAK ADA]", d.id_menu);
+            continue;
         }
+
+        gotoxy(xLeft, detilY++);
+        printf("%-16.16s %-5d Rp%.0f",
+            m.nama_menu,
+            d.jumlah,
+            m.harga
+        );
     }
 }
 
-int pembayaran(char *id_pesan, double total) {
-    int clearW = consoleW() - 27;
-    int clearH = consoleH() - 9;
-    clearArea(27, 9, clearW, clearH);
+int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
     Pembayaran b;
+    int metode;   // 1 = TUNAI, 2 = NON-TUNAI
+    double bayar; // uang yang dibayarkan (khusus tunai)
+    double kembali;
 
     autoIDBayar(b.id_bayar);
     strcpy(b.id_pesan, id_pesan);
@@ -73,21 +132,125 @@ int pembayaran(char *id_pesan, double total) {
     b.tanggal = now();
     b.jumlah = total;
 
-    gotoxy(30,13);
+    int hY=yTop;
+    gotoxy(xLeft,hY++);printf("-------------------------------");
+    gotoxy(xLeft,hY++);
     printf("PEMBAYARAN");
-    gotoxy(30,14);
+    gotoxy(xLeft,hY++);
     printf("ID Bayar    : %s", b.id_bayar);
-    gotoxy(30,15); printf("Metode Bayar: "); showcurs();
-    inputtext(b.metode_bayar);
-    strcpy(b.status, "SUCCESS");
+    gotoxy(xLeft,hY++); printf("Total       : RP%.2f", total);
 
-    printf("Total Bayar : Rp%.0f", total);
+    metode = 0;
+    char buf[5];
 
+    while (1) {
+        gotoxy(xLeft, hY++);
+        printf("Metode Bayar:");
+        gotoxy(xLeft, hY++);
+        printf("1. Tunai");
+        gotoxy(xLeft, hY++);
+        printf("2. Non-Tunai");
+        gotoxy(xLeft, hY++);
+        printf("Pilih (1/2): ");
+        showcurs();
+
+        if (inputField(buf) == 0)
+        {
+            FILE *f = fopen("../FILE/pesanan.dat", "rb+");
+            Pesanan p;
+
+            while (fread(&p, sizeof(Pesanan), 1, f)) {
+                if (strcmp(p.id_pesan, id_pesan) == 0) {
+                    strcpy(p.status, "BATAL");
+                    fseek(f, -sizeof(Pesanan), SEEK_CUR);
+                    fwrite(&p, sizeof(Pesanan), 1, f);
+
+                    if (strcmp(p.id_meja, "-") != 0)
+                        SetMeja(p.id_meja, 1); // KOSONG
+                    break;
+                }
+            }
+            fclose(f);
+            return 0;
+        }
+
+        metode = atoi(buf);
+        if (metode == 1 || metode == 2) break;
+    }
+    b.metode_bayar = metode;
+
+    if (b.metode_bayar == 1) { // TUNAI
+        while (1) {
+            gotoxy(xLeft, hY++);
+            printf("Bayar (Rp): ");
+            if (inputField(buf) == 0) return 0;
+
+            b.bayar = atof(buf);
+            if (b.bayar < total) {
+                gotoxy(xLeft, hY++);
+                printf("Uang kurang!");
+                continue;
+            }
+
+            kembali = b.bayar - total;
+            break;
+        }
+
+        gotoxy(xLeft, hY++);
+        printf("Kembalian : Rp%.0f", kembali);
+        popupAlert(1, "Pebayaran berhasil");
+    }
+    if (b.metode_bayar == 2) {
+        gotoxy(xLeft, hY++);
+        printf("Silakan scan QR...");
+        Sleep(1000);
+
+        gotoxy(xLeft, hY++);
+        printf("Menunggu pembayaran...");
+        Sleep(1500);
+
+        gotoxy(xLeft, hY++);
+        printf("Pembayaran berhasil!");
+        b.bayar = total;
+        kembali = 0;
+        popupAlert(1, "Pebayaran berhasil");
+    }
+    strcpy(b.status, "LUNAS");
+
+    //update data pesanan
+    FILE *fp = fopen("../FILE/pesanan.dat", "rb+");
+    Pesanan p;
+
+    while (fread(&p, sizeof(Pesanan), 1, fp)) {
+        if (strcmp(p.id_pesan, id_pesan) == 0) {
+            strcpy(p.status, "LUNAS");
+            fseek(fp, -sizeof(Pesanan), SEEK_CUR);
+            fwrite(&p, sizeof(Pesanan), 1, fp);
+
+            if (strcmp(p.id_meja, "-") != 0)
+                SetMeja(p.id_meja, 1); // meja jadi KOSONG
+
+            break;
+        }
+    }
+    fclose(fp);
+
+    //update data pembayaran
     FILE *f = fopen("../FILE/pembayaran.dat", "ab");
     fwrite(&b, sizeof(Pembayaran), 1, f);
     fclose(f);
 
     return 1;
+}
+
+void showbayar(char *id_pesan, char *namaKasir, double total)
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
+    tampilDetailPesanan(id_pesan, namaKasir, 30, 10);
+    pembayaran(id_pesan, total, 70, 10);
 }
 
 

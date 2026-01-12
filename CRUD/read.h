@@ -152,6 +152,7 @@ void sortMenuByStatus() {
 
 //membaca data menu ke file
 void loadMenu() {
+    jumlahMenu = 0;
     FILE *file = fopen(FILENAME, "rb");
 
     if (file == NULL) {

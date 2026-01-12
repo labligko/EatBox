@@ -287,7 +287,8 @@ void hapusMenu() {
         }
     }
 
-void detailMenu() {
+void detailMenu()
+{
     char buffer[10];
     int pilihan;
 
@@ -330,85 +331,6 @@ void detailMenu() {
     printf("Tekan tombol apa saja untuk kembali...");
     getch();
 }
-
-// void cariMenu() {
-//     char keyword[100];
-//
-//     int clearW = consoleW() - 27;
-//     int clearH = consoleH() - 9;
-//     clearArea(27, 9, clearW, clearH);   //untuk menghappus satu sisi saja
-//
-//     //untuk judul
-//     gotoxy(1, 10);  printf("CARI DATA MENU");
-//     gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
-//     gotoxy(30, 11); printf("Masukkan Kata Kunci (Nama/Kategori): ");
-//     showcurs();
-//
-//     if (inputtext(keyword) == 0) return;
-//
-//     //frame untuk tabel
-//     int left = 30, top = 13, right = 120, bot = 35;
-//     frame(left, top, right, bot);
-//
-//     int y = top + 1;
-//     setRGBColor(202, 40, 44, 1);
-//     setRGBColor(251, 255, 199,0);
-//     //header tabel
-//     gotoxy(left + 2, y);
-//     printf("%-6s %-15s %-20s %-10s %-25s %-10s",
-//            "ID", "Kategori", "Nama Menu", "Harga", "Deskripsi", "Status");
-//
-//     y++;
-//     gotoxy(left + 1, y);
-//     for (int k = left + 1; k < right; k++) printf("─");
-//     y++; //pindah ke bawah garis
-//
-//     int found = 0;
-//
-//     //data menu
-//     for (int i = 0; i < jumlahMenu; i++) {
-//         if (strstr(daftarMenu[i].nama_menu, keyword) ||
-//             strstr(daftarMenu[i].kategori, keyword)) {
-//
-//             if (y >= bot - 1) break; // batas bawah frame
-//
-//             char desc_short[26];
-//             if (strlen(daftarMenu[i].deskripsi) > 25) {
-//                 strncpy(desc_short, daftarMenu[i].deskripsi, 22);
-//                 desc_short[22] = '\0';
-//                 strcat(desc_short, "...");
-//             } else {
-//                 strcpy(desc_short, daftarMenu[i].deskripsi);
-//             }
-//
-//             gotoxy(left + 2, y);
-//             printf("%-6s %-15s %-20s %10.0lf %-25s %-10s",
-//                    daftarMenu[i].id_menu,
-//                    daftarMenu[i].kategori,
-//                    daftarMenu[i].nama_menu,
-//                    daftarMenu[i].harga,
-//                    desc_short,
-//                    daftarMenu[i].status == 1 ? "Tersedia" : "Habis");;
-//
-//             y++; //ini biar data nya ke print terus ke bawah g di satu tempat numpuk
-//             found++;
-//             }
-//     }
-//
-//     //jika ditidak dapat ditemukan
-//     if (found == 0) {
-//         gotoxy(left + 2, y + 1);
-//         printf("Tidak ada menu yang cocok dengan '%s'.", keyword);
-//     } else {
-//         gotoxy(left, bot + 1);
-//         printf("Ditemukan %d menu.", found);
-//     }
-//
-//     //footer
-//     gotoxy(left, bot + 3);
-//     printf("Tekan sembarang tombol untuk kembali...");
-//     getch();
-// }
 
 void tampilkanTabel(int page) {
         applyColors();

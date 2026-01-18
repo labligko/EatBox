@@ -11,7 +11,10 @@ extern Meja daftarMeja[50];
 extern int totalMeja;
 extern Menu daftarMenu[100];
 extern int jumlahMenu;
+extern char listPesanHariIni[100][15];
+extern int totalPesanHariIni;
 char namaKasir[50];
+
 
 /* =====================================================
    UTIL
@@ -100,7 +103,7 @@ void showMiniMenu(int page) {
     frame(105,y++,131,35);
     gotoxy(107, y++); printf("DAFTAR MENU");
     gotoxy(107, y++); printf("No  Nama        Harga");
-    gotoxy(107, y++); printf("[<] Prev  [>] Next");
+    gotoxy(107, 36); printf("[<] Prev  [>] Next");
 
     int count = 0;
     for (int i = start; i < jumlahMenu && count < 20; i++) {
@@ -287,9 +290,12 @@ void selesaiPesan()
     char buf[10];
     int targetNo;
 
-    gotoxy(left, top);
+    gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(left, top+1);
     printf("No Pesanan: ");
     inputtext(buf);
+
+    if (buf == 0) return;
 
     if (!onlyNum(buf)) return;
     targetNo = atoi(buf);
@@ -309,7 +315,7 @@ void selesaiPesan()
 
         if (counter != targetNo) continue;
 
-        if (strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL)
+        if ((strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL)|| (strstr(p.status, "BATAL") != NULL))
             strcpy(p.status, "BATAL");
         else
             strcpy(p.status, "PESANAN SELESAI");
@@ -336,9 +342,15 @@ int lihatPesan()
     char jam[10];
     int x = left;
     int y = top + 3;
+    totalPesanHariIni = 0; // reset index
     while (fread(&p, sizeof(Pesanan), 1, f))
     {
         if (!hariIni(p.tanggal)) continue;
+
+        // SIMPAN ID PESANAN
+        strcpy(listPesanHariIni[totalPesanHariIni], p.id_pesan);
+        totalPesanHariIni++;
+
         formatJam(p.tanggal, jam); //mengambil data jam
         getNamaKasir(p.id_akun, namaKasir); //mengambil nama kasir
         gotoxy(x+2, y);

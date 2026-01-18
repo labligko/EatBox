@@ -118,6 +118,8 @@ BahanBaku daftarBahan[100]; // Array global
 int totalBahan = 0;         // Counter global
 
 extern char currentKasirID[10];
+char listPesanHariIni[100][15];
+int totalPesanHariIni = 0;
 void formatTanggal(DateTime d, char *out)
 {
     sprintf(out, "%02d/%02d/%04d", d.hari, d.bulan, d.tahun);//print string sampai batas (abaikan buffer)

@@ -10,9 +10,12 @@
 void tambahPesan();
 void selesaiPesan();
 int lihatPesan();
+void detilPesan();
 
 char currentKasirID[10];
 char currentKasir[50] = ""; //deklarasi kasir saat ini
+extern char listPesanHariIni[100][15];
+extern int totalPesanHariIni;
 
 int getIDAkunByUsername(const char *username, char *outID)
 {
@@ -64,7 +67,7 @@ void kasir(char nama[50])
     int currentView = 0;
 
     char *menuSup[] = {
-        " Pesanan Baru", " Selesaikan Pesanan", " Keluar"
+        " Pesanan Baru", " Selesaikan Pesanan", " Detail Pesanan", " Keluar"
     };
 
     while(1)
@@ -95,7 +98,7 @@ void kasir(char nama[50])
 
             for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
 
-            int Data = lihatPesan();
+            lihatPesan();
         }
         else if (currentView == 1) {
             totalPesan = lihatPesan(); // Render tabel & dapatkan total data
@@ -114,7 +117,7 @@ void kasir(char nama[50])
         else if(currentView == 1) { gotoxy(1,10); printf("DATA PESANAN"); gotoxy(72, 10); printf("(%s)", tgl); }
 
         // 5. Menu Select (Program Pauses Here)
-        int pilih = menuSelect(1, 12, menuSup, 3);
+        int pilih = menuSelect(1, 12, menuSup, 4);
 
         // 6. Logic Navigasi
         if (pilih == -1) { // Prev Page (Hanya jika di View Tabel)
@@ -131,15 +134,59 @@ void kasir(char nama[50])
         }
         else if (pilih == 1) { // selesaikan status pesanan
             selesaiPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
-            currentView = 1; // Setelah tambah, tampilkan tabel
+            currentView = 0; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
-        else if (pilih == 2) { // KELUAR
+        else if (pilih == 2)
+        {
+            detilPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
+            currentView = 0; // Setelah tambah, tampilkan tabel
+            // Fix Sidebar (karena createKar pakai sidebar buat helper)
+            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+        }
+        else if (pilih == 3) { // KELUAR
             exit(0);
         }
     }
 }
 
+void tampilkanDeskripsiPesananByNo(int noUrut)
+{
+    if (noUrut < 1 || noUrut > totalPesanHariIni) {
+        gotoxy(30, 36);
+        printf("Nomor tidak valid!");
+        return;
+    }
+
+    char idPesan[15];
+    strcpy(idPesan, listPesanHariIni[noUrut - 1]);
+
+    tampilDetailPesanan(idPesan, namaKasir, 30, 12);
+}
+
+void detilPesan()
+{
+    lihatPesan();
+
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
+    char buf[10];
+    int targetNo;
+
+    gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(left, top+1);
+    printf("No Pesanan: ");
+    inputtext(buf);
+
+    if (!onlyNum(buf)) return;
+    targetNo = atoi(buf);
+    if (targetNo <= 0) return;
+
+    tampilkanDeskripsiPesananByNo(targetNo);
+    getch();
+}
 
 #endif //EATBOX_KASIR_H

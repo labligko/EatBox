@@ -89,9 +89,9 @@ void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yT
     gotoxy(xLeft, headY++); printf("Meja       : %d", p.no_meja);
 
     /* HEADER DETAIL */
-    headY++; // 🔥 KASIH JEDA 1 BARIS
+    headY++; // KASIH JEDA 1 BARIS
     gotoxy(xLeft, headY++); printf("-------------------------------");
-    gotoxy(xLeft, headY++); printf("Nama Menu        Qty   Total");
+    gotoxy(xLeft, headY++); printf("Nama Menu        Qty   Harga");
     gotoxy(xLeft, headY++); printf("-------------------------------");
 
     /* DETAIL START DI SINI */
@@ -200,20 +200,28 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
         printf("Kembalian : Rp%.0f", kembali);
         popupAlert(1, "Pebayaran berhasil");
     }
-    if (b.metode_bayar == 2) {
+    if (b.metode_bayar == 2) { // NON-TUNAI
         gotoxy(xLeft, hY++);
-        printf("Silakan scan QR...");
-        Sleep(1000);
+        printf("[ QR CODE PEMBAYARAN ]");
 
         gotoxy(xLeft, hY++);
+        printf("Scan menggunakan aplikasi e-wallet");
+
+        gotoxy(xLeft, hY++);
+        printf("Kode: %s", b.id_bayar);
+
+        hY++; // jeda
+        gotoxy(xLeft, hY++);
         printf("Menunggu pembayaran...");
-        Sleep(1500);
+        Sleep(5000);
 
         gotoxy(xLeft, hY++);
         printf("Pembayaran berhasil!");
+
         b.bayar = total;
         kembali = 0;
-        popupAlert(1, "Pebayaran berhasil");
+
+        popupAlert(1, "Pembayaran berhasil");
     }
     strcpy(b.status, "LUNAS");
 

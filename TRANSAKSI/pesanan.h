@@ -28,7 +28,6 @@ void autoIDPesan(char *out) {
     }
     sprintf(out, "ORD%03d", last + 1);
 }
-
 int findMejaByNomor(int nomor) {
     for (int i = 0; i < totalMeja; i++)
         if (daftarMeja[i].status == 1 &&
@@ -36,7 +35,6 @@ int findMejaByNomor(int nomor) {
             return i;
     return -1;
 }
-
 void setMeja(const char *id, int ket)
 {
     FILE *f = fopen("../FILE/meja.dat", "r");
@@ -80,14 +78,14 @@ void setMeja(const char *id, int ket)
 void showMiniMeja() {
     loadMeja();
     int y = top + 1;
-    gotoxy(110, y++); printf("DAFTAR MEJA");
-    gotoxy(110, y++); printf("No  Meja  Status");
+    frame(105,y++,131,34);
+    gotoxy(107, y++); printf("DAFTAR MEJA");
+    gotoxy(107, y++); printf("No Meja  Status");
 
     for (int i = 0; i < totalMeja; i++) {
         if (!daftarMeja[i].status) continue;
         gotoxy(110, y++);
-        printf("%-3d %-4d %s",
-            i + 1,
+        printf("%-5d   %s",
             daftarMeja[i].nomor_meja,
             daftarMeja[i].keterangan == 1 ? "Kosong" : "Terisi"
         );
@@ -96,20 +94,25 @@ void showMiniMeja() {
 
 void showMiniMenu(int page) {
     loadMenu();
-    int start = (page - 1) * 10;
+    int start = (page - 1) * 20;
     int y = top + 1;
 
-    gotoxy(110, y++); printf("DAFTAR MENU");
-    gotoxy(110, y++); printf("No  Nama        Harga");
+    frame(105,y++,131,35);
+    gotoxy(107, y++); printf("DAFTAR MENU");
+    gotoxy(107, y++); printf("No  Nama        Harga");
+    gotoxy(107, y++); printf("[<] Prev  [>] Next");
 
-    for (int i = start; i < start + 10 && i < jumlahMenu; i++)
-    {
-        gotoxy(110, y++);
-        printf("%-3d %-10.10s %.0f",
+    int count = 0;
+    for (int i = start; i < jumlahMenu && count < 20; i++) {
+        if (daftarMenu[i].status != 1) continue;
+
+        gotoxy(107, y++);
+        printf("%-3d %-10.10s Rp%.0f",
             i + 1,
             daftarMenu[i].nama_menu,
             daftarMenu[i].harga
         );
+        count++;
     }
 }
 
@@ -174,7 +177,7 @@ void tambahPesan() {
             break;
         }
     }
-    clearArea(110, top+1, 20, totalMeja+2);
+    clearArea(105,top+1,26,34);
 
     FILE *fp = fopen("../FILE/pesanan.dat", "ab");
     fwrite(&p, sizeof(Pesanan), 1, fp);
@@ -193,9 +196,11 @@ void tambahPesan() {
         char buf[10];
         int showSide = 0;
         int msgY = top + 4;
+        int maxPage = (jumlahMenu + 20 - 1) / 20;
 
         strcpy(d.id_pesan, p.id_pesan);
 
+        clearArea(105,top+1,25,35);
         showMiniMenu(page);
         clearinput(left, top + 3, 50);
         gotoxy(left, top + 3);
@@ -205,6 +210,8 @@ void tambahPesan() {
         int res = inputField(buf);
 
         if (res == 0) return;   // ESC batal pesanan
+        if (res == -1 && page > 1) page--;
+        if (res == -2 && page < maxPage) page++;
 
         if (res == 1) {
             clearinput(left, msgY, 40);
@@ -221,7 +228,7 @@ void tambahPesan() {
                 continue;
             }
 
-            int idx = atoi(buf) - 1 + (page - 1) * 10;
+            int idx = atoi(buf) - 1 + (page - 1) * 20;
             if (idx < 0 || idx >= jumlahMenu) {
                 gotoxy(left, msgY);
                 printf("Menu tidak ditemukan!");

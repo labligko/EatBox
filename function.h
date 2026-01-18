@@ -489,6 +489,13 @@ int inputField(char input[]) {
             return 1;
         }
 
+        // panah
+        if (ch == -32 || ch == 224) {
+            ch = _getch();
+            if (ch == 75) return -1; //LEFT
+            if (ch == 77) return -2; //RIGHT
+        }
+
         if (ch == 8) // BACKSPACE
         {
             if (i > 0) {

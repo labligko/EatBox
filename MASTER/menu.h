@@ -2,11 +2,16 @@
 #define EATBOX_MENU_H
 
 #define MAX_MENU 100
+#define MAX_MENU_BAHAN 300
 #define FILENAME "../FILE/menu.dat"
 #define ITEMS_PER_PAGE 10
+#include "bahanBaku.h"
 
 extern Menu daftarMenu[MAX_MENU];
 extern int jumlahMenu;
+//relasi bahan baku
+extern MenuBahan menuBahan[MAX_MENU_BAHAN];
+extern int totalMenuBahan;
 
 // DECLARATION
 void tampilMenuUtama();
@@ -15,10 +20,12 @@ void tampilkanTabel(int page);
 // void cariMenu();
 void detailMenu();
 void tambahMenu();
+void pilihBahanMenu(Menu *m);
 void lihatMenu();
 void ubahMenu();
 void hapusMenu();
 void saveMenu();
+
 
 void saveMenu() {
     FILE *file = fopen(FILENAME, "wb");
@@ -145,6 +152,52 @@ void tambahMenu() {
         }
     }
 }
+void pilihBahanMenu(Menu *m) {
+    int pilihan;
+    char buffer[20];
+    int left = 30, top = 11, right = 105, bot = 35;
+
+    while (1) {
+        clearArea(27, 9, consoleW() - 27, consoleH() - 9);
+        frame(left, top, right, bot);
+
+        gotoxy(left + 3, top + 1);
+        printf("PILIH BAHAN UNTUK MENU");
+
+        tampilBahan();   //perlu tersedia di bahanbaku
+
+        gotoxy(left + 3, top + 1);
+        printf("PILIH BAHAN UNTUK MENU");
+
+        int y = bot - 6;
+        gotoxy(left + 3, y);
+        printf("[0] Selesai");
+
+        if (pilihan == 0) break;
+        if (pilihan == 1) {
+            tambahBahan();
+            continue;
+        }
+
+        if (pilihan < 1 || pilihan > totalBahan) {
+            popupAlert(0, "Pilihan Tidak Valid!");
+            continue;
+        }
+
+        //menyimpan relasi
+        strcpy(menuBahan[totalMenuBahan].id_menu, m->id_menu);
+        strcpy(menuBahan[totalMenuBahan].id_bahan,
+               daftarBahan[pilihan - 1].id_bahan);
+
+        gotoxy(left + 3, y + 5);
+        printf("Jumlah Pemakaian : ");
+        scanf("%s", buffer);
+
+        menuBahan[totalMenuBahan].jumlah = buffer;
+        totalMenuBahan++;
+    }
+}
+
 void ubahMenu() {
     // char idTarget[20]; ganti jadi no urut
     int noMenu;

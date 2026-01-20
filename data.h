@@ -49,15 +49,24 @@ typedef struct
     int status;
 }Karyawan;
 
+typedef struct {
+    char id_menu[10];
+    char id_bahan[10];
+    int jumlah; // pemakaian per 1 menu
+} MenuBahan;
+
 typedef struct
 {
     char id_menu[10];
     char kategori[20];
     char nama_menu[100];
+    char id_bahan[10];
     double harga;
     text deskripsi;
     int keterangan; //buat keterangan tersedia dll
     int status;
+
+    //relasi menu dengan bahan
 }Menu;
 
 typedef struct
@@ -69,6 +78,7 @@ typedef struct
     int minimal_stok;
     int status; // buat status aktif/gk
 }BahanBaku;
+
 
 typedef struct
 {

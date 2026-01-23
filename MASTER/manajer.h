@@ -9,10 +9,18 @@ extern int currentPage;
 #define VIEW_ALL 0
 #define VIEW_BULANAN 1
 #define VIEW_TAHUNAN 2
+#define SORT_NONE 0
+#define SORT_KASIR 1
+#define SORT_TOTAL 2
+#define SORT_TANGGAL 3
 
+int sortMode = SORT_NONE;
 int viewMode = VIEW_ALL;
 int filterBulan = 0;
 int filterTahun = 0;
+
+char keyword[50] = "";
+int searchMode = 0;  // 1 = kasir, 2 = metode
 
 /* =====================================================
    UTIL JOIN PESANAN
@@ -90,6 +98,89 @@ int getPesananByID(const char *id, Pesanan *out)
     fclose(f);
     return 0;
 }
+int cmpKasir(const void *a, const void *b) {
+    Pembayaran *x = (Pembayaran*)a;
+    Pembayaran *y = (Pembayaran*)b;
+
+    Karyawan kx = {0}, ky = {0};
+    getKaryawanByID(x->id_akun, &kx);
+    getKaryawanByID(y->id_akun, &ky);
+
+    return strcmp(kx.nama, ky.nama);
+}
+
+int cmpTotal(const void *a, const void *b) {
+    Pembayaran *x = (Pembayaran*)a;
+    Pembayaran *y = (Pembayaran*)b;
+
+    if (x->jumlah > y->jumlah) return -1;
+    if (x->jumlah < y->jumlah) return 1;
+    return 0;
+}
+
+int cmpTanggal(const void *a, const void *b) {
+    Pembayaran *x = (Pembayaran*)a;
+    Pembayaran *y = (Pembayaran*)b;
+
+    if (x->tanggal.tahun != y->tanggal.tahun)
+        return y->tanggal.tahun - x->tanggal.tahun;
+    if (x->tanggal.bulan != y->tanggal.bulan)
+        return y->tanggal.bulan - x->tanggal.bulan;
+    return y->tanggal.hari - x->tanggal.hari;
+}
+
+int cocokSearch(Pembayaran b) {
+    if (searchMode == 0) return 1;
+
+    if (searchMode == 1) {
+        Karyawan k;
+        if (getKaryawanByID(b.id_akun, &k))
+            return strstr(k.nama, keyword) != NULL;
+    }
+
+    if (searchMode == 2) {
+        return (strcmp(keyword, "TUNAI") == 0 && b.metode_bayar == 1) ||
+               (strcmp(keyword, "NON") == 0 && b.metode_bayar == 2);
+    }
+
+    return 0;
+}
+
+void judulLaporan()
+{
+    char info[100] = "";
+    int x;
+
+    // VIEW MODE
+    if (viewMode == VIEW_ALL){
+        x = 65; strcpy(info, "SEMUA DATA PENJUALAN");
+    }
+    else if (viewMode == VIEW_BULANAN){
+        x = 55; sprintf(info, "LAPORAN BULAN %02d/%d", filterBulan, filterTahun);
+    }
+    else if (viewMode == VIEW_TAHUNAN){
+        x = 60; sprintf(info, "LAPORAN TAHUN %d", filterTahun);
+    }
+
+    // SEARCH MODE
+    if (searchMode == 1){
+        x = 40; sprintf(info + strlen(info), " | HASIL PENCARIAN KASIR \"%s\"", keyword);
+    }
+    else if (searchMode == 2){
+        x = 45; sprintf(info + strlen(info), " | METODE %s", (strcmp(keyword, "1") == 0 ? "TUNAI" : "NON-TUNAI"));
+    }
+
+    // SORT MODE
+    if (sortMode == SORT_KASIR)
+        strcat(info, " | DIURUTKAN KASIR");
+    else if (sortMode == SORT_TOTAL)
+        strcat(info, " | DIURUTKAN TOTAL");
+    else if (sortMode == SORT_TANGGAL)
+        strcat(info, " | DIURUTKAN TANGGAL");
+
+    gotoxy(x, 10);
+    printf("%s", info);
+}
 
 /* =====================================================
    FILTER PEMBAYARAN
@@ -120,44 +211,52 @@ int lihatPesanan()
     FILE *f = fopen("../FILE/pembayaran.dat", "rb");
     if (!f) return 0;
 
-    Pembayaran b;
-    Karyawan k;
+    Pembayaran list[1000];
+    int n = 0;
 
-    int total = 0, shown = 0;
-    int start = (currentPage - 1) * 20;
-
-    int left = 28;
-    int y = 14;
-
-    while (fread(&b, sizeof(Pembayaran), 1, f))
+    while (fread(&list[n], sizeof(Pembayaran), 1, f))
     {
-        if (!cocokFilterBayar(b)) continue;
+        if (!cocokFilterBayar(list[n])) continue;
+        if (!cocokSearch(list[n])) continue;
+        n++;
+    }
+    fclose(f);
 
-        if (total >= start && shown < 20)
-        {
-            char tgl[25];
-            char namaKasir[50] = "-";
+    if (sortMode == SORT_KASIR)
+        qsort(list, n, sizeof(Pembayaran), cmpKasir);
+    else if (sortMode == SORT_TOTAL)
+        qsort(list, n, sizeof(Pembayaran), cmpTotal);
+    else if (sortMode == SORT_TANGGAL)
+        qsort(list, n, sizeof(Pembayaran), cmpTanggal);
 
-            formatTanggalJam(b.tanggal, tgl);
+    int start = (currentPage - 1) * 20;
+    int end = start + 20;
+    if (end > n) end = n;
 
-            if (getKaryawanByID(b.id_akun, &k))
-                strcpy(namaKasir, k.nama);
+    int y = 14;
+    int left = 28;
 
-            gotoxy(left+2,  y); printf("%-3d", total + 1);
-            gotoxy(left+7,  y); printf("%-20s", tgl);
-            gotoxy(left+30, y); printf("%-20s", namaKasir);
-            gotoxy(left+55, y); printf("Rp%.0f", b.jumlah);
-            gotoxy(left+72, y); printf("%s",
-                b.metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
+    for (int i = start; i < end; i++)
+    {
+        char tgl[25];
+        char namaKasir[50] = "-";
+        Karyawan k;
 
-            y++;
-            shown++;
-        }
-        total++;
+        formatTanggalJam(list[i].tanggal, tgl);
+        if (getKaryawanByID(list[i].id_akun, &k))
+            strcpy(namaKasir, k.nama);
+
+        gotoxy(left+2,  y); printf("%-3d", i + 1);
+        gotoxy(left+7,  y); printf("%-20s", tgl);
+        gotoxy(left+30, y); printf("%-20s", namaKasir);
+        gotoxy(left+55, y); printf("Rp%.0f", list[i].jumlah);
+        gotoxy(left+72, y); printf("%s",
+            list[i].metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
+
+        y++;
     }
 
-    fclose(f);
-    return total;
+    return n;
 }
 
 /* =====================================================
@@ -232,6 +331,63 @@ void tahunan()
     viewMode = VIEW_TAHUNAN;
     currentPage = 1;
 }
+void menuUrutkan()
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
+    char *opsi[] = {
+        " Tidak Diurutkan",
+        " Berdasarkan Kasir",
+        " Berdasarkan Total Terbesar",
+        " Berdasarkan Tanggal Terbaru"
+    };
+
+    int p = menuSelect(30, 12, opsi, 4);
+    if (p >= 0) {
+        sortMode = p;
+        currentPage = 1;
+    }
+}
+void menuCari()
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
+    char *opsi[] = {
+        " Nama Kasir",
+        " Metode Bayar",
+        " Reset Pencarian"
+    };
+
+    int p = menuSelect(30, 12, opsi, 3);
+    if (p < 0) return;
+
+    clearArea(27, 9, clearW, clearH);
+    showcurs();
+
+    if (p == 0) {
+        gotoxy(30, 12);
+        printf("Cari Nama Kasir: ");
+        inputField(keyword);
+        searchMode = 1;
+    }
+    else if (p == 1) {
+        gotoxy(30, 12);
+        printf("Metode (1 = TUNAI / 2 = NON-TUNAI): ");
+        inputField(keyword);
+        strupr(keyword);   // <-- penting
+        searchMode = 2;
+    }
+    else {
+        searchMode = 0;
+        keyword[0] = 0;
+    }
+
+    currentPage = 1;
+}
 
 /* =====================================================
    HEADER UI (KEEP)
@@ -266,7 +422,7 @@ void manajer(char nama[50])
     strcpy(currentKasirID, nama);
 
     char *menuSup[] = {
-        " Bulanan", " Tahunan", " Keluar"
+        " Semua Data", " Bulanan", " Tahunan", " Urutkan", " Cari", " Keluar"
     };
 
     while (1)
@@ -275,13 +431,7 @@ void manajer(char nama[50])
         int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
 
-        if (viewMode == VIEW_ALL)
-            gotoxy(60,10), printf("SEMUA DATA PENJUALAN");
-        else if (viewMode == VIEW_BULANAN)
-            gotoxy(55,10), printf("LAPORAN BULAN %02d/%d", filterBulan, filterTahun);
-        else
-            gotoxy(60,10), printf("LAPORAN TAHUN %d", filterTahun);
-
+        judulLaporan();
         headerLaporan();
 
         int totalData = lihatPesanan();
@@ -294,17 +444,23 @@ void manajer(char nama[50])
         gotoxy(1,10); printf("Halo, %s", cutname(nama));
         gotoxy(1,20); printf("[↕] Pilih Menu");
 
-        int pilih = menuSelect(1,12, menuSup, 3);
+        int pilih = menuSelect(1,12, menuSup, 6);
 
         if (pilih == -1 && currentPage > 1)
             currentPage--;
         else if (pilih == -2 && currentPage < maxPage)
             currentPage++;
         else if (pilih == 0)
-            bulanan();
+            viewMode = VIEW_ALL;
         else if (pilih == 1)
-            tahunan();
+            bulanan();
         else if (pilih == 2)
+            tahunan();
+        else if (pilih == 3)
+            menuUrutkan();
+        else if (pilih == 4)
+            menuCari();
+        else if (pilih == 5)
             exit(0);
     }
 }

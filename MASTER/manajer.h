@@ -371,7 +371,7 @@ void menuCari()
     if (p == 0) {
         gotoxy(30, 12);
         printf("Cari Nama Kasir: ");
-        inputField(keyword);
+        inputtext(keyword);
         searchMode = 1;
     }
     else if (p == 1) {

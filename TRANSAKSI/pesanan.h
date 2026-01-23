@@ -293,7 +293,7 @@ void tambahPesan() {
             break;
         }
     }
-    kurangiStokBahan(d.id_menu, d.jumlah);
+
     fclose(fr);
 
     showbayar(p.id_pesan, namaKasir, p.total);

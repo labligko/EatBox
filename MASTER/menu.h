@@ -141,7 +141,8 @@ void tambahMenu() {
             daftarMenu[jumlahMenu++] = m;
             saveMenu();
             popupAlert(1,"Menu Berhasil Ditambahkan!");
-            return; // Keluar setelah simpan
+            kelolaResepMenu(m.id_menu);
+            // return; // Keluar setelah simpan
         }
     }
 }

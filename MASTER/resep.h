@@ -22,11 +22,22 @@ void loadResep() {
     fclose(f);
 }
 
+int cekResepAda(char *id_menu, char *id_bahan)
+{
+    for (int i = 0; i < totalResep; i++)
+        if (strcmp(daftarResep[i].id_menu, id_menu) == 0 &&
+            strcmp(daftarResep[i].id_bahan, id_bahan) == 0)
+            return i;
+    return -1;
+}
+
 void kelolaResepMenu(char *id_menu) {
     char buf[20];
 
     while (1) {
-        clearArea(27, 9, consoleW(), consoleH());
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
         gotoxy(30,10); printf("KELOLA RESEP MENU [%s]", id_menu);
         gotoxy(30,12); printf("Daftar Bahan:");
 
@@ -63,7 +74,12 @@ void kelolaResepMenu(char *id_menu) {
         strcpy(r.id_bahan, daftarBahan[idxBahan].id_bahan);
         r.jumlah = atoi(buf);
 
-        daftarResep[totalResep++] = r;
+        int idx = cekResepAda(id_menu, daftarBahan[idxBahan].id_bahan);
+        if (idx != -1) {
+            daftarResep[idx].jumlah += r.jumlah; // akumulasi
+        } else {
+            daftarResep[totalResep++] = r;
+        }
         saveResep();
 
         if (!popupConfirm("Tambah bahan lain?", "Ya", "Selesai"))
@@ -79,23 +95,43 @@ int cariBahanByID(char *id) {
     return -1;
 }
 
-void kurangiStokBahan(char *id_menu, int qty) {
+void kurangiStokDariPesanan(char *id_pesan)
+{
+    FILE *fpDetail = fopen("../FILE/detail_pesanan.dat", "rb");
+    if (!fpDetail) return;
+
     loadResep();
     loadBahan();
 
-    for (int i = 0; i < totalResep; i++) {
-        if (strcmp(daftarResep[i].id_menu, id_menu) == 0) {
-            int idx = cariBahanByID(daftarResep[i].id_bahan);
-            if (idx != -1) {
-                daftarBahan[idx].stok -= daftarResep[i].jumlah * qty;
-                if (daftarBahan[idx].stok < 0)
-                    daftarBahan[idx].stok = 0;
+    DetailPesanan d;
+
+    while (fread(&d, sizeof(DetailPesanan), 1, fpDetail))
+    {
+        if (strcmp(d.id_pesan, id_pesan) != 0)
+            continue;
+
+        // cari semua resep untuk menu ini
+        for (int i = 0; i < totalResep; i++)
+        {
+            if (strcmp(daftarResep[i].id_menu, d.id_menu) == 0)
+            {
+                int idxBahan = cariBahanByID(daftarResep[i].id_bahan);
+                if (idxBahan != -1)
+                {
+                    int totalPakai =
+                        daftarResep[i].jumlah * d.jumlah;
+
+                    daftarBahan[idxBahan].stok -= totalPakai;
+
+                    if (daftarBahan[idxBahan].stok < 0)
+                        daftarBahan[idxBahan].stok = 0;
+                }
             }
         }
     }
+
+    fclose(fpDetail);
     saveBahan();
 }
-
-
 
 #endif //EATBOX_RESEP_H

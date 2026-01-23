@@ -3,6 +3,7 @@
 
 #include "../function.h"
 #include "../data.h"
+#include "../MASTER/resep.h"
 
 void autoIDBayar(char *out) {
     FILE *f = fopen("../FILE/pembayaran.dat", "rb");
@@ -235,6 +236,8 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
             strcpy(p.status, "LUNAS");
             fseek(fp, -sizeof(Pesanan), SEEK_CUR);
             fwrite(&p, sizeof(Pesanan), 1, fp);
+
+            kurangiStokDariPesanan(id_pesan);
 
             if (strcmp(p.id_meja, "-") != 0)
                 SetMeja(p.id_meja, 1); // meja jadi KOSONG

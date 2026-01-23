@@ -126,7 +126,7 @@ void tambahBahan() {
     BahanBaku b;
     char buffer[50];
     int left = 30, top = 11, right = 90, bot = 28;
-    int inputX = left + 18;
+    int inputX = left + 22;
 
     generateIDBahan(b.id_bahan);
     b.status = 1;
@@ -145,11 +145,11 @@ void tambahBahan() {
 
         // Label
         int y = top + 2;
-        gotoxy(left+3, y);   printf("ID Bahan     : %s", b.id_bahan);
-        y+=2; gotoxy(left+3, y); printf("Nama Bahan   : ");
-        y+=2; gotoxy(left+3, y); printf("Stok Awal    : ");
-        y+=2; gotoxy(left+3, y); printf("Satuan       : ");
-        y+=2; gotoxy(left+3, y); printf("Min. Stok    : ");
+        gotoxy(left+3, y);       printf("ID Bahan         : %s", b.id_bahan);
+        y+=2; gotoxy(left+3, y); printf("Nama Bahan       : ");
+        y+=2; gotoxy(left+3, y); printf("Stok Awal        : ");
+        y+=2; gotoxy(left+3, y); printf("Satuan (g/ml/pcs): ");
+        y+=2; gotoxy(left+3, y); printf("Min. Stok        : ");
 
         // --- INPUT SEQUENTIAL ---
 
@@ -173,7 +173,7 @@ void tambahBahan() {
         do {
             clearinput(inputX, top+8, 15); gotoxy(inputX, top+8); showcurs();
             if(inputtext(b.satuan) == 0) return;
-            if(strlen(b.satuan) > 0) break;
+            if(strlen(b.satuan) > 0 && strcmp(b.satuan, "g")==0 || strcmp(b.satuan, "ml")==0  ||strcmp(b.satuan, "pcs")==0 ) break;
         } while(1);
 
         // 4. Minimal Stok (Alert limit)

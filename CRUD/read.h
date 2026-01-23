@@ -182,7 +182,7 @@ void loadMenu() {
 //tambahan buat penyesuaian
 int dataMenu(int left, int startY, int page)
 {
-    if (jumlahMenu == 0) loadMenu();
+    if (jumlahMenu == 0)    loadMenu();
 
     int limit = 20; // maksimal yang di tampilkan
     int startIndex = (page - 1) * limit;

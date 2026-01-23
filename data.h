@@ -70,6 +70,12 @@ typedef struct
     int status; // buat status aktif/gk
 }BahanBaku;
 
+typedef struct {
+    char id_menu[10];
+    char id_bahan[10];
+    int jumlah; // pemakaian per 1 menu
+} ResepMenu;
+
 typedef struct
 {
     char id_meja[10];
@@ -116,6 +122,9 @@ int jumlahMenu = 0;
 
 BahanBaku daftarBahan[100]; // Array global
 int totalBahan = 0;         // Counter global
+ResepMenu daftarResep[500];
+int totalResep;
+#define FILE_RESEP "../FILE/resep_menu.dat"
 
 extern char currentKasirID[10];
 char listPesanHariIni[100][15];

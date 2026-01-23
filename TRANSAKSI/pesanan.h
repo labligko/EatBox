@@ -74,6 +74,23 @@ void setMeja(const char *id, int ket)
     remove("../FILE/meja.dat");
     rename("../FILE/meja.tmp", "../FILE/meja.dat");
 }
+void resetMejaJikaBedaHari()
+{
+    FILE *f = fopen("../FILE/pesanan.dat", "rb");
+    if (!f) return;
+
+    Pesanan p;
+    while (fread(&p, sizeof(Pesanan), 1, f))
+    {
+        if (p.no_meja > 0 && !hariIni(p.tanggal))
+        {
+            // meja masih terikat pesanan lama
+            if (strcmp(p.id_meja, "-") != 0)
+                setMeja(p.id_meja, 1); // KOSONG
+        }
+    }
+    fclose(f);
+}
 
 /* =====================================================
    UI MINI (TAB)
@@ -123,6 +140,7 @@ void showMiniMenu(int page) {
    TAMBAH PESANAN
 ===================================================== */
 void tambahPesan() {
+    resetMejaJikaBedaHari();
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
     clearArea(27, 9, clearW, clearH);
@@ -315,7 +333,7 @@ void selesaiPesan()
 
         if (counter != targetNo) continue;
 
-        if ((strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL)|| (strstr(p.status, "BATAL") != NULL))
+        if (strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL || strstr(p.status, "BATAL") != NULL)
             strcpy(p.status, "BATAL");
         else
             strcpy(p.status, "PESANAN SELESAI");

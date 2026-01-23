@@ -1,7 +1,10 @@
 #ifndef EATBOX_MANAJER_H
 #define EATBOX_MANAJER_H
 
-int currentPages = 1;
+#include "../function.h"
+#include "../data.h"
+
+extern int currentPage;
 
 #define VIEW_ALL 0
 #define VIEW_BULANAN 1
@@ -11,27 +14,58 @@ int viewMode = VIEW_ALL;
 int filterBulan = 0;
 int filterTahun = 0;
 
-int cocokFilter(Pesanan p)
+/* =====================================================
+   UTIL JOIN PESANAN
+===================================================== */
+int getPesananByID(const char *id, Pesanan *out)
 {
+    FILE *f = fopen("../FILE/pesanan.dat", "rb");
+    if (!f) return 0;
+
+    while (fread(out, sizeof(Pesanan), 1, f))
+    {
+        if (strcmp(out->id_pesan, id) == 0)
+        {
+            fclose(f);
+            return 1;
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
+/* =====================================================
+   FILTER PEMBAYARAN
+===================================================== */
+int cocokFilterBayar(Pembayaran b)
+{
+    if (strcmp(b.status, "LUNAS") != 0)
+        return 0;
+
     if (viewMode == VIEW_ALL)
         return 1;
 
     if (viewMode == VIEW_BULANAN)
-        return p.tanggal.bulan == filterBulan &&
-               p.tanggal.tahun == filterTahun;
+        return b.tanggal.bulan == filterBulan &&
+               b.tanggal.tahun == filterTahun;
 
     if (viewMode == VIEW_TAHUNAN)
-        return p.tanggal.tahun == filterTahun;
+        return b.tanggal.tahun == filterTahun;
 
     return 0;
 }
 
+/* =====================================================
+   VIEW DATA (PAGING)
+===================================================== */
 int lihatPesanan()
 {
-    FILE *f = fopen("FILE/pesanan.dat", "rb");
+    FILE *f = fopen("../FILE/pembayaran.dat", "rb"); // FIX PATH
     if (!f) return 0;
 
+    Pembayaran b;
     Pesanan p;
+
     int total = 0;
     int shown = 0;
     int start = (currentPage - 1) * 20;
@@ -40,20 +74,25 @@ int lihatPesanan()
     int top  = 11;
     int y = top + 3;
 
-    while (fread(&p, sizeof(Pesanan), 1, f))
+    while (fread(&b, sizeof(Pembayaran), 1, f))
     {
-        if (!cocokFilter(p)) continue;
+        if (!cocokFilterBayar(b)) continue;
 
         if (total >= start && shown < 20)
         {
             char jam[6];
-            formatJam(p.tanggal, jam);
+            formatJam(b.tanggal, jam);
 
-            gotoxy(left+2, y);  printf("%-3d", total+1);
-            gotoxy(left+6, y);  printf("%-12s", p.id_akun);
-            gotoxy(left+20, y); printf("%-5d", p.no_meja);
-            gotoxy(left+36, y); printf("Rp%.0f", p.total);
-            gotoxy(left+50, y); printf("%-10s", p.status);
+            int noMeja = 0;
+            if (getPesananByID(b.id_pesan, &p))
+                noMeja = p.no_meja;
+
+            gotoxy(left+2, y);  printf("%-3d", total + 1);
+            gotoxy(left+6, y);  printf("%-12s", b.id_akun);
+            gotoxy(left+20, y); printf("%-5d", noMeja);
+            gotoxy(left+36, y); printf("Rp%.0f", b.jumlah);
+            gotoxy(left+50, y); printf("%-10s",
+                b.metode_bayar == 1 ? "TUNAI" : "NON");
             gotoxy(left+66, y); printf("%s", jam);
 
             y++;
@@ -63,9 +102,12 @@ int lihatPesanan()
     }
 
     fclose(f);
-    return total; // penting buat paging
+    return total;
 }
 
+/* =====================================================
+   FILTER INPUT
+===================================================== */
 void bulanan()
 {
     clearArea(27, 9, consoleW(), consoleH());
@@ -91,6 +133,9 @@ void tahunan()
     currentPage = 1;
 }
 
+/* =====================================================
+   HEADER UI (KEEP)
+===================================================== */
 void headerLaporan()
 {
     int left = 28, right = 131, top = 11, bot = 34;
@@ -100,17 +145,21 @@ void headerLaporan()
     gotoxy(left+6, top+1);  printf("Kasir");
     gotoxy(left+20, top+1); printf("Meja");
     gotoxy(left+36, top+1); printf("Total");
-    gotoxy(left+50, top+1); printf("Status");
+    gotoxy(left+50, top+1); printf("Metode");
     gotoxy(left+66, top+1); printf("Waktu");
 
     for (int x = left+1; x < right; x++)
         gotoxy(x, top+2), printf("─");
 }
 
+/* =====================================================
+   MENU MANAJER
+===================================================== */
 void manajer(char nama[50])
 {
     system("cls");
-    applyColors(); appname(43,1);
+    applyColors();
+    appname(43,1);
 
     garisx(0,8);
     garisy(25,8);
@@ -127,10 +176,6 @@ void manajer(char nama[50])
         int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
 
-        char tgl[20];
-        formatTanggal(now(), tgl);
-
-        // JUDUL
         if (viewMode == VIEW_ALL)
             gotoxy(60,10), printf("SEMUA DATA PENJUALAN");
         else if (viewMode == VIEW_BULANAN)
@@ -140,12 +185,12 @@ void manajer(char nama[50])
 
         headerLaporan();
 
-        int totalPesan = lihatPesan();
-        int maxPage = (totalPesan == 0) ? 1 : (totalPesan - 1) / 20 + 1;
+        int totalData = lihatPesanan();
+        int maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
 
         gotoxy(29,35);
-        printf("Halaman %d / %d | Total: %d   [<] Prev  [>] Next",
-               currentPage, maxPage, totalPesan);
+        printf("Halaman %d / %d | Total Transaksi: %d   [<] Prev  [>] Next",
+               currentPage, maxPage, totalData);
 
         gotoxy(1,10); printf("Halo, %s", cutname(nama));
         gotoxy(1,20); printf("[↕] Pilih Menu");
@@ -165,4 +210,4 @@ void manajer(char nama[50])
     }
 }
 
-#endif //EATBOX_MANAJER_H
+#endif // EATBOX_MANAJER_H

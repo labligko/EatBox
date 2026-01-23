@@ -122,6 +122,7 @@ void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yT
 
 int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
     Pembayaran b;
+    memset(&b, 0, sizeof(Pembayaran)); // Mengisi buffer dengan 0 (membersihkan)
     int metode;   // 1 = TUNAI, 2 = NON-TUNAI
     double bayar; // uang yang dibayarkan (khusus tunai)
     double kembali;

@@ -18,12 +18,12 @@ int renderTabelMenu(int left, int top, int right, int bot) {
     frame(left, top, right, bot);
 
     int yhead = top + 1;
-    gotoxy(left+2, yhead);  printf("ID");
+    gotoxy(left+2, yhead);  printf("No");
     gotoxy(left+10, yhead); printf("Nama Menu");
     gotoxy(left+27, yhead); printf("Kategori");
     gotoxy(left+44, yhead); printf("Harga");
     gotoxy(left+60, yhead); printf("Deskripsi");
-    gotoxy(left+85, yhead); printf("Status");
+    gotoxy(left+85, yhead); printf("Keterangan");
 
     for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
 

@@ -137,5 +137,10 @@ void formatJam(DateTime d, char *out)
 {
     snprintf(out, 6, "%02d:%02d", d.jam, d.menit);//print string sampai batas (abaikan buffer)
 }
+void formatTanggalJam(DateTime d, char *out)
+{
+    sprintf(out, "%02d/%02d/%04d %02d:%02d",
+            d.hari, d.bulan, d.tahun, d.jam, d.menit);
+}
 
 #endif //EATBOX_DATA_H

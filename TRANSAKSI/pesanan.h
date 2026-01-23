@@ -4,6 +4,7 @@
 #include "../function.h"
 #include "../data.h"
 #include "../MASTER/meja.h"
+#include "../MASTER/resep.h"
 
 int left = 30, top = 11;
 
@@ -279,6 +280,7 @@ void tambahPesan() {
         }
     }
     clearArea(110, top+1, 20, jumlahMeja+2);
+    DetailPesanan d;
 
     /* UPDATE TOTAL */
     FILE *fr = fopen("../FILE/pesanan.dat", "rb+");
@@ -291,6 +293,7 @@ void tambahPesan() {
             break;
         }
     }
+    kurangiStokBahan(d.id_menu, d.jumlah);
     fclose(fr);
 
     showbayar(p.id_pesan, namaKasir, p.total);

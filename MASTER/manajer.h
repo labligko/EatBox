@@ -17,6 +17,63 @@ int filterTahun = 0;
 /* =====================================================
    UTIL JOIN PESANAN
 ===================================================== */
+// int getKaryawanByID(const char *id, Karyawan *out)
+// {
+//     FILE *f = fopen("../FILE/karyawan.dat", "rb");
+//     if (!f) return 0;
+//
+//     while (fread(out, sizeof(Karyawan), 1, f))
+//     {
+//         if (strcmp(out->id, id) == 0 && out->status == 1)
+//         {
+//             fclose(f);
+//             return 1;
+//         }
+//     }
+//     fclose(f);
+//     return 0;
+// }
+
+int getKaryawanByID(const char *id, Karyawan *out)
+{
+    FILE *f = fopen("../FILE/karyawan.dat", "r");
+    if (!f) return 0;
+
+    char line[1024];
+    char f_id[20], f_user[20], f_pass[50], f_nama[50];
+    char f_telp[20], f_email[50], f_role[20], f_alamat[255];
+    int f_stat;
+
+    while (fgets(line, sizeof(line), f))
+    {
+        line[strcspn(line, "\n")] = 0;
+
+        sscanf(line,
+            "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d",
+            f_id, f_user, f_pass, f_nama,
+            f_telp, f_email, f_role, f_alamat, &f_stat
+        );
+
+        if (strcmp(f_id, id) == 0 && f_stat == 1)
+        {
+            strcpy(out->id, f_id);
+            strcpy(out->username, f_user);
+            strcpy(out->password, f_pass);
+            strcpy(out->nama, f_nama);
+            strcpy(out->telp, f_telp);
+            strcpy(out->email, f_email);
+            strcpy(out->role, f_role);
+            strcpy(out->alamat, f_alamat);
+            out->status = f_stat;
+
+            fclose(f);
+            return 1;
+        }
+    }
+
+    fclose(f);
+    return 0;
+}
 int getPesananByID(const char *id, Pesanan *out)
 {
     FILE *f = fopen("../FILE/pesanan.dat", "rb");
@@ -60,19 +117,17 @@ int cocokFilterBayar(Pembayaran b)
 ===================================================== */
 int lihatPesanan()
 {
-    FILE *f = fopen("../FILE/pembayaran.dat", "rb"); // FIX PATH
+    FILE *f = fopen("../FILE/pembayaran.dat", "rb");
     if (!f) return 0;
 
     Pembayaran b;
-    Pesanan p;
+    Karyawan k;
 
-    int total = 0;
-    int shown = 0;
+    int total = 0, shown = 0;
     int start = (currentPage - 1) * 20;
 
     int left = 28;
-    int top  = 11;
-    int y = top + 3;
+    int y = 14;
 
     while (fread(&b, sizeof(Pembayaran), 1, f))
     {
@@ -80,20 +135,20 @@ int lihatPesanan()
 
         if (total >= start && shown < 20)
         {
-            char jam[6];
-            formatJam(b.tanggal, jam);
+            char tgl[25];
+            char namaKasir[50] = "-";
 
-            int noMeja = 0;
-            if (getPesananByID(b.id_pesan, &p))
-                noMeja = p.no_meja;
+            formatTanggalJam(b.tanggal, tgl);
 
-            gotoxy(left+2, y);  printf("%-3d", total + 1);
-            gotoxy(left+6, y);  printf("%-12s", b.id_akun);
-            gotoxy(left+20, y); printf("%-5d", noMeja);
-            gotoxy(left+36, y); printf("Rp%.0f", b.jumlah);
-            gotoxy(left+50, y); printf("%-10s",
-                b.metode_bayar == 1 ? "TUNAI" : "NON");
-            gotoxy(left+66, y); printf("%s", jam);
+            if (getKaryawanByID(b.id_akun, &k))
+                strcpy(namaKasir, k.nama);
+
+            gotoxy(left+2,  y); printf("%-3d", total + 1);
+            gotoxy(left+7,  y); printf("%-20s", tgl);
+            gotoxy(left+30, y); printf("%-20s", namaKasir);
+            gotoxy(left+55, y); printf("Rp%.0f", b.jumlah);
+            gotoxy(left+72, y); printf("%s",
+                b.metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
 
             y++;
             shown++;
@@ -110,25 +165,70 @@ int lihatPesanan()
 ===================================================== */
 void bulanan()
 {
-    clearArea(27, 9, consoleW(), consoleH());
+    char bufBulan[5], bufTahun[6];
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
 
+    gotoxy(30, 11); printf("[ESC] Batal   [ENTER] Lanjut");
     gotoxy(30,12); printf("INPUT BULAN (1-12): ");
-    scanf("%d", &filterBulan);
+    showcurs();
+    int r = inputField(bufBulan);
+    if (r == 0) { // ESC
+        return;
+    }
 
-    gotoxy(30,13); printf("INPUT TAHUN: ");
-    scanf("%d", &filterTahun);
+    int bulan = atoi(bufBulan);
+    if (bulan < 1 || bulan > 12) {
+        gotoxy(30,14); printf("Bulan tidak valid!");
+        _getch();
+        return;
+    }
 
+    // INPUT TAHUN
+    gotoxy(30,13); printf("INPUT TAHUN       : ");
+    showcurs();
+    r = inputField(bufTahun);
+    if (r == 0) {
+        return;
+    }
+
+    int tahun = atoi(bufTahun);
+    if (tahun < 2000 || tahun > 2100) {
+        gotoxy(30,14); printf("Tahun tidak valid!");
+        _getch();
+        return;
+    }
+
+    filterBulan = bulan;
+    filterTahun = tahun;
     viewMode = VIEW_BULANAN;
     currentPage = 1;
 }
-
 void tahunan()
 {
-    clearArea(27, 9, consoleW(), consoleH());
+    char bufTahun[6];
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
 
+    gotoxy(30, 11); printf("[ESC] Batal   [ENTER] Lanjut");
     gotoxy(30,12); printf("INPUT TAHUN: ");
-    scanf("%d", &filterTahun);
+    showcurs();
 
+    int r = inputField(bufTahun);
+    if (r == 0) {
+        return;
+    }
+
+    int tahun = atoi(bufTahun);
+    if (tahun < 2000 || tahun > 2100) {
+        gotoxy(30,14); printf("Tahun tidak valid!");
+        _getch();
+        return;
+    }
+
+    filterTahun = tahun;
     viewMode = VIEW_TAHUNAN;
     currentPage = 1;
 }
@@ -141,12 +241,11 @@ void headerLaporan()
     int left = 28, right = 131, top = 11, bot = 34;
     frame(left, top, right, bot);
 
-    gotoxy(left+2, top+1);  printf("No");
-    gotoxy(left+6, top+1);  printf("Kasir");
-    gotoxy(left+20, top+1); printf("Meja");
-    gotoxy(left+36, top+1); printf("Total");
-    gotoxy(left+50, top+1); printf("Metode");
-    gotoxy(left+66, top+1); printf("Waktu");
+    gotoxy(left+2,  top+1); printf("No");
+    gotoxy(left+7,  top+1); printf("Tanggal");
+    gotoxy(left+30, top+1); printf("Kasir");
+    gotoxy(left+55, top+1); printf("Total");
+    gotoxy(left+72, top+1); printf("Metode");
 
     for (int x = left+1; x < right; x++)
         gotoxy(x, top+2), printf("─");

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include "bahanbaku.h"
 #include "../data.h"
 
 void saveResep() {
@@ -69,6 +70,32 @@ void kelolaResepMenu(char *id_menu) {
             break;
     }
 }
+
+int cariBahanByID(char *id) {
+    for (int i = 0; i < totalBahan; i++) {
+        if (strcmp(daftarBahan[i].id_bahan, id) == 0)
+            return i;
+    }
+    return -1;
+}
+
+void kurangiStokBahan(char *id_menu, int qty) {
+    loadResep();
+    loadBahan();
+
+    for (int i = 0; i < totalResep; i++) {
+        if (strcmp(daftarResep[i].id_menu, id_menu) == 0) {
+            int idx = cariBahanByID(daftarResep[i].id_bahan);
+            if (idx != -1) {
+                daftarBahan[idx].stok -= daftarResep[i].jumlah * qty;
+                if (daftarBahan[idx].stok < 0)
+                    daftarBahan[idx].stok = 0;
+            }
+        }
+    }
+    saveBahan();
+}
+
 
 
 #endif //EATBOX_RESEP_H

@@ -7,8 +7,10 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../../../include/master/menu.h"
+#include "../../../include/master/meja.h"
 #include "../../../include/transaksi/pesanan.h"
 #include "../../../include/transaksi/pembayaran.h"
 
@@ -52,7 +54,7 @@ void kasir(char nama[50])
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
     gotoxy(1,20); printf(" [↕] Pilih Menu");
 
-    int currentView = 0;
+    int currentView = 1;
 
     char *menuSup[] = {
         " Pesanan Baru", " Selesaikan Pesanan", " Detail Pesanan", " Keluar"
@@ -70,7 +72,7 @@ void kasir(char nama[50])
         char tgl[20];
         formatTanggal(now(), tgl); // ambil tanggal
 
-        if (currentView == 0) {
+        if (currentView == 1) {
             gotoxy(60,10); printf("DATA PESANAN");
             gotoxy(80,10); printf("(%s)", tgl);
             frame(left, top, right, bot);
@@ -85,10 +87,7 @@ void kasir(char nama[50])
 
             for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
 
-            lihatPesan();
-        }
-        else if (currentView == 1) {
-            totalPesan = lihatPesan();
+            totalPesan = lihatPesan(currentpage);
             maxPage = (totalPesan == 0) ? 1 : (totalPesan - 1) / 20 + 1;
 
             gotoxy(29, bot+1);
@@ -114,19 +113,19 @@ void kasir(char nama[50])
         else if (pilih == 0) { // tambah pesanan
             tambahPesan();
             // Setelah search selesai, kembalikan tampilan
-            currentView = 0; // Atau 1 terserah mau balik kemana
+            currentView = 1; // Atau 1 terserah mau balik kemana
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
         else if (pilih == 1) { // selesaikan status pesanan
             selesaiPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
-            currentView = 0; // Setelah tambah, tampilkan tabel
+            currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
         else if (pilih == 2)
         {
             detilPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
-            currentView = 0; // Setelah tambah, tampilkan tabel
+            currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
@@ -156,7 +155,7 @@ void tampilkanDeskripsiPesananByNo(int noUrut)
 
 void detilPesan()
 {
-    lihatPesan();
+    totalPesanHariIni = loadPesananHariIni();
 
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;

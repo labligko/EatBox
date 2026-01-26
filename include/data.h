@@ -51,7 +51,7 @@ typedef struct {
     char id_menu[10];
     char id_bahan[10];
     int jumlah; // pemakaian per 1 menu
-} ResepMenu;
+}ResepMenu;
 typedef struct
 {
     char id_meja[10];
@@ -128,5 +128,8 @@ extern int searchMode;
 void injectUserUtama();
 void injectDummyKaryawan();
 void injectDummyMeja();
+void injectDummyMenu();
+void injectDummyBahan();
+void injectDummyResep();
 
 #endif //PERAPIHAN_DATA_H

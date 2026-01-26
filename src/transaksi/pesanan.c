@@ -332,17 +332,22 @@ void selesaiPesan()
     fclose(f);
 }
 
-int lihatPesan()
+int lihatPesan(int page)
 {
     FILE* f = fopen(FILE_PESANAN, "rb");
     if (!f) return 0;
+
     Pesanan p;
     int total = 0;
-    int left = 28, top = 11;
-    char jam[10];
-    int x = left;
     int y = top + 3;
-    totalPesanHariIni = 0; // reset index
+    int counter;
+    char jam[10];
+    totalPesanHariIni = 0;
+
+    int itemsPerPage = 20;
+    int startIndex = (page - 1) * itemsPerPage;
+    int endIndex = startIndex + itemsPerPage - 1;
+
     while (fread(&p, sizeof(Pesanan), 1, f))
     {
         if (!hariIni(p.tanggal)) continue;
@@ -351,23 +356,41 @@ int lihatPesan()
         strcpy(listPesanHariIni[totalPesanHariIni], p.id_pesan);
         totalPesanHariIni++;
 
-        formatJam(p.tanggal, jam); //mengambil data jam
-        getNamaKasir(p.id_akun, namaKasir); //mengambil nama kasir
-        gotoxy(x+2, y);
-        printf("%d", total + 1);
-        gotoxy(x + 6, y);
-        printf("%s", namaKasir);
-        gotoxy(x + 20, y);
-        printf("%d", p.no_meja);
-        gotoxy(x + 36, y);
-        printf("%.0f", p.total);
-        gotoxy(x + 50, y);
-        printf("%s", p.status);
-        gotoxy(x + 66, y);
-        printf("%s", jam);
+        // Hanya render data untuk page sekarang
+        if (total >= startIndex && total <= endIndex) {
+            formatJam(p.tanggal, jam);
+            getNamaKasir(p.id_akun, namaKasir);
+
+            gotoxy(left + 2, y); printf("%d", total + 1);
+            gotoxy(left + 6, y); printf("%s", namaKasir);
+            gotoxy(left + 20, y); printf("%d", p.no_meja);
+            gotoxy(left + 36, y); printf("%.0f", p.total);
+            gotoxy(left + 50, y); printf("%s", p.status);
+            gotoxy(left + 66, y); printf("%s", jam);
+            y++;
+            counter++;
+        }
         total++;
-        y++;
     }
+    fclose(f);
+    return total;
+}
+
+int loadPesananHariIni()
+{
+    FILE* f = fopen(FILE_PESANAN, "rb");
+    if (!f) return 0;
+
+    Pesanan p;
+    int total = 0;
+
+    while (fread(&p, sizeof(Pesanan), 1, f))
+    {
+        if (!hariIni(p.tanggal)) continue;
+        strcpy(listPesanHariIni[total], p.id_pesan);
+        total++;
+    }
+
     fclose(f);
     return total;
 }

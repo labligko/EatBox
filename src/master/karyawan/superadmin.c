@@ -852,23 +852,26 @@ int dataKaryawan(int left, int startY, int page)
     return totalData; // Kembalikan jumlah total data agar supadm tau max page nya
 }
 
-void injectDummyKaryawan()
-{
+void injectDummyKaryawan() {
     char *names[] = {
         "Andra Wijaya","Ayunda Risu","Dimas Anggara","Fikri Haikal","Hana Pertiwi",
         "Ilham Saputra","Karin Novilda","Lutfi Halim","Maya Estianty","Nabil Makarim",
         "Raisa Andriana","Satria Baja","Tara Basro","Vania Larissa","Yoga Pratama",
-        "Budi Santoso","Siti Aminah","Reza Rahadian","Dian Sastro","Joko Anwar"
+        "Budi Santoso","Siti Aminah","Reza Rahadian","Dian Sastro","Joko Anwar",
+        "Farel Pratama","Nadia Safira","Kevin Julio","Shinta Bachir","Rizky Febian",
+        "Agnes Monica","Denny Cagur","Citra Kirana","Hafiz Suip","Tasya Kamila"
     };
 
     char *domains[] = {"gmail.com","yahoo.com","outlook.com"};
+
     char *roles[] = {
         "manajer","manajer",
         "staff","staff","staff","staff","staff","staff","staff","staff",
-        "kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir"
+        "kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir","kasir",
+        "staff","staff","kasir","kasir","staff","staff","kasir","kasir","staff","kasir"
     };
 
-    for(int i=0;i<20;i++){
+    for(int i = 0; i < 30; i++){
         Karyawan k = {0};
         char temp[50];
 

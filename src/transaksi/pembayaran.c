@@ -10,7 +10,7 @@
 #include "../../include/transaksi/pembayaran.h"
 
 void autoIDBayar(char *out) {
-    FILE *f = fopen("FILE_PEMBAYARAN", "rb");
+    FILE *f = fopen(FILE_PEMBAYARAN, "rb");
     Pembayaran b;
     int last = 0;
 

@@ -10,6 +10,7 @@ void showMiniMeja();
 void showMiniMenu(int page);
 void tambahPesan();
 void selesaiPesan();
-int lihatPesan();
+int lihatPesan(int page);
+int loadPesananHariIni();
 
 #endif //PERAPIHAN_PESANAN_H

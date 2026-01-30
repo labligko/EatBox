@@ -21,7 +21,7 @@ void generateIDMeja(char *id) {
 }
 int cariMejaNorut(int noUrut) {
     int count = 0;
-    for (int i = 0; i < totalMeja; i++)
+    for (int i = totalMeja - 1; i >= 0; i--)
     {
         if (daftarMeja[i].status != 1) continue;
 
@@ -31,7 +31,7 @@ int cariMejaNorut(int noUrut) {
     return -1;
 }
 int cariMeja(int noMeja) { // Fungsi ini mencari index array berdasarkan Nomor Meja
-    for (int i = 0; i < totalMeja; i++) {
+    for (int i = totalMeja - 1; i >= 0; i--) {
         if (daftarMeja[i].nomor_meja == noMeja) {
             return i; // Ketemu, kembalikan index array-nya
         }
@@ -155,7 +155,7 @@ int renderTabelMeja(int left, int top, int right, int bot, int page) {
     int y;
 
     // === LOOP 1: MEJA AKTIF (Status == 1) ===
-    for (int i = 0; i < totalMeja; i++) {
+    for (int i = totalMeja - 1; i >= 0; i--) {
         if (daftarMeja[i].status != 1) continue; // Skip jika bukan meja aktif
 
         // Logika Pagination
@@ -181,7 +181,7 @@ int renderTabelMeja(int left, int top, int right, int bot, int page) {
 
     // === LOOP 2: MEJA RUSAK (Status == 0) ===
     // Lanjutkan counter 'skipped' dan 'printed' dari loop sebelumnya
-    for (int i = 0; i < totalMeja; i++)
+    for (int i = totalMeja - 1; i >= 0 && printed < limit; i--)
     {
         if (daftarMeja[i].status != 0) continue; // Skip jika bukan meja rusak
 

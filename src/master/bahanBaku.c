@@ -50,12 +50,13 @@ void generateIDBahan(char* output)
 int getIndexByNoUrut(int no)
 {
     int count = 0;
-    for (int i = 0; i < totalBahan; i++)
+    for (int i = totalBahan - 1; i >= 0; i--)
     {
         if (daftarBahan[i].status == 1)
         {
             count++;
-            if (count == no) return i;
+            if (count == no)
+                return i;
         }
     }
     return -1;
@@ -97,7 +98,7 @@ int renderTabelBahan(int left, int top, int right, int bot, int page)
     int no = 0;
 
     // === AKTIF DULU ===
-    for (int i = 0; i < totalBahan; i++)
+    for (int i = totalBahan - 1; i >= 0; i--)
     {
         if (daftarBahan[i].status != 1) continue;
         no++;
@@ -123,7 +124,7 @@ int renderTabelBahan(int left, int top, int right, int bot, int page)
     }
 
     // === HABIS DI BAWAH ===
-    for (int i = 0; i < totalBahan && shown < limit; i++)
+    for (int i = totalBahan - 1; i >= 0 && shown < limit; i--)
     {
         if (daftarBahan[i].status != 0) continue;
         no++;

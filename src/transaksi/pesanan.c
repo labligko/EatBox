@@ -9,6 +9,8 @@
 #include "../../include/transaksi/pembayaran.h"
 #include "../../include/transaksi/pesanan.h"
 
+#include <conio.h>
+
 char namaKasir[50];
 char listPesanHariIni[100][15];
 int totalPesanHariIni;
@@ -295,27 +297,30 @@ void selesaiPesan()
     printf("No Pesanan: ");
     inputtext(buf);
 
-    if (buf == 0) return;
-
     if (!onlyNum(buf)) return;
     targetNo = atoi(buf);
-    if (targetNo <= 0) return;
+
+    if (targetNo <= 0 || targetNo > totalPesanHariIni) {
+        gotoxy(left, top+2);
+        printf("Nomor tidak valid!");
+        getch();
+        return;
+    }
+
+    // 🔥 AMBIL ID PESANAN BERDASARKAN URUTAN NEWEST
+    char targetID[15];
+    strcpy(targetID, listPesanHariIni[targetNo - 1]);
 
     FILE *f = fopen(FILE_PESANAN, "rb+");
     if (!f) return;
 
     Pesanan p;
-    int counter = 0;
-
-    while (fread(&p, sizeof(Pesanan), 1, f) == 1)
+    while (fread(&p, sizeof(Pesanan), 1, f))
     {
-        if (!hariIni(p.tanggal)) continue;
+        if (strcmp(p.id_pesan, targetID) != 0) continue;
 
-        counter++;
-
-        if (counter != targetNo) continue;
-
-        if (strstr(p.status, "MENUNGGU PEMBAYARAN") != NULL || strstr(p.status, "BATAL") != NULL)
+        if (strstr(p.status, "MENUNGGU PEMBAYARAN") ||
+            strstr(p.status, "BATAL"))
             strcpy(p.status, "BATAL");
         else
             strcpy(p.status, "PESANAN SELESAI");
@@ -337,42 +342,45 @@ int lihatPesan(int page)
     FILE* f = fopen(FILE_PESANAN, "rb");
     if (!f) return 0;
 
+    Pesanan list[500];
     Pesanan p;
     int total = 0;
-    int y = top + 3;
-    int counter;
     char jam[10];
+
     totalPesanHariIni = 0;
 
-    int itemsPerPage = 20;
-    int startIndex = (page - 1) * itemsPerPage;
-    int endIndex = startIndex + itemsPerPage - 1;
-
+    // 1️⃣ LOAD SEMUA PESANAN HARI INI
     while (fread(&p, sizeof(Pesanan), 1, f))
     {
         if (!hariIni(p.tanggal)) continue;
-
-        // SIMPAN ID PESANAN
-        strcpy(listPesanHariIni[totalPesanHariIni], p.id_pesan);
-        totalPesanHariIni++;
-
-        // Hanya render data untuk page sekarang
-        if (total >= startIndex && total <= endIndex) {
-            formatJam(p.tanggal, jam);
-            getNamaKasir(p.id_akun, namaKasir);
-
-            gotoxy(left + 2, y); printf("%d", total + 1);
-            gotoxy(left + 6, y); printf("%s", namaKasir);
-            gotoxy(left + 20, y); printf("%d", p.no_meja);
-            gotoxy(left + 36, y); printf("%.0f", p.total);
-            gotoxy(left + 50, y); printf("%s", p.status);
-            gotoxy(left + 66, y); printf("%s", jam);
-            y++;
-            counter++;
-        }
-        total++;
+        list[total++] = p;
     }
     fclose(f);
+
+    int itemsPerPage = 20;
+    int start = (page - 1) * itemsPerPage;
+    int end = start + itemsPerPage;
+
+    int y = top + 3;
+
+    // 2️⃣ RENDER DARI BELAKANG (NEWEST)
+    for (int i = total - 1 - start; i >= 0 && i >= total - end; i--)
+    {
+        formatJam(list[i].tanggal, jam);
+        getNamaKasir(list[i].id_akun, namaKasir);
+
+        strcpy(listPesanHariIni[totalPesanHariIni], list[i].id_pesan);
+        totalPesanHariIni++;
+
+        gotoxy(left + 2, y); printf("%d", totalPesanHariIni);
+        gotoxy(left + 6, y); printf("%s", namaKasir);
+        gotoxy(left + 20, y); printf("%d", list[i].no_meja);
+        gotoxy(left + 36, y); printf("%.0f", list[i].total);
+        gotoxy(left + 50, y); printf("%s", list[i].status);
+        gotoxy(left + 66, y); printf("%s", jam);
+        y++;
+    }
+
     return total;
 }
 

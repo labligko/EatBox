@@ -290,11 +290,7 @@ void updateKar()
         clearinput(left+17, top+11, 30);
         gotoxy(left+17, top+10); printf("%-30s", a.email);
 
-        // 6. Role (Sama kayak sebelumnya)
-        clearinput(left+17, top+12, 20); gotoxy(left+17, top+12);
-        if (inputtext(buffer) == 0) return;
-        if (strlen(buffer) > 0 && cekrole(buffer)) strcpy(a.role, buffer);
-        gotoxy(left+17, top+12); printf("%-20s", a.role);
+        // 6. Role (tidak bisa dirubah)
 
         // 7. Alamat
         clearinput(left+17, top+14, 40); gotoxy(left+17, top+14);
@@ -378,16 +374,21 @@ void hapusKar(){
         if (popupConfirm("Non-aktifkan karyawan Ini?", "Ya", "Batal"))
         {
             // User pilih ENTER (Ya)
-            if(deleteKaryawan(realID)) {
+            int res = deleteKaryawan(realID);
+            if (res == -1) {
+                popupAlert(0, "SUPERADMIN tidak bisa dinonaktifkan!");
+                return;
+            }
+            if(res == 1) {
                 setRGBColor(202, 40, 44, 1);
                 setRGBColor(251, 255, 199,0);
                 gotoxy(30, 13); printf("Mengubah Data No %d (ID: %s)...", noUrut, realID);
                 Sleep(500);
                 popupAlert(1,"Status Berhasil Diubah!");
                 return; // Keluar dari menu update
-            } else {
-                popupAlert(0,"Gagal mengubah data!");
             }
+            else
+                popupAlert(0,"Gagal mengubah data!");
         }
         else
         { clearArea(27, 9, clearW, clearH); }
@@ -687,10 +688,22 @@ int finID(int targetNo, char *destID){
         total++;
     fclose(f);
 
-    for (int i=0;i<total-1;i++)
-        for (int j=0;j<total-i-1;j++)
-            if (list[j].status < list[j+1].status) //Sorting
-                temp=list[j], list[j]=list[j+1], list[j+1]=temp;
+    for (int i = 0; i < total - 1; i++) {
+        for (int j = 0; j < total - i - 1; j++) {
+
+            // 1. Prioritas status (aktif dulu)
+            if (list[j].status < list[j+1].status ||
+
+                // 2. Kalau status sama, urutkan berdasarkan ID (baru dulu)
+                (list[j].status == list[j+1].status &&
+                 list[j].id < list[j+1].id)
+            ) {
+                temp = list[j];
+                list[j] = list[j+1];
+                list[j+1] = temp;
+            }
+        }
+    }
 
     if (targetNo < 1 || targetNo > total) return 0;
     strcpy(destID, list[targetNo-1].id);
@@ -804,6 +817,11 @@ int deleteKaryawan(char idTarget[])
     while (fread(&k, sizeof(Karyawan), 1, f))
     {
         if (strcmp(k.id, idTarget) == 0) {
+            if (strcmp(k.role, "superadmin") == 0) {
+                fclose(f);
+                return -1; // kode khusus: superadmin dilindungi
+            }
+
             k.status = 0;
             fseek(f, -sizeof(Karyawan), SEEK_CUR);
             fwrite(&k, sizeof(Karyawan), 1, f);
@@ -857,7 +875,14 @@ int dataKaryawan(int left, int startY, int page)
     // 2. SORT AKTIF DI ATAS
     for (int i = 0; i < totalData - 1; i++) {
         for (int j = 0; j < totalData - i - 1; j++) {
-            if (list[j].status < list[j+1].status) {
+
+            // 1. Prioritas status (aktif dulu)
+            if (list[j].status < list[j+1].status ||
+
+                // 2. Kalau status sama, urutkan berdasarkan ID (baru dulu)
+                (list[j].status == list[j+1].status &&
+                 list[j].id < list[j+1].id)
+            ) {
                 temp = list[j];
                 list[j] = list[j+1];
                 list[j+1] = temp;

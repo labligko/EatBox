@@ -130,7 +130,7 @@ void kasir(char nama[50])
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
         else if (pilih == 3) { // KELUAR
-            exit(0);
+            return;
         }
     }
 }

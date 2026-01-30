@@ -6,6 +6,7 @@
 #include "../../../include/data.h"
 #include "../../../include/function.h"
 #include "../../../include/master/karyawan/superadmin.h"
+#include "../../../include/login.h"
 
 #define KEY_F2 60
 
@@ -62,10 +63,11 @@ void createKar()
             else if (strlen(a.username) < 4) { //Minimal 4 huruf biar gak kependekan
                 gotoxy(left+17, top+3); printf("Minimal 4 karakter!");
             }
-            else if (isDuplicate("username", a.username, "")) { // CEK DUPLIKAT
-                gotoxy(left+17, top+3); printf("Nama pengguna sudah dipakai!");
+            if (isDuplicate("username", a.username, "")) { // CEK DUPLIKAT
+                gotoxy(left+17, top+3); printf("Nama pengguna sudah dipakai!"); continue;
             }
-        } while (strlen(a.username) == 0);
+            break;
+        } while (1);
         clearinput(left+17, top+3, 40);
 
         // 2. PASSWORD
@@ -187,15 +189,19 @@ void updateKar()
         formEdit(&a);
 
         // 1. Username
-        clearinput(left+17, top+2, 35); gotoxy(left+17, top+2); showcurs();
-        if (inputusname(buffer) == 0) return;
-        if (strlen(buffer) > 0) strcpy(a.username, buffer);
-        if (strlen(buffer) < 4) {
-            gotoxy(left+17, top+3); printf("Minimal 4 karakter!");
-        }
-        // CEK DUPLIKAT (a.id sebagai pengecualian)
-        else if (isDuplicate("username", buffer, a.id)) {
-            gotoxy(left+17, top+3); printf("Nama pengguna sudah dipakai!");
+        while (1)
+        {
+            clearinput(left+17, top+2, 35); gotoxy(left+17, top+2); showcurs();
+            if (inputusname(buffer) == 0) return;
+            if (strlen(buffer) > 0) strcpy(a.username, buffer);
+            if (strlen(buffer) < 4) {
+                gotoxy(left+17, top+3); printf("Minimal 4 karakter!");
+            }
+            // CEK DUPLIKAT (a.id sebagai pengecualian)
+            if (isDuplicate("username", buffer, a.id)) {
+                gotoxy(left+17, top+3); printf("Nama pengguna sudah dipakai!"); continue;
+            }
+            break;
         }
         gotoxy(left+17, top+2); printf("%-35s", a.username);
         clearinput(left+17, top+3, 40);
@@ -523,10 +529,43 @@ void supadm(char nama[50]){
     garisx(0,8);
     garisy(25,8); // Garis Sidebar
 
+    char *menuSup[] = {
+        " Kelola Karyawan", " Keluar"
+    };
+
+    while(1)
+    {
+        int clearW = consoleW() - 27;
+        int clearH = consoleH() - 9;
+        clearArea(27, 9, clearW, clearH);
+        gotoxy(1,10); printf("Halo, %s", cutname(nama));
+        gotoxy(1,20); printf(" [↕] Pilih Menu");
+
+        dashboard(nama);
+
+        int pilih = menuSelect(1, 12, menuSup, 2);
+
+        if (pilih == 0) { // KELOLA DATA KARYAWAN
+            kelolaKar(nama);
+            currentpage = 1;
+        }
+        else if (pilih == 1) { // LOGOUT
+            return;
+        }
+    }
+}
+
+void kelolaKar(char *nama)
+{
+    system("cls");
+    applyColors();appname(43, 1);
+    garisx(0,8);
+    garisy(25,8); // Garis Sidebar
+
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
     gotoxy(1,20); printf(" [↕] Pilih Menu");
 
-    int currentView = 0;
+    int currentView = 1;
 
     char *menuSup[] = {
         " Data Karyawan", " Detail Karyawan", " Tambah Karyawan", " Ubah Karyawan", " Hapus Karyawan", " Keluar"
@@ -542,10 +581,7 @@ void supadm(char nama[50]){
         int totalData = 0;
         int maxPage = 1;
 
-        if (currentView == 0) {
-            dashboard(nama);
-        }
-        else if (currentView == 1) {
+        if (currentView == 1) {
             totalData = lihatKar(); // Render tabel & dapatkan total data
             maxPage = (totalData == 0) ? 1 : (totalData - 1) / 20 + 1;
 
@@ -598,7 +634,8 @@ void supadm(char nama[50]){
             clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
         }
         else if (pilih == 5) { // KELUAR
-            exit(0);
+            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            return;
         }
     }
 }

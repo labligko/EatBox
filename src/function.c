@@ -260,7 +260,7 @@ int inputusname(char input[])
     {
         ch = _getch(); // buat baca input langsung dari keyboard
 
-        if (ch == 27)return 0;
+        if (ch == 27) exit(0);
 
         if (ch == 13) // baca input ketika ENTER
         {
@@ -662,7 +662,7 @@ int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
 }
 
 void resetColor() {
-    printf("\x1b[0m");
+    printf("\x1b[0m"); //Reset semua atribut tampilan ke default.
 }
 void showcurs()
 {

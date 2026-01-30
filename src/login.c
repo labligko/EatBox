@@ -36,9 +36,10 @@ int cekLogin(const char *nama, const char *pass, char *role)
     return 0;
 }
 
-void login(char nama[50], char pass[50])
+int login(char nama[50])
 {
-    char role[50] = "";
+    char pass[50], role[50];
+    system("cls"); applyColors();
 
     appname(43, 2);
     garisx(0, 10);
@@ -81,14 +82,17 @@ void login(char nama[50], char pass[50])
         gotoxy(42, 21); printf("Nama Pengguna\t: ");
         gotoxy(42, 22); printf("Kata Sandi\t: ");
 
-        gotoxy(58, 21); fflush(stdin); inputusname(nama);
-        gotoxy(58, 22); fflush(stdin); inputpasslog(pass, 42, 22, "Kata Sandi");
+        gotoxy(58, 21); fflush(stdin); showcurs(); inputusname(nama);
+        gotoxy(58, 22); fflush(stdin); showcurs(); inputpasslog(pass, 42, 22, "Kata Sandi");
 
         // if (strcmp(nama, "superadmin") == 0 && strcmp(pass, "superadmin") == 0) {supadm(nama); break;}
         int statusLogin = cekLogin(nama, pass, role);
 
         if (statusLogin == 1) {
-            break; // Login Sukses
+            if (strcmp(role,"superadmin")==0) return 1;
+            if (strcmp(role,"staff")==0) return 2;
+            if (strcmp(role,"manajer")==0) return 3;
+            if (strcmp(role,"kasir")==0) return 4;
         }
         else if (statusLogin == -1) {
             gotoxy(53, 27);
@@ -101,8 +105,4 @@ void login(char nama[50], char pass[50])
             Sleep(1000);
         }
     }
-    if (strcmp(role, "superadmin") == 0){supadm(nama);}
-    else if (strcmp(role, "staff") == 0){staff(nama);}
-    else if (strcmp(role, "manajer") == 0){manajer(nama);}
-    else if (strcmp(role, "kasir") == 0){kasir(nama);}
 }

@@ -8,6 +8,7 @@ void detailKar();
 int lihatKar();
 void dashboard(char *nama);
 void supadm(char nama[50]);
+void kelolaKar(char *nama);
 void formEdit(Karyawan *a);
 int finID(int targetNo, char *destID);
 int gantiPass(char *passAwal);

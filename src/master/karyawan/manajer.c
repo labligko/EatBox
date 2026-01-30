@@ -421,6 +421,6 @@ void manajer(char nama[50])
         else if (pilih == 4)
             menuCari();
         else if (pilih == 5)
-            exit(0);
+            return;
     }
 }

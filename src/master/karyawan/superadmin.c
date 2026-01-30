@@ -155,7 +155,7 @@ void updateKar()
         char inputNoStr[10];
         char realID[20]; // Ini buat nampung ID asli (KY00..)
 
-        gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
+        gotoxy(left, top-1); printf(" [ESC] Kembali    [ENTER] Lanjut");
         gotoxy(1,10); printf("UBAH DATA KARYAWAN");
         gotoxy(30,11);printf("Masukkan No. Urut: "); showcurs();
 
@@ -330,7 +330,7 @@ void hapusKar(){
         char inputNoStr[10];
         char realID[20];
 
-        gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
+        gotoxy(left, top-1); printf(" [ESC] Kembali    [ENTER] Lanjut");
         gotoxy(1,10); printf("HAPUS DATA KARYAWAN ");
         gotoxy(30,12); printf("Masukkan No. Urut : ");
 
@@ -405,7 +405,7 @@ void detailKar(){
         // --- 2. INPUT NOMOR URUT ---
 
         gotoxy(1, 10);  printf("DETAIL DATA KARYAWAN");
-        gotoxy(30, 10); printf("[ESC] Kembali");
+        gotoxy(left, top-1); printf(" [ESC] Kembali    [ENTER] Lanjut");
         gotoxy(30, 12); printf("Masukkan No. Urut (Dari Tabel): ");
 
         inputtext(inputNoStr);
@@ -593,11 +593,10 @@ void kelolaKar(char *nama)
             setRGBColor(202, 40, 44, 1);
             setRGBColor(251, 255, 199,0);
             printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentpage, maxPage, totalData);
-        }
 
-        // 4. Handle Sidebar Title (Biar balik lagi kalo abis diganti submenu)
-        if(currentView == 0) { gotoxy(1,10); printf("Halo, %s", cutname(nama)); }
-        else if(currentView == 1) { gotoxy(1,10); printf("DATA KARYAWAN"); }
+            gotoxy(1,10); printf("Halo, %s", cutname(nama));
+            gotoxy(1,10); printf("DATA KARYAWAN");
+        }
 
         // 5. Menu Select (Program Pauses Here)
         int pilih = menuSelect(1, 12, menuSup, 6);
@@ -616,7 +615,7 @@ void kelolaKar(char *nama)
         else if (pilih == 1) { // CARI KARYAWAN
             detailKar();
             // Setelah search selesai, kembalikan tampilan
-            currentView = 0; // Atau 1 terserah mau balik kemana
+            currentView = 1; // Atau 1 terserah mau balik kemana
             clearArea(1, 10, 24, 30);
             gotoxy(1,20); printf(" [↕]      Pilih Menu");
             gotoxy(1,21); printf(" [ENTER]  Lanjut");
@@ -660,7 +659,7 @@ void formEdit(Karyawan *a)
 
     gotoxy(1,10); printf("UBAH DATA KARYAWAN  ");
     clearinput(left, top-1, 40);
-    gotoxy(left, top-1); printf(" [ESC] Batal   [ENTER] Lewati/Lanjut");
+    gotoxy(left, top-1); printf(" [ESC] Kembali   [ENTER] Lewati/Lanjut");
 
     int y = top + 2;
 

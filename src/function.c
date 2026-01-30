@@ -260,7 +260,7 @@ int inputusname(char input[])
     {
         ch = _getch(); // buat baca input langsung dari keyboard
 
-        if (ch == 27) exit(0);
+        if (ch == 27) return 0;
 
         if (ch == 13) // baca input ketika ENTER
         {

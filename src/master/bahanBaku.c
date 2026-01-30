@@ -273,7 +273,9 @@ void ubahBahan()
 
         gotoxy(1, 10);
         printf("UBAH DATA BAHAN");
-        gotoxy(left, 10);
+        gotoxy(left, top - 1);
+        printf(" [ESC] Batal   [ENTER] Lanjut");
+        gotoxy(30, 11);
         printf("Masukkan No Bahan : ");
         showcurs();
 
@@ -391,7 +393,9 @@ void hapusBahan()
 
         gotoxy(1, 10);
         printf("HAPUS DATA BAHAN");
-        gotoxy(30, 10);
+        gotoxy(left, top - 1);
+        printf(" [ESC] Batal   [ENTER] Lanjut");
+        gotoxy(30, 11);
         printf("Masukkan No Bahan : ");
         showcurs();
 

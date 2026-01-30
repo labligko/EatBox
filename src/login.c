@@ -82,7 +82,7 @@ int login(char nama[50])
         gotoxy(42, 21); printf("Nama Pengguna\t: ");
         gotoxy(42, 22); printf("Kata Sandi\t: ");
 
-        gotoxy(58, 21); fflush(stdin); showcurs(); inputusname(nama);
+        gotoxy(58, 21); fflush(stdin); showcurs(); if (inputusname(nama) ==0) exit(0);
         gotoxy(58, 22); fflush(stdin); showcurs(); inputpasslog(pass, 42, 22, "Kata Sandi");
 
         // if (strcmp(nama, "superadmin") == 0 && strcmp(pass, "superadmin") == 0) {supadm(nama); break;}

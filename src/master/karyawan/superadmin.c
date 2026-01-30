@@ -539,7 +539,8 @@ void supadm(char nama[50]){
         int clearH = consoleH() - 9;
         clearArea(27, 9, clearW, clearH);
         gotoxy(1,10); printf("Halo, %s", cutname(nama));
-        gotoxy(1,20); printf(" [↕] Pilih Menu");
+        gotoxy(1,20); printf(" [↕]      Pilih Menu");
+        gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
         dashboard(nama);
 
@@ -563,7 +564,8 @@ void kelolaKar(char *nama)
     garisy(25,8); // Garis Sidebar
 
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
-    gotoxy(1,20); printf(" [↕] Pilih Menu");
+    gotoxy(1,20); printf(" [↕]      Pilih Menu");
+    gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
     int currentView = 1;
 
@@ -615,26 +617,36 @@ void kelolaKar(char *nama)
             detailKar();
             // Setelah search selesai, kembalikan tampilan
             currentView = 0; // Atau 1 terserah mau balik kemana
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 2) { // TAMBAH
             createKar(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
             currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 3) { // UBAH
             updateKar();
             currentView = 1;
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 4) { // HAPUS
             hapusKar();
             currentView = 1;
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 5) { // KELUAR
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
             return;
         }
     }

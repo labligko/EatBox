@@ -147,7 +147,8 @@ void showMenu(char nama[50])
         // --- SIDEBAR HEADER ---
         clearinput(1,10,24);clearinput(1,12,24);
         gotoxy(1,10); printf("KELOLA MENU     ");
-        gotoxy(1,20); printf(" [↕] Pilih Menu");
+        gotoxy(1,20); printf(" [↕]      Pilih Menu");
+        gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
         // --- Menu Select ---
         int pilih = menuSelect(1, 12, opsiMenu, 6);
@@ -226,7 +227,8 @@ void showBahan(char nama[50])
         // SIDEBAR
         clearinput(1,10,24);
         gotoxy(1,10); printf("KELOLA BAHAN    "); // Judul disesuaikan
-        gotoxy(1,20); printf(" [↕] Pilih Menu");
+        gotoxy(1,20); printf(" [↕]      Pilih Menu");
+        gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
         // MENU SELECT
         int pilih = menuSelect(1, 12, opsiMenu, 5);
@@ -297,7 +299,8 @@ void showMeja(char nama[50])
         // SIDEBAR
         clearinput(1,10,24);
         gotoxy(1,10); printf("KELOLA MEJA     ");
-        gotoxy(1,20); printf(" [↕] Pilih Menu");
+        gotoxy(1,20); printf(" [↕]      Pilih Menu");
+        gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
         // MENU SELECT
         int pilih = menuSelect(1, 12, opsiMenu, 5);

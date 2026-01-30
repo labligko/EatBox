@@ -402,7 +402,8 @@ void manajer(char nama[50])
                currentpage, maxPage, totalData);
 
         gotoxy(1,10); printf("Halo, %s", cutname(nama));
-        gotoxy(1,20); printf("[↕] Pilih Menu");
+        gotoxy(1,20); printf(" [↕]      Pilih Menu");
+        gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
         int pilih = menuSelect(1,12, menuSup, 6);
 

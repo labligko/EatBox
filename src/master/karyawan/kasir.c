@@ -52,7 +52,8 @@ void kasir(char nama[50])
     strcpy(currentKasir, nama); // kasir saat ini berdasarkan login
 
     gotoxy(1,10); printf("Halo, %s", cutname(nama));
-    gotoxy(1,20); printf(" [↕] Pilih Menu");
+    gotoxy(1,20); printf(" [↕]      Pilih Menu");
+    gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
     int currentView = 1;
 
@@ -114,20 +115,26 @@ void kasir(char nama[50])
             tambahPesan();
             // Setelah search selesai, kembalikan tampilan
             currentView = 1; // Atau 1 terserah mau balik kemana
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 1) { // selesaikan status pesanan
             selesaiPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
             currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 2)
         {
             detilPesan(); // Masuk ke fungsi create, loop didalamnya, lalu return kesini
             currentView = 1; // Setelah tambah, tampilkan tabel
             // Fix Sidebar (karena createKar pakai sidebar buat helper)
-            clearArea(1, 10, 24, 30); gotoxy(1,20); printf(" [↕] Pilih Menu");
+            clearArea(1, 10, 24, 30);
+            gotoxy(1,20); printf(" [↕]      Pilih Menu");
+            gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 3) { // KELUAR
             return;

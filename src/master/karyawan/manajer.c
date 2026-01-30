@@ -422,6 +422,7 @@ void manajer(char nama[50])
         else if (pilih == 4)
             menuCari();
         else if (pilih == 5)
-            return;
+            if (popupConfirm("Apakah anda yakin ingin keluar?", "Ya", "Tidak"))
+                return;
     }
 }

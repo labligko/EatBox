@@ -137,7 +137,8 @@ void kasir(char nama[50])
             gotoxy(1,21); printf(" [ENTER]  Lanjut");
         }
         else if (pilih == 3) { // KELUAR
-            return;
+            if (popupConfirm("Apakah anda yakin ingin keluar?", "Ya", "Tidak"))
+                return;
         }
     }
 }

@@ -81,7 +81,8 @@ void staff(char nama[50])
             showMeja(nama);
         }
         else if (pilih == 3) {
-            return;
+            if (popupConfirm("Apakah anda yakin ingin keluar?", "Ya", "Tidak"))
+                return;
         }
     }
 }

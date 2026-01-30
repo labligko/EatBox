@@ -551,7 +551,8 @@ void supadm(char nama[50]){
             currentpage = 1;
         }
         else if (pilih == 1) { // LOGOUT
-            return;
+            if (popupConfirm("Apakah anda yakin ingin keluar?", "Ya", "Tidak"))
+                return;
         }
     }
 }

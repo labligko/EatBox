@@ -162,19 +162,21 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
 
     if (b.metode_bayar == 1) { // TUNAI
         while (1) {
-            gotoxy(xLeft, hY++); printf("Bayar (Rp): ");
+            clearinput(xLeft+10,hY,20);
+            gotoxy(xLeft, hY); printf("Bayar (Rp): ");
             if (inputField(buf) == 0) return 0;
 
             b.bayar = atof(buf);
             if (b.bayar < total) {
-                gotoxy(xLeft, hY++); printf("Uang kurang!");
+                gotoxy(xLeft, hY+1); printf("Uang kurang!");
                 continue;
             }
 
             kembali = b.bayar - total;
             break;
         }
-        gotoxy(xLeft, hY++); printf("Kembalian : Rp%.0f", kembali);
+        clearinput(xLeft, hY+1,20);
+        gotoxy(xLeft, hY+1); printf("Kembalian : Rp%.0f", kembali); Sleep(1000);
         popupAlert(1, "Pebayaran berhasil");
     }
     if (b.metode_bayar == 2) { // NON-TUNAI

@@ -13,7 +13,7 @@ int totalResep;
 
 void saveResep() {
     FILE *f = fopen(FILE_RESEP, "wb");
-    if (!f) return;
+    if (!f) { totalResep = 0; return;}
     fwrite(&totalResep, sizeof(int), 1, f);
     fwrite(daftarResep, sizeof(ResepMenu), totalResep, f);
     fclose(f);
@@ -36,6 +36,8 @@ int cekResepAda(char *id_menu, char *id_bahan)
 }
 void kelolaResepMenu(char *id_menu) {
     char buf[20];
+    loadResep();
+    loadBahan();
 
     while (1) {
         int clearW = consoleW() - 27;

@@ -6,6 +6,8 @@
 #include "../../include/data.h"
 #include "../../include/function.h"
 #include "../../include/master/menu.h"
+
+#include "../../include/master/bahanBaku.h"
 #include "../../include/master/resep.h"
 
 Menu daftarMenu[MAX_MENU];
@@ -262,6 +264,8 @@ void detailMenu()
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
     clearArea(27, 9, clearW, clearH);
+    loadResep();
+    loadBahan();
 
     gotoxy(1, 10);  printf("DETAIL MENU");
     gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
@@ -293,6 +297,34 @@ void detailMenu()
     y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %.0lf", m.harga);
     y += 2; gotoxy(left + 2, y); printf("Deskripsi : %s", m.deskripsi);
     y += 2; gotoxy(left + 2, y); printf("Status    : %s", m.status ? "Tersedia" : "Habis");
+
+    frame(right + 1,top, right+25, bot);
+    int yres = top +2;
+    gotoxy(right + 3, top+1); printf("RESEP MENU");
+    yres++;
+
+    int adaResep = 0;
+
+    for (int i = 0; i < totalResep; i++) {
+        if (strcmp(daftarResep[i].id_menu, m.id_menu) == 0) {
+            int idxBahan = cariBahanByID(daftarResep[i].id_bahan);
+            if (idxBahan != -1) {
+                gotoxy(right + 3, yres);
+                printf("- %s : %d %s",
+                    daftarBahan[idxBahan].nama_bahan,
+                    daftarResep[i].jumlah,
+                    daftarBahan[idxBahan].satuan
+                );
+                yres++;
+                adaResep = 1;
+            }
+        }
+    }
+
+    if (!adaResep) {
+        gotoxy(right + 3, yres);
+        printf("(Belum ada resep)");
+    }
 
     gotoxy(left + 2, bot - 2);
     printf("Tekan tombol apa saja untuk kembali...");

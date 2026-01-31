@@ -883,3 +883,33 @@ int getMenuByID(const char *id, Menu *out) {
     fclose(f);
     return 0;
 }
+
+char* formatHarga(double harga) {
+    static char result[30];
+    char temp[30];
+    long long angka = (long long) harga;
+
+    int i = 0, j = 0, count = 0;
+
+    if (angka == 0) {
+        strcpy(result, "0");
+        return result;
+    }
+
+    while (angka > 0) {
+        if (count == 3) {
+            temp[i++] = '.';
+            count = 0;
+        }
+        temp[i++] = (angka % 10) + '0';
+        angka /= 10;
+        count++;
+    }
+
+    for (int k = i - 1; k >= 0; k--) {
+        result[j++] = temp[k];
+    }
+    result[j] = '\0';
+
+    return result;
+}

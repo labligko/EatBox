@@ -99,20 +99,20 @@ void showMiniMenu(int page) {
     int start = (page - 1) * 20;
     int y = top + 1;
 
-    frame(105,y++,131,35);
-    gotoxy(107, y++); printf("DAFTAR MENU");
-    gotoxy(107, y++); printf("No  Nama        Harga");
-    gotoxy(107, 36); printf("[<] Prev  [>] Next");
+    frame(90,y++,131,35);
+    gotoxy(92, y++); printf("DAFTAR MENU");
+    gotoxy(92, y++); printf("No  Nama \t\t\t Harga");
+    gotoxy(92, 36); printf("[<] Prev  [>] Next");
 
     int count = 0;
     for (int i = start; i < hitungMenuAktif() && count < 20; i++) {
         if (daftarMenu[i].status != 1) continue;
 
-        gotoxy(107, y++);
-        printf("%-3d %-10.10s Rp%.0f",
+        gotoxy(92, y++);
+        printf("%-3d %-24.24s Rp %6s",
             i + 1,
             daftarMenu[i].nama_menu,
-            daftarMenu[i].harga
+            formatHarga(daftarMenu[i].harga)
         );
         count++;
     }
@@ -133,7 +133,7 @@ void tambahPesan() {
     Pesanan p;
     autoIDPesan(p.id_pesan);
     strcpy(p.id_akun, currentKasirID);
-    strcpy(p.status, "MENUNGGU PEMBAYARAN");
+    strcpy(p.status, "BATAL");
     p.total = 0;
     p.tanggal = now();
     gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
@@ -203,7 +203,7 @@ void tambahPesan() {
 
         strcpy(d.id_pesan, p.id_pesan);
 
-        clearArea(105,top+1,25,35);
+        clearArea(90,top+1,42,35);
         showMiniMenu(page);
         clearinput(left, top + 3, 50);
         gotoxy(left, top + 3);

@@ -163,7 +163,12 @@ void tampilkanDeskripsiPesananByNo(int noUrut)
 
 void detilPesan()
 {
-    totalPesanHariIni = loadPesananHariIni();
+    if (totalPesanHariIni <= 0) {
+        gotoxy(left, top+2);
+        printf("Tidak ada pesanan hari ini!");
+        getch();
+        return;
+    }
 
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
@@ -172,14 +177,41 @@ void detilPesan()
     char buf[10];
     int targetNo;
 
-    gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
-    gotoxy(left, top+1);printf("No Pesanan: ");
+    gotoxy(left, top);   printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(left, top+1); printf("No Pesanan: ");
     inputtext(buf);
 
     if (!onlyNum(buf)) return;
     targetNo = atoi(buf);
-    if (targetNo <= 0) return;
+
+    if (targetNo < 1 || targetNo > totalPesanHariIni) {
+        gotoxy(left, top+2);
+        printf("Nomor tidak valid!");
+        getch();
+        return;
+    }
+
+    char targetID[15];
+    strcpy(targetID, listPesanHariIni[targetNo - 1]);
+
+    Pesanan p;
+    double totalPesanan = 0;
+
+    FILE *f = fopen(FILE_PESANAN, "rb");
+    if (!f) return;
+
+    while (fread(&p, sizeof(Pesanan), 1, f)) {
+        if (strcmp(p.id_pesan, targetID) == 0) {
+            totalPesanan = p.total;
+            break;
+        }
+    }
+    fclose(f);
+
+    char totalStr[30];
+    formatHarga(totalPesanan, totalStr);
 
     tampilkanDeskripsiPesananByNo(targetNo);
+    gotoxy(30, 16); printf("Total      : Rp %s", totalStr);
     getch();
 }

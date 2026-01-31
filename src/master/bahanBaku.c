@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+char stok[30], minstok[30], sat[30];
 
 // ================= file HANDLING =================
 void saveBahan()
@@ -85,8 +86,8 @@ int renderTabelBahan(int left, int top, int right, int bot, int page)
     frame(left, top, right, bot);
 
     gotoxy(left + 2, top + 1);
-    printf("%-4s %-25s %-8s %-8s %-8s %-10s",
-           "No", "Nama Bahan", "Stok", "Min", "Satuan", "Status");;
+    printf("%-4s %-25s %9s %9s %-8s %-10s",
+           "No", "Nama Bahan", "Stok", "Min", " Satuan", "Status");
 
     // Garis
     gotoxy(left + 1, top + 2);
@@ -111,12 +112,14 @@ int renderTabelBahan(int left, int top, int right, int bot, int page)
                    ? "MENIPIS"
                    : "AMAN");
 
+        formatHarga(daftarBahan[i].stok, stok);
+        formatHarga(daftarBahan[i].minimal_stok, minstok);
         gotoxy(left + 2, y++);
-        printf("%-4d %-25.25s %-8d %-8d %-8s %-10s",
+        printf("%-4d %-25.25s %9s %9s %5s    %-10s",
                no,
                daftarBahan[i].nama_bahan,
-               daftarBahan[i].stok,
-               daftarBahan[i].minimal_stok,
+               stok,
+               minstok,
                daftarBahan[i].satuan,
                status);
 
@@ -130,13 +133,16 @@ int renderTabelBahan(int left, int top, int right, int bot, int page)
         no++;
         if (no <= start) continue;
 
+        formatHarga(daftarBahan[i].stok, stok);
+        formatHarga(daftarBahan[i].minimal_stok, minstok);
+
         setRGBColor(210, 212, 200, 0);
         gotoxy(left + 2, y++);
-        printf("%-4d %-25.25s %-8d %-8d %-8s %-10s",
+        printf("%-4d %-25.25s %9s %9s %5s    %-10s",
                no,
                daftarBahan[i].nama_bahan,
-               daftarBahan[i].stok,
-               daftarBahan[i].minimal_stok,
+               stok,
+               minstok,
                daftarBahan[i].satuan,
                "HABIS");
 
@@ -302,6 +308,9 @@ void ubahBahan()
         gotoxy(left, top - 1);
         printf(" [ESC] Batal   [ENTER] Lewati/Tetap");
 
+        formatHarga(b->stok, stok);
+        formatHarga(b->minimal_stok, minstok);
+
         int y = top + 2;
         // Tampilkan Data Lama
         gotoxy(left + 3, y);
@@ -311,13 +320,13 @@ void ubahBahan()
         printf("Nama Bahan   : %s", b->nama_bahan);
         y += 2;
         gotoxy(left + 3, y);
-        printf("Stok Saat Ini: %d", b->stok);
+        printf("Stok Saat Ini: %s", stok);
         y += 2;
         gotoxy(left + 3, y);
         printf("Satuan       : %s", b->satuan);
         y += 2;
         gotoxy(left + 3, y);
-        printf("Min. Stok    : %d", b->minimal_stok);
+        printf("Min. Stok    : %s", minstok);
 
         // EDIT NAMA
         clearinput(inputX, top + 4, 30);
@@ -410,11 +419,13 @@ void hapusBahan()
             continue;
         }
 
+        formatHarga(daftarBahan[idx].stok, stok);
+
         // Preview
         gotoxy(30, 12);
         printf("Bahan  : %s", daftarBahan[idx].nama_bahan);
         gotoxy(30, 13);
-        printf("Stok   : %d %s", daftarBahan[idx].stok, daftarBahan[idx].satuan);
+        printf("Stok   : %s %s", stok, daftarBahan[idx].satuan);
         gotoxy(30, 14);
         printf("tekan ENTER untuk lanjut...");
         getchar();

@@ -366,11 +366,14 @@ void tampilkanTabel(int page) {
                 strcpy(desc_short, daftarMenu[i].deskripsi);
             }
 
-            printf("| %-4s | %-16s | %-22s | %8.0lf | %-23s | %-10s |\n",
+            char hargaMenu[30];
+            formatHarga(daftarMenu[i].harga, hargaMenu);
+
+            printf("| %-4s | %-16s | %-22s | %6s | %-23s | %-10s |\n",
                    i+1,
                    daftarMenu[i].kategori,
                    daftarMenu[i].nama_menu,
-                   daftarMenu[i].harga,
+                   hargaMenu,
                    desc_short,
                    statusTxt);
         }
@@ -477,13 +480,15 @@ int dataMenu(int left, int startY, int page)
         if (daftarMenu[i].status != 1) setRGBColor(210, 212, 200, 0);
 
         int y = startY + printedCount;
+        char hargaMenu[30];
+        formatHarga(daftarMenu[i].harga, hargaMenu);
 
         // Cetak pakai gotoxy (Sesuaikan koordinat X dengan showMenu kamu)
         // gotoxy(left+2, y);  printf("%s", daftarMenu[i].id_menu);
         gotoxy(left+2, y);  printf("%d", i+1);
         gotoxy(left+10, y); printf("%-15.15s", daftarMenu[i].nama_menu); // Nama Menu
         gotoxy(left+27, y); printf("%-15.15s", daftarMenu[i].kategori);  // Kategori
-        gotoxy(left+44, y); printf("Rp %-10.0lf", daftarMenu[i].harga);   // Harga
+        gotoxy(left+44, y); printf("Rp %6s", hargaMenu);   // Harga
         gotoxy(left+60, y); printf("%-20.20s", desc_short);              // Deskripsi
         gotoxy(left+85, y); printf("%s", (daftarMenu[i].status == 1 ? "Tersedia" : "Habis")); // Status
 

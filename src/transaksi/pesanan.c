@@ -144,6 +144,8 @@ void showMiniMenu(int page) {
     loadMenu();
     int start = (page - 1) * 20;
     int y = top + 1;
+    char hargaLM[30];
+
 
     frame(90,y++,131,35);
     gotoxy(92, y++); printf("DAFTAR MENU");
@@ -154,11 +156,12 @@ void showMiniMenu(int page) {
     for (int i = start; i < hitungMenuAktif() && count < 20; i++) {
         if (daftarMenu[i].status != 1) continue;
 
+        formatHarga(daftarMenu[i].harga, hargaLM);
         gotoxy(92, y++);
         printf("%-3d %-24.24s Rp %6s",
             i + 1,
             daftarMenu[i].nama_menu,
-            formatHarga(daftarMenu[i].harga)
+            hargaLM
         );
         count++;
     }
@@ -246,6 +249,7 @@ void tambahPesan() {
     while (1) {
         clearArea(left, top+3, clearW-left, clearH);
         DetailPesanan d;
+        memset(&d, 0, sizeof(DetailPesanan));
         char buf[10];
         int showSide = 0;
         int msgY = top + 4;
@@ -295,8 +299,7 @@ void tambahPesan() {
             if (!onlyNum(buf)) continue;
 
             d.jumlah = atoi(buf);
-            double harga = daftarMenu[idx].harga;
-            d.subtotal = d.jumlah * harga;
+            d.subtotal = d.jumlah * daftarMenu[idx].harga;
             p.total += d.subtotal;
 
             FILE *fd = fopen(FILE_DETAIL, "ab");
@@ -449,5 +452,15 @@ int loadPesananHariIni()
     }
 
     fclose(f);
+
+    // 🔥 BALIK URUTAN: OLDEST → NEWEST
+    for (int i = 0; i < total / 2; i++)
+    {
+        char tmp[15];
+        strcpy(tmp, listPesanHariIni[i]);
+        strcpy(listPesanHariIni[i], listPesanHariIni[total - 1 - i]);
+        strcpy(listPesanHariIni[total - 1 - i], tmp);
+    }
+
     return total;
 }

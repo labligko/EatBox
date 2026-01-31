@@ -68,6 +68,6 @@ int stringCek(char *mainStr, char *subStr);
 int getNamaKasir(const char* id, char* outNama);
 int getMenuByID(const char *id, Menu *out);
 
-char* formatHarga(double harga);
+void formatHarga(double harga, char *result);
 
 #endif //PERAPIHAN_FUNCTION_H

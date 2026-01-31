@@ -9,5 +9,6 @@ void detilPesan();
 extern char currentKasir[50]; //deklarasi kasir saat ini
 extern char listPesanHariIni[100][15];
 extern int totalPesanHariIni;
+extern Pesanan pesanHariIni[500];
 
 #endif //PERAPIHAN_KASIR_H

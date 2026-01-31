@@ -884,8 +884,7 @@ int getMenuByID(const char *id, Menu *out) {
     return 0;
 }
 
-char* formatHarga(double harga) {
-    static char result[30];
+void formatHarga(double harga, char *result) {
     char temp[30];
     long long angka = (long long) harga;
 
@@ -893,7 +892,7 @@ char* formatHarga(double harga) {
 
     if (angka == 0) {
         strcpy(result, "0");
-        return result;
+        return;
     }
 
     while (angka > 0) {
@@ -910,6 +909,4 @@ char* formatHarga(double harga) {
         result[j++] = temp[k];
     }
     result[j] = '\0';
-
-    return result;
 }

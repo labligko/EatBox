@@ -68,7 +68,7 @@ void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yT
     // Header tabel
     int headY = yTop;
 
-    gotoxy(xLeft, headY++); printf("-------------------------------");
+    gotoxy(xLeft, headY++); printf("------------------------------------------------------");
     gotoxy(xLeft, headY++); printf("ID Pesanan : %s", p.id_pesan);
     gotoxy(xLeft, headY++); printf("Kasir      : %s", kasirName);
     gotoxy(xLeft, headY++); printf(
@@ -80,9 +80,9 @@ void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yT
 
     /* HEADER DETAIL */
     headY++; // KASIH JEDA 1 BARIS
-    gotoxy(xLeft, headY++); printf("-------------------------------");
-    gotoxy(xLeft, headY++); printf("Nama Menu        Qty   Harga");
-    gotoxy(xLeft, headY++); printf("-------------------------------");
+    gotoxy(xLeft, headY++); printf("-----------------------------------------------------");
+    gotoxy(xLeft, headY++); printf("Nama Menu   \t   Harga      Qty   Subtotal");
+    gotoxy(xLeft, headY++); printf("-----------------------------------------------------");
 
     /* DETAIL START DI SINI */
     int detilY = headY;
@@ -100,8 +100,13 @@ void tampilDetailPesanan(const char *idPesan, char *kasirName, int xLeft, int yT
             continue;
         }
 
+        char hargaStr[30], subStr[30];
+
+        formatHarga(m.harga, hargaStr);
+        formatHarga(d.subtotal, subStr);
+
         gotoxy(xLeft, detilY++);
-        printf("%-16.16s %-5d Rp%.0f", m.nama_menu, d.jumlah, m.harga);
+        printf("%-20.20s Rp %6s   %-4d Rp %8s", m.nama_menu, hargaStr, d.jumlah, subStr);
     }
     fclose(fpDetail);
     fclose(fpPesan);
@@ -112,6 +117,7 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
     memset(&b, 0, sizeof(Pembayaran)); // Mengisi buffer dengan 0 (membersihkan)
     int metode;   // 1 = TUNAI, 2 = NON-TUNAI
     double kembali;
+    char totbayar[30];
 
     autoIDBayar(b.id_bayar);
     strcpy(b.id_pesan, id_pesan);
@@ -119,11 +125,17 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
     b.tanggal = now();
     b.jumlah = total;
 
+    formatHarga(total, totbayar);
+
     int hY=yTop;
-    gotoxy(xLeft,hY++); printf("-------------------------------");
+    gotoxy(xLeft-1,hY++); printf("--------------------------------");
     gotoxy(xLeft,hY++); printf("PEMBAYARAN");
     gotoxy(xLeft,hY++); printf("ID Bayar    : %s", b.id_bayar);
-    gotoxy(xLeft,hY++); printf("Total       : RP%.2f", total);
+    gotoxy(xLeft,hY++); printf("Total       : RP %8s", totbayar);
+    for (int i = yTop+1; i < bot; i++)
+    {
+        gotoxy(xLeft-2, i); printf("|");
+    }
 
     metode = 0;
     char buf[5];
@@ -230,5 +242,5 @@ void showbayar(char *id_pesan, char *namaKasir, double total)
     clearArea(27, 9, clearW, clearH);
 
     tampilDetailPesanan(id_pesan, namaKasir, 30, 10);
-    pembayaran(id_pesan, total, 70, 10);
+    pembayaran(id_pesan, total, 85, 10);
 }

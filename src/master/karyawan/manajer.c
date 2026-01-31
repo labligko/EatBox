@@ -99,8 +99,10 @@ int cocokSearch(Pembayaran b) {
     }
 
     if (searchMode == 2) {
-        return (strcmp(keyword, "TUNAI") == 0 && b.metode_bayar == 1) ||
-               (strcmp(keyword, "NON") == 0 && b.metode_bayar == 2);
+        if (strcmp(keyword, "1") == 0)
+            return b.metode_bayar == 1;
+        if (strcmp(keyword, "2") == 0)
+            return b.metode_bayar == 2;
     }
 
     return 0;
@@ -332,16 +334,20 @@ void menuCari()
     showcurs();
 
     if (p == 0) {
+        gotoxy(30,11);
+        printf("[ESC] Batal   [ENTER] Lanjut");
         gotoxy(30, 12);
         printf("Cari Nama Kasir: ");
         inputtext(keyword);
         searchMode = 1;
     }
     else if (p == 1) {
+        gotoxy(30,11);
+        printf("[ESC] Batal   [ENTER] Lanjut");
         gotoxy(30, 12);
         printf("Metode (1 = TUNAI / 2 = NON-TUNAI): ");
         inputField(keyword);
-        strupr(keyword);   // <-- penting
+        strupr(keyword);
         searchMode = 2;
     }
     else {

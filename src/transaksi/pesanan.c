@@ -78,23 +78,45 @@ void resetMejaJikaBedaHari()
 /* =====================================================
    UI MINI (TAB)
 ===================================================== */
-void showMiniMeja() {
+void showMiniMeja(int page) {
+    clearArea(105, top+1, 26, 34);
     loadMeja();
-    int y = top + 1;
-    frame(105,y++,131,35);
-    gotoxy(107, y++); printf("DAFTAR MEJA");
-    gotoxy(107, y++); printf("No Meja  Status");
 
-    for (int i = 0; i < totalMeja; i++) {
+    int itemsPerPage = 20;
+    int start = (page - 1) * itemsPerPage;
+    int shown = 0;
+
+    int y = top + 1;
+
+    frame(105, y++, 131, 35);
+    gotoxy(107, y++); printf("DAFTAR MEJA");
+    gotoxy(107, y++); printf("No Meja    Status");
+    gotoxy(107, 36);  printf("[<] Prev  [>] Next");
+
+    int index = 0;
+    for (int i = 0; i < totalMeja; i++)
+    {
         if (!daftarMeja[i].status) continue;
+
+        if (index < start) {
+            index++;
+            continue;
+        }
+
+        if (shown >= itemsPerPage) break;
+
         gotoxy(110, y++);
         printf("%-5d   %s",
             daftarMeja[i].nomor_meja,
             daftarMeja[i].keterangan == 1 ? "Kosong" : "Terisi"
         );
+
+        shown++;
+        index++;
     }
 }
 void showMiniMenu(int page) {
+    clearArea(90,top+1,42,35);
     loadMenu();
     int start = (page - 1) * 20;
     int y = top + 1;
@@ -139,7 +161,8 @@ void tambahPesan() {
     gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
 
     while (1) {
-        showMiniMeja();
+        showMiniMeja(page);
+        int maxPageMeja = (hitungMejaAktif() + 20 - 1) / 20;
         clearinput(left, top + 1, 50);
         gotoxy(left, top + 1);
         printf("No Meja (0=Take Away) : ");
@@ -148,6 +171,8 @@ void tambahPesan() {
         int res = inputField(buf);
 
         if (res == 0) return ;          // ESC
+        if (res == -1 && page > 1) page--;
+        if (res == -2 && page < maxPageMeja) page++;
         if (res == 1)
         {
             if (buf[0] == '\0') continue; // ENTER tapi kosong → ulang input
@@ -194,7 +219,7 @@ void tambahPesan() {
     /* ===== INPUT MENU ===== */
     page = 1;
     while (1) {
-        clearArea(left, top+3, 70, clearH);
+        clearArea(left, top+3, clearW-left, clearH);
         DetailPesanan d;
         char buf[10];
         int showSide = 0;
@@ -203,7 +228,6 @@ void tambahPesan() {
 
         strcpy(d.id_pesan, p.id_pesan);
 
-        clearArea(90,top+1,42,35);
         showMiniMenu(page);
         clearinput(left, top + 3, 50);
         gotoxy(left, top + 3);

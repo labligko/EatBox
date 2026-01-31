@@ -74,8 +74,8 @@ void kasir(char nama[50])
         formatTanggal(now(), tgl); // ambil tanggal
 
         if (currentView == 1) {
-            gotoxy(60,10); printf("DATA PESANAN");
-            gotoxy(80,10); printf("(%s)", tgl);
+            gotoxy(1,10); printf("DATA PESANAN");
+            gotoxy(70,10); printf("(%s)", tgl);
             frame(left, top, right, bot);
 
             int yhead = top + 1;
@@ -99,7 +99,7 @@ void kasir(char nama[50])
 
         // 4. Handle Sidebar Title (Biar balik lagi kalo abis diganti submenu)
         if(currentView == 0) { gotoxy(1,10); printf("Halo, %s", cutname(nama)); }
-        else if(currentView == 1) { gotoxy(1,10); printf("DATA PESANAN"); gotoxy(72, 10); printf("(%s)", tgl); }
+        else if(currentView == 1) { gotoxy(1,10); printf("DATA PESANAN"); gotoxy(70, 10); printf("(%s)", tgl); }
 
         // 5. Menu Select (Program Pauses Here)
         int pilih = menuSelect(1, 12, menuSup, 4);

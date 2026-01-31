@@ -6,7 +6,7 @@ int findMejaByNomor(int nomor);
 void setMeja(const char *id, int ket);
 void resetMejaJikaBedaHari();
 
-void showMiniMeja();
+void showMiniMeja(int page);
 void showMiniMenu(int page);
 void tambahPesan();
 void selesaiPesan();

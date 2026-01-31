@@ -32,8 +32,7 @@ void autoIDPesan(char *out) {
 }
 int findMejaByNomor(int nomor) {
     for (int i = 0; i < totalMeja; i++)
-        if (daftarMeja[i].status == 1 &&
-            daftarMeja[i].nomor_meja == nomor)
+        if (daftarMeja[i].status == 1 && daftarMeja[i].nomor_meja == nomor)
             return i;
     return -1;
 }
@@ -57,22 +56,47 @@ void setMeja(const char *id, int ket)
 
     fclose(f);
 }
+int sudahResetHariIni()
+{
+    FILE *f = fopen("last_reset.dat", "rb");
+    if (!f) return 0;
+
+    DateTime d;
+    fread(&d, sizeof(DateTime), 1, f);
+    fclose(f);
+
+    return hariIni(d);
+}
+void simpanResetHariIni()
+{
+    FILE *f = fopen("last_reset.dat", "wb");
+    if (!f) return;
+
+    DateTime d = now();
+    fwrite(&d, sizeof(DateTime), 1, f);
+    fclose(f);
+}
 void resetMejaJikaBedaHari()
 {
+    if (sudahResetHariIni())
+        return;
+
     FILE *f = fopen(FILE_PESANAN, "rb");
     if (!f) return;
 
     Pesanan p;
     while (fread(&p, sizeof(Pesanan), 1, f))
     {
-        if (p.no_meja > 0 && !hariIni(p.tanggal))
+        if (p.no_meja > 0 &&
+            strcmp(p.id_meja, "-") != 0 &&
+            !hariIni(p.tanggal))
         {
-            // meja masih terikat pesanan lama
-            if (strcmp(p.id_meja, "-") != 0)
-                setMeja(p.id_meja, 1); // KOSONG
+            setMeja(p.id_meja, 1);
         }
     }
+
     fclose(f);
+    simpanResetHariIni(); // ✅ tandai sudah reset
 }
 
 /* =====================================================
@@ -145,6 +169,7 @@ void showMiniMenu(int page) {
 ===================================================== */
 void tambahPesan() {
     resetMejaJikaBedaHari();
+    loadMeja();
     int clearW = consoleW() - 27;
     int clearH = consoleH() - 9;
     clearArea(27, 9, clearW, clearH);

@@ -206,11 +206,14 @@ int lihatPesanan()
         if (getKaryawanByID(list[i].id_akun, &k))
             strcpy(namaKasir, k.nama);
 
+        char jumlah[30];
+        formatHarga(list[i].jumlah, jumlah);
+
         gotoxy(left+2,  y); printf("%-3d", i + 1);
         gotoxy(left+7,  y); printf("%-20s", tgl);
         gotoxy(left+30, y); printf("%-20s", namaKasir);
-        gotoxy(left+55, y); printf("Rp%.0f", list[i].jumlah);
-        gotoxy(left+72, y); printf("%s",
+        gotoxy(left+50, y); printf("Rp %9s", jumlah);
+        gotoxy(left+65, y); printf("%10s",
             list[i].metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
 
         y++;
@@ -360,8 +363,8 @@ void headerLaporan()
     gotoxy(left+2,  top+1); printf("No");
     gotoxy(left+7,  top+1); printf("Tanggal");
     gotoxy(left+30, top+1); printf("Kasir");
-    gotoxy(left+55, top+1); printf("Total");
-    gotoxy(left+72, top+1); printf("Metode");
+    gotoxy(left+50, top+1); printf("Total");
+    gotoxy(left+65, top+1); printf("Metode");
 
     for (int x = left+1; x < right; x++)
         gotoxy(x, top+2), printf("─");

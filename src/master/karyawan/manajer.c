@@ -344,9 +344,16 @@ void menuCari()
     else if (p == 1) {
         gotoxy(30,11);
         printf("[ESC] Batal   [ENTER] Lanjut");
-        gotoxy(30, 12);
-        printf("Metode (1 = TUNAI / 2 = NON-TUNAI): ");
-        inputField(keyword);
+        while (1)
+        {
+            gotoxy(30, 12);
+            printf("Metode (1 = TUNAI / 2 = NON-TUNAI): ");
+            if (inputField(keyword) == 0) return;
+            if (strcmp(keyword, "1") == 0 || strcmp(keyword, "2") == 0) break;
+            gotoxy(30, 13); printf("Angka tidak valid!");
+            clearinput(50,12,20);
+        }
+        clearinput(30,13,30);
         strupr(keyword);
         searchMode = 2;
     }

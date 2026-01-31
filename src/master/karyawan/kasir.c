@@ -82,9 +82,9 @@ void kasir(char nama[50])
             gotoxy(left+2, yhead); printf("No");
             gotoxy(left+6, yhead); printf("Nama Kasir");
             gotoxy(left+20, yhead); printf("No. Meja");
-            gotoxy(left+36, yhead); printf("Total");
-            gotoxy(left+50, yhead); printf("Status");
-            gotoxy(left+66, yhead); printf("Waktu");
+            gotoxy(left+36, yhead); printf("  Total");
+            gotoxy(left+55, yhead); printf("Status");
+            gotoxy(left+75, yhead); printf("Waktu");
 
             for (int x = left+1; x < right; x++) { gotoxy(x, yhead+1); printf("─"); }
 

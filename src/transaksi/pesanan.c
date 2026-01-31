@@ -424,12 +424,15 @@ int lihatPesan(int page)
         strcpy(listPesanHariIni[totalPesanHariIni], list[i].id_pesan);
         totalPesanHariIni++;
 
+        char totalbayar[30];
+        formatHarga(list[i].total, totalbayar);
+
         gotoxy(left + 2, y); printf("%d", totalPesanHariIni);
         gotoxy(left + 6, y); printf("%s", namaKasir);
         gotoxy(left + 20, y); printf("%d", list[i].no_meja);
-        gotoxy(left + 36, y); printf("%.0f", list[i].total);
-        gotoxy(left + 50, y); printf("%s", list[i].status);
-        gotoxy(left + 66, y); printf("%s", jam);
+        gotoxy(left + 36, y); printf("Rp %9s", totalbayar);
+        gotoxy(left + 55, y); printf("%s", list[i].status);
+        gotoxy(left + 75, y); printf("%s", jam);
         y++;
     }
 

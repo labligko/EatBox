@@ -179,12 +179,15 @@ void ubahMenu() {
         gotoxy(left, top - 1);
         printf("[ENTER] Lewati   [ESC] Batal");
 
+        char hargaMenu[30];
+        formatHarga(m->harga, hargaMenu);
+
         //data lama
         int y = top + 6;
         gotoxy(left + 2, y);     printf("No Menu   : %d", noMenu + 1);
         y += 2; gotoxy(left + 2, y); printf("Kategori  : %s", m->kategori);
         y += 2; gotoxy(left + 2, y); printf("Nama Menu : %s", m->nama_menu);
-        y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %.0lf", m->harga);
+        y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %6s", hargaMenu);
         y += 2; gotoxy(left + 2, y); printf("Deskripsi : %s", m->deskripsi);
         y += 2; gotoxy(left + 2, y); printf("Status    : %s",
                 m->status == 1 ? "1 (Tersedia)" : "0 (Habis)");
@@ -198,7 +201,7 @@ void ubahMenu() {
                 break;
             }
         } while (1);
-        gotoxy(left+17, top+12); printf("%.0lf", m->harga);
+        gotoxy(left+17, top+12); printf("%6s", hargaMenu);
 
         //mengubah deskripsi
         clearinput(left + 14, top + 14, 50);
@@ -239,9 +242,12 @@ void hapusMenu() {
                 continue;
             }
 
+            char hargaMenu[30];
+            formatHarga(daftarMenu[noMenu].harga, hargaMenu);
+
             //mereview data
             gotoxy(30, 13); printf("Menu   : %s", daftarMenu[noMenu].nama_menu);
-            gotoxy(30, 14); printf("Harga  : Rp %.0lf", daftarMenu[noMenu].harga);
+            gotoxy(30, 14); printf("Harga  : Rp %6s", hargaMenu);
             gotoxy(30, 15); printf("Status : %s", daftarMenu[noMenu].status ? "Tersedia" : "Habis");
             gotoxy(30, 16);printf("tekan ENTER untuk lanjut..."); getchar();
 
@@ -288,13 +294,16 @@ void detailMenu()
     int left = 30, top = 13, right = 100, bot = 32;
     frame(left, top, right, bot);
 
+    char hargaMenu[30];
+    formatHarga(m.harga, hargaMenu);
+
     gotoxy(left + 2, top + 1); printf("DETAIL MENU TERPILIH");
 
     int y = top + 3;
     gotoxy(left + 2, y);     printf("No Menu   : %d", pilihan + 1);
     y += 2; gotoxy(left + 2, y); printf("Kategori  : %s", m.kategori);
     y += 2; gotoxy(left + 2, y); printf("Nama Menu : %s", m.nama_menu);
-    y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %.0lf", m.harga);
+    y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %6s", hargaMenu);
     y += 2; gotoxy(left + 2, y); printf("Deskripsi : %s", m.deskripsi);
     y += 2; gotoxy(left + 2, y); printf("Status    : %s", m.status ? "Tersedia" : "Habis");
 

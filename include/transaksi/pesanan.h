@@ -4,6 +4,8 @@
 void autoIDPesan(char *out);
 int findMejaByNomor(int nomor);
 void setMeja(const char *id, int ket);
+int sudahResetHariIni();
+void simpanResetHariIni();
 void resetMejaJikaBedaHari();
 
 void showMiniMeja(int page);

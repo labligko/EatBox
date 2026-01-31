@@ -132,8 +132,7 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
     gotoxy(xLeft,hY++); printf("PEMBAYARAN");
     gotoxy(xLeft,hY++); printf("ID Bayar    : %s", b.id_bayar);
     gotoxy(xLeft,hY++); printf("Total       : RP %8s", totbayar);
-    for (int i = yTop+1; i < bot; i++)
-    {
+    for (int i = yTop+1; i < bot; i++){
         gotoxy(xLeft-2, i); printf("|");
     }
 

@@ -300,7 +300,7 @@ void updateKar()
         setRGBColor(251, 255, 199, 0);
         if (inputbebas(buffer) == 0) return;
         if (strlen(buffer) > 0) strcpy(a.alamat, buffer);
-        gotoxy(left+17, top+14); printf("%-40s", a.alamat);
+        gotoxy(left+17, top+12); printf("%-40s", a.alamat);
 
         // --- KONFIRMASI SIMPAN ---
         if (popupConfirm("Simpan Perubahan Data Ini?", "Ya", "Batal"))
@@ -601,7 +601,6 @@ void kelolaKar(char *nama)
             printf("Halaman: %d / %d (Total: %d)   [<] Prev  [>] Next", currentpage, maxPage, totalData);
 
             gotoxy(1,10); printf("Halo, %s", cutname(nama));
-            gotoxy(1,10); printf("DATA KARYAWAN");
         }
 
         // 5. Menu Select (Program Pauses Here)

@@ -17,6 +17,7 @@ void detailMenu();
 void tampilkanTabel(int page);
 void lihatMenu();
 
+int getMenuNumber(const char *id);
 void sortMenuByStatus();
 void loadMenu();
 int dataMenu(int left, int startY, int page);

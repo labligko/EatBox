@@ -54,9 +54,7 @@ int hitungMenuAktif()
 void tambahMenu() {
     Menu m;
     char buffer[50]; // Buffer sementara untuk validasi angka
-    int pointer = 0;
-    int maxField = 5;
-    int left = 30, top = 11, right = 105, bot = 35;
+    left = 30, top = 11, right = 105, bot = 35;
 
     strcpy(m.kategori, "");
     strcpy(m.nama_menu, "");
@@ -140,10 +138,9 @@ void tambahMenu() {
     }
 }
 void ubahMenu() {
-    // char idTarget[20]; ganti jadi no urut
     int noMenu;
     char buffer[100];
-    int left = 30, top = 11, right = 105, bot = 35;
+    left = 30, top = 11, right = 105, bot = 35;
 
     //masukkan no urut menu
     while (1) {
@@ -291,7 +288,7 @@ void detailMenu()
     Menu m = daftarMenu[pilihan];
 
     // frame detail
-    int left = 30, top = 13, right = 100, bot = 32;
+    left = 30, top = 13, right = 100, bot = 32;
     frame(left, top, right, bot);
 
     char hargaMenu[30];
@@ -437,11 +434,31 @@ void lihatMenu() {
     currentpage = 1;
 }
 
+int getMenuNumber(const char *id) {
+    int num = 0;
+    sscanf(id, "MN%d", &num);
+    return num;
+}
+
 void sortMenuByStatus() {
     Menu temp;
     for (int i = 0; i < jumlahMenu - 1; i++) {
         for (int j = 0; j < jumlahMenu - i - 1; j++) {
-            if (daftarMenu[j].status < daftarMenu[j + 1].status) {
+
+            int statusA = daftarMenu[j].status;
+            int statusB = daftarMenu[j + 1].status;
+
+            int idA = getMenuNumber(daftarMenu[j].id_menu);
+            int idB = getMenuNumber(daftarMenu[j + 1].id_menu);
+
+            // 1️⃣ status aktif dulu
+            if (statusA < statusB) {
+                temp = daftarMenu[j];
+                daftarMenu[j] = daftarMenu[j + 1];
+                daftarMenu[j + 1] = temp;
+            }
+            // 2️⃣ status sama → ID lebih besar (newest) dulu
+            else if (statusA == statusB && idA < idB) {
                 temp = daftarMenu[j];
                 daftarMenu[j] = daftarMenu[j + 1];
                 daftarMenu[j + 1] = temp;
@@ -493,7 +510,6 @@ int dataMenu(int left, int startY, int page)
         formatHarga(daftarMenu[i].harga, hargaMenu);
 
         // Cetak pakai gotoxy (Sesuaikan koordinat X dengan showMenu kamu)
-        // gotoxy(left+2, y);  printf("%s", daftarMenu[i].id_menu);
         gotoxy(left+2, y);  printf("%d", i+1);
         gotoxy(left+10, y); printf("%-15.15s", daftarMenu[i].nama_menu); // Nama Menu
         gotoxy(left+27, y); printf("%-15.15s", daftarMenu[i].kategori);  // Kategori

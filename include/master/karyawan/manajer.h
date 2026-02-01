@@ -21,4 +21,7 @@ void menuCari();
 void headerLaporan();
 void manajer(char nama[50]);
 
+
+void detailPesanan();
+
 #endif //PERAPIHAN_MANAJER_H

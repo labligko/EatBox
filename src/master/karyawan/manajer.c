@@ -6,6 +6,8 @@
 #include "../../../include/data.h"
 #include "../../../include/function.h"
 #include "../../../include/master/karyawan/manajer.h"
+#include "../../../include/master/menu.h"
+#include "../../../include/transaksi/pembayaran.h"
 
 #define VIEW_ALL 0
 #define VIEW_BULANAN 1
@@ -22,6 +24,8 @@ int filterTahun = 0;
 
 char keyword[50] = "";
 int searchMode = 0;  // 1 = kasir, 2 = metode
+Pembayaran listView[1000];
+int totalView = 0;
 
 /* =====================================================
    UTIL JOIN PESANAN
@@ -173,27 +177,26 @@ int lihatPesanan()
     FILE *f = fopen(FILE_PEMBAYARAN, "rb");
     if (!f) return 0;
 
-    Pembayaran list[1000];
-    int n = 0;
+    totalView = 0;
 
-    while (fread(&list[n], sizeof(Pembayaran), 1, f))
+    while (fread(&listView[totalView], sizeof(Pembayaran), 1, f))
     {
-        if (!cocokFilterBayar(list[n])) continue;
-        if (!cocokSearch(list[n])) continue;
-        n++;
+        if (!cocokFilterBayar(listView[totalView])) continue;
+        if (!cocokSearch(listView[totalView])) continue;
+        totalView++;
     }
     fclose(f);
 
     if (sortMode == SORT_KASIR)
-        qsort(list, n, sizeof(Pembayaran), cmpKasir);
+        qsort(listView, totalView, sizeof(Pembayaran), cmpKasir);
     else if (sortMode == SORT_TOTAL)
-        qsort(list, n, sizeof(Pembayaran), cmpTotal);
+        qsort(listView, totalView, sizeof(Pembayaran), cmpTotal);
     else if (sortMode == SORT_TANGGAL)
-        qsort(list, n, sizeof(Pembayaran), cmpTanggal);
+        qsort(listView, totalView, sizeof(Pembayaran), cmpTanggal);
 
     int start = (currentpage - 1) * 20;
     int end = start + 20;
-    if (end > n) end = n;
+    if (end > totalView) end = totalView;
 
     int y = 14;
     int left = 28;
@@ -203,25 +206,26 @@ int lihatPesanan()
         char tgl[25];
         char namaKasir[50] = "-";
         Karyawan k;
+        Pembayaran *p = &listView[i];
 
-        formatTanggalJam(list[i].tanggal, tgl);
-        if (getKaryawanByID(list[i].id_akun, &k))
+        formatTanggalJam(listView[i].tanggal, tgl);
+        if (getKaryawanByID(listView[i].id_akun, &k))
             strcpy(namaKasir, k.nama);
 
         char jumlah[30];
-        formatHarga(list[i].jumlah, jumlah);
+        formatHarga(listView[i].jumlah, jumlah);
 
         gotoxy(left+2,  y); printf("%-3d", i + 1);
         gotoxy(left+7,  y); printf("%-20s", tgl);
         gotoxy(left+30, y); printf("%-20s", namaKasir);
         gotoxy(left+50, y); printf("Rp %9s", jumlah);
         gotoxy(left+65, y); printf("%10s",
-            list[i].metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
+            listView[i].metode_bayar == 1 ? "TUNAI" : "NON-TUNAI");
 
         y++;
     }
 
-    return n;
+    return totalView;
 }
 
 /* =====================================================
@@ -398,7 +402,7 @@ void manajer(char nama[50])
     strcpy(currentKasirID, nama);
 
     char *menuSup[] = {
-        " Semua Data", " Bulanan", " Tahunan", " Urutkan", " Cari", " Keluar"
+        " Semua Data", " Bulanan", " Tahunan", " Urutkan", " Cari", " Detail Pesanan", " Keluar"
     };
 
     while (1)
@@ -421,7 +425,7 @@ void manajer(char nama[50])
         gotoxy(1,20); printf(" [↕]      Pilih Menu");
         gotoxy(1,21); printf(" [ENTER]  Lanjut");
 
-        int pilih = menuSelect(1,12, menuSup, 6);
+        int pilih = menuSelect(1,12, menuSup, 7);
 
         if (pilih == -1 && currentpage > 1)
             currentpage--;
@@ -438,7 +442,75 @@ void manajer(char nama[50])
         else if (pilih == 4)
             menuCari();
         else if (pilih == 5)
+            detailPesanan();
+        else if (pilih == 6)
             if (popupConfirm("Apakah anda yakin ingin keluar?", "Ya", "Tidak"))
                 return;
     }
+}
+
+void tampilkanDeskripsiPesanan(const char *idPesan)
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 12, clearW, clearH);
+
+    loadMenu();
+    tampilDetailPesanan(idPesan, currentKasirID, 30, 12);
+}
+
+void detailPesanan()
+{
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
+    if (totalView <= 0) {
+        gotoxy(30, 16);
+        printf("Tidak ada data!");
+        getch();
+        return;
+    }
+
+    char buf[10];
+    int no;
+
+    gotoxy(30, 11); printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(30, 12); printf("No Urut: "); showcurs();
+    inputtext(buf);
+
+    if (!onlyNum(buf)) return;
+    no = atoi(buf);
+
+    if (no < 1 || no > totalView) {
+        gotoxy(30, 16);
+        printf("Nomor tidak valid!");
+        getch();
+        return;
+    }
+
+    Pembayaran *pb = &listView[no - 1];
+
+    Pesanan p;
+    if (!getPesananByID(pb->id_pesan, &p)) {
+        gotoxy(30, 16);
+        printf("Pesanan tidak ditemukan!");
+        getch();
+        return;
+    }
+
+    // --- tampil detail ---
+    clearArea(27, 9, consoleW()-27, consoleH()-9);
+
+    gotoxy(30, 10);   printf("[ESC] Batal   [ENTER] Lanjut");
+    gotoxy(30, 11); printf("DETAIL PESANAN");
+    gotoxy(30, 13); printf("ID Pesan : %s", p.id_pesan);
+    gotoxy(30, 14); printf("Total    : Rp ");
+
+    char totalStr[30];
+    formatHarga(p.total, totalStr);
+
+    tampilkanDeskripsiPesanan(p.id_pesan);
+    gotoxy(30, 16); printf("Total      : Rp %s", totalStr);
+    getch();
 }

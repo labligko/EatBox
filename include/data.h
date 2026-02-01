@@ -114,6 +114,8 @@ extern int left, right, top, bot;
 extern char namaKasir[50];
 extern char keyword[50];
 extern int searchMode;
+extern Pembayaran listView[1000];
+extern int totalView;
 
 #define FILE_TEMP       "../file/temp.dat"
 #define FILE_KARYAWAN   "../file/karyawan.dat"

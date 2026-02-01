@@ -163,16 +163,16 @@ void tampilkanDeskripsiPesananByNo(int noUrut)
 
 void detilPesan()
 {
+    int clearW = consoleW() - 27;
+    int clearH = consoleH() - 9;
+    clearArea(27, 9, clearW, clearH);
+
     if (totalPesanHariIni <= 0) {
         gotoxy(left, top+2);
         printf("Tidak ada pesanan hari ini!");
         getch();
         return;
     }
-
-    int clearW = consoleW() - 27;
-    int clearH = consoleH() - 9;
-    clearArea(27, 9, clearW, clearH);
 
     char buf[10];
     int targetNo;

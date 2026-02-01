@@ -115,7 +115,7 @@ void kelolaResepMenu(char *id_menu) {
         if (idxBahan == -1) continue;
 
         gotoxy(80, 13);
-        printf("Jumlah pemakaian %s per 1 menu: ", daftarBahan[idxBahan].id_bahan);
+        printf("Jumlah pemakaian per 1 menu: ");
         inputField(buf);
         if (!onlyNum(buf)) continue;
 

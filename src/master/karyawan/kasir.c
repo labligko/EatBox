@@ -178,8 +178,8 @@ void detilPesan()
     int targetNo;
 
     gotoxy(left, top);   printf("[ESC] Batal   [ENTER] Lanjut");
-    gotoxy(left, top+1); printf("No Pesanan: ");
-    inputtext(buf);
+    gotoxy(left, top+1); printf("No Pesanan: "); showcurs();
+    inputField(buf);
 
     if (!onlyNum(buf)) return;
     targetNo = atoi(buf);

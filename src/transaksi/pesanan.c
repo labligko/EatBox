@@ -346,7 +346,7 @@ void tambahPesan() {
 
                 gotoxy(left, top + 4);
                 printf("Jumlah : ");
-                int r = inputtext(buf);
+                int r = inputField(buf);
                 if (r == 0) return;
                 if (!onlyNum(buf)) continue;
 
@@ -409,8 +409,8 @@ void selesaiPesan()
 
     gotoxy(left, top); printf("[ESC] Batal   [ENTER] Lanjut");
     gotoxy(left, top+1);
-    printf("No Pesanan: ");
-    inputtext(buf);
+    printf("No Pesanan: "); showcurs();
+    inputField(buf);
 
     if (!onlyNum(buf)) return;
     targetNo = atoi(buf);

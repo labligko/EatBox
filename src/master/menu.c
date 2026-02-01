@@ -169,7 +169,6 @@ void tambahMenu() {
             saveMenu();
             popupAlert(1,"Menu Berhasil Ditambahkan!");
             kelolaResepMenu(m.id_menu);
-            // return; // Keluar setelah simpan
         }
     }
 }
@@ -420,7 +419,7 @@ void tampilkanTabel(int page) {
             char hargaMenu[30];
             formatHarga(daftarMenu[i].harga, hargaMenu);
 
-            printf("| %-4s | %-16s | %-22s | %6s | %-23s | %-10s |\n",
+            printf("| %-4s | %-16s | %-22s | %7s | %-23s | %-10s |\n",
                    i+1,
                    daftarMenu[i].kategori,
                    daftarMenu[i].nama_menu,

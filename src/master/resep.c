@@ -3,10 +3,12 @@
 #include "../../include/data.h"
 #include "../../include/function.h"
 #include "../../include/master/resep.h"
+#include "../../include/master/menu.h"
 #include "../../include/master/bahanBaku.h"
 
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 ResepMenu daftarResep[100];
 int totalResep;
@@ -36,8 +38,17 @@ int cekResepAda(char *id_menu, char *id_bahan)
 }
 void kelolaResepMenu(char *id_menu) {
     char buf[20];
+    int page = 1;
+    int perPage = 15;
     loadResep();
     loadBahan();
+
+    int totalAktif = 0;
+    for (int i = 0; i < totalBahan; i++)
+        if (daftarBahan[i].status == 1)
+            totalAktif++;
+
+    int maxPage = (totalAktif + perPage - 1) / perPage;
 
     while (1) {
         int clearW = consoleW() - 27;
@@ -47,31 +58,64 @@ void kelolaResepMenu(char *id_menu) {
         gotoxy(30,11);printf("[ESC] Untuk tambah bahan baru");
         gotoxy(30,12); printf("Daftar Bahan:");
 
+        int start = (page - 1) * perPage;
+        int end = start + perPage;
+
         int y = 14;
         int no = 1;
+        int tampil = 0;
+
+        frame(28, y-1, 55, bot);
+        gotoxy(30, bot + 1);printf("[<] Prev   Page %d/%d   [>] Next", page, maxPage);
+
+        // cari bahan aktif ke-n
         for (int i = 0; i < totalBahan; i++) {
             if (daftarBahan[i].status != 1) continue;
+
+            if (no - 1 < start) {
+                no++;
+                continue;
+            }
+
+            if (tampil >= perPage) break;
+
             gotoxy(30, y++);
-            printf("%d. %s (%s)", no++, daftarBahan[i].nama_bahan, daftarBahan[i].satuan);
+            printf("%d. %s (%s)", no,
+                   daftarBahan[i].nama_bahan,
+                   daftarBahan[i].satuan);
+
+            no++;
+            tampil++;
         }
 
         gotoxy(80, 12);
         printf("Pilih No Bahan (0 = Tambah Bahan Baru): ");
         showcurs();
-        inputField(buf);
+        int ret = inputField(buf);
 
-        int pilih = atoi(buf);
-        if (pilih == 0) {
+        if (ret == 0) {
+            // ESC → keluar / tambah bahan baru (sesuai UI lu)
             tambahBahan();
             loadBahan();
             continue;
         }
 
+        if (ret == -1) {          // LEFT
+            if (page > 1) page--;
+            continue;
+        }
+
+        if (ret == -2) {          // RIGHT
+            if (page < maxPage) page++;
+            continue;
+        }
+
+        int pilih = atoi(buf);
         int idxBahan = getIndexByNoUrut(pilih);
         if (idxBahan == -1) continue;
 
         gotoxy(80, 13);
-        printf("Jumlah pemakaian per 1 menu: ");
+        printf("Jumlah pemakaian %s per 1 menu: ", daftarBahan[idxBahan].id_bahan);
         inputField(buf);
         if (!onlyNum(buf)) continue;
 
@@ -89,7 +133,11 @@ void kelolaResepMenu(char *id_menu) {
         saveResep();
 
         if (!popupConfirm("Tambah bahan lain?", "Ya", "Selesai"))
-            break;
+        {
+            popupAlert(1, "Resep berhasil ditambahkan!");
+            Sleep(500);
+        }
+        return;
     }
 }
 

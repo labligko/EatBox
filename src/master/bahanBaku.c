@@ -50,15 +50,16 @@ void generateIDBahan(char* output)
 
 int getIndexByNoUrut(int no)
 {
-    int count = 0;
-    for (int i = totalBahan - 1; i >= 0; i--)
+    int count = 1;
+    for (int i = 0; i < totalBahan; i++)
     {
-        if (daftarBahan[i].status == 1)
-        {
-            count++;
-            if (count == no)
-                return i;
-        }
+        if (daftarBahan[i].status != 1)
+            continue;
+
+        if (count == no)
+            return i;
+
+        count++;
     }
     return -1;
 }

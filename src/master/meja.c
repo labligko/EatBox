@@ -90,7 +90,7 @@ void tambahMeja() {
             gotoxy(left+15, top+4);
             showcurs();
 
-            if(inputtext(buffer) == 0) return;
+            if(inputField(buffer) == 0) return;
 
             if(!onlyNum(buffer) || strlen(buffer) == 0) {
                 gotoxy(left+2, bot-2); printf("Input harus angka!   ");
@@ -112,7 +112,7 @@ void tambahMeja() {
         // INPUT KAPASITAS
         do {
             clearinput(left+15, top+6, 10); gotoxy(left+15, top+6); showcurs();
-            if(inputtext(buffer) == 0) return;
+            if(inputField(buffer) == 0) return;
             if(onlyNum(buffer) && strlen(buffer) > 0) {
                 m.kapasitas = atoi(buffer); break;
             }
@@ -229,7 +229,7 @@ void ubahMeja() {
         gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
         gotoxy(30, 11); printf("Masukkan No Urut : ");
         showcurs();
-        if (inputtext(buffer) == 0) return;
+        if (inputField(buffer) == 0) return;
         noUrut = atoi(buffer);
 
         int idx = cariMejaNorut(noUrut);
@@ -251,19 +251,19 @@ void ubahMeja() {
 
             // EDIT NOMOR
             clearinput(left+15, top+4, 10); gotoxy(left+15, top+4); showcurs();
-            if(inputtext(buffer) == 0) return;
+            if(inputField(buffer) == 0) return;
             if(strlen(buffer) > 0) m->nomor_meja = atoi(buffer);
             gotoxy(left+15, top+4); printf("%d", m->nomor_meja);
 
             // EDIT KAPASITAS
             clearinput(left+15, top+6, 10); gotoxy(left+15, top+6); showcurs();
-            if(inputtext(buffer) == 0) return;
+            if(inputField(buffer) == 0) return;
             if(strlen(buffer) > 0) m->kapasitas = atoi(buffer);
             gotoxy(left+15, top+6); printf("%d", m->kapasitas);
 
             // EDIT STATUS
             clearinput(left+15, top+8, 5); gotoxy(left+15, top+8); showcurs();
-            if (inputtext(buffer) == 0) return;
+            if (inputField(buffer) == 0) return;
             if (strlen(buffer) > 0) m->keterangan = atoi(buffer);
             gotoxy(left+15, top+8); printf("%d", m->keterangan);
 
@@ -290,7 +290,7 @@ void hapusMeja() {
     gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
     gotoxy(30, 11); printf("Masukkan No Urut : ");
     showcurs();
-    if (inputtext(buffer) == 0) return;
+    if (inputField(buffer) == 0) return;
     noUrut = atoi(buffer);
 
     int idx = cariMejaNorut(noUrut);

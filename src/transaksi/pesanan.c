@@ -267,10 +267,10 @@ void tambahPesan() {
         loadMeja();
     }
 
+    int selesaiInputMenu = 0;
     /* ===== INPUT MENU ===== */
     page = 1;
     while (1) {
-        clearArea(left, top+3, clearW-left, clearH);
         DetailPesanan d;
         memset(&d, 0, sizeof(DetailPesanan));
         char buf[10];
@@ -290,7 +290,29 @@ void tambahPesan() {
 
             int res = inputField(buf);
 
-            if (res == 0) return; // ESC batal pesanan
+            if (res == 0)
+            {
+                hapusDetailPesanan(p.id_pesan);
+
+                FILE *f = fopen(FILE_PESANAN, "rb+");
+                Pesanan tmp;
+                while (fread(&tmp, sizeof(Pesanan), 1, f))
+                {
+                    if (strcmp(tmp.id_pesan, p.id_pesan) == 0)
+                    {
+                        strcpy(tmp.status, "BATAL");
+                        fseek(f, -sizeof(Pesanan), SEEK_CUR);
+                        fwrite(&tmp, sizeof(Pesanan), 1, f);
+
+                        if (strcmp(tmp.id_meja, "-") != 0)
+                            setMeja(tmp.id_meja, 1);
+                        break;
+                    }
+                }
+                fclose(f);
+
+                return;
+            }// ESC batal pesanan
             if (res == -1 && page > 1) page--;
             if (res == -2 && page < maxPage) page++;
 
@@ -324,7 +346,8 @@ void tambahPesan() {
 
                 gotoxy(left, top + 4);
                 printf("Jumlah : ");
-                inputtext(buf);
+                int r = inputtext(buf);
+                if (r == 0) return;
                 if (!onlyNum(buf)) continue;
 
                 d.jumlah = atoi(buf);
@@ -344,11 +367,13 @@ void tambahPesan() {
                 fclose(fd);
 
                 int lanjut = popupConfirm("Apakah ingin menambah pesanan?", "Ya", "Tidak");
-                if (lanjut == 1) continue;   // balik ke input No Menu
+                if (lanjut == 1) {clearArea(left, top+3, clearW-left, clearH); continue;}   // balik ke input No Menu
 
+                selesaiInputMenu = 1;
                 break;      // lanjut ke pembayaran
             }
         }
+        if (selesaiInputMenu) break;
     }
     clearArea(110, top+1, 20, jumlahMeja+2);
     DetailPesanan d;
@@ -450,6 +475,7 @@ int lihatPesan(int page)
     int itemsPerPage = 20;
     int start = (page - 1) * itemsPerPage;
     int end = start + itemsPerPage;
+    char mejanomer[5];
 
     int y = top + 3;
 
@@ -458,6 +484,8 @@ int lihatPesan(int page)
     {
         formatJam(list[i].tanggal, jam);
         getNamaKasir(list[i].id_akun, namaKasir);
+        if (list[i].no_meja == 0)strcpy(mejanomer, "-");
+        else snprintf(mejanomer, sizeof(mejanomer), "%d", list[i].no_meja);
 
         strcpy(listPesanHariIni[totalPesanHariIni], list[i].id_pesan);
         totalPesanHariIni++;
@@ -467,7 +495,7 @@ int lihatPesan(int page)
 
         gotoxy(left + 2, y); printf("%d", totalPesanHariIni);
         gotoxy(left + 6, y); printf("%s", namaKasir);
-        gotoxy(left + 20, y); printf("%d", list[i].no_meja);
+        gotoxy(left + 20, y); printf("%4s", mejanomer);
         gotoxy(left + 36, y); printf("Rp %9s", totalbayar);
         gotoxy(left + 55, y); printf("%s", list[i].status);
         gotoxy(left + 75, y); printf("%s", jam);

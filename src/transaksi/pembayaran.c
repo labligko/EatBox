@@ -242,6 +242,7 @@ void showbayar(char *id_pesan, char *namaKasir, double total)
     int clearH = consoleH() - 9;
     clearArea(27, 9, clearW, clearH);
 
-    tampilDetailPesanan(id_pesan, namaKasir, 30, 10);
-    pembayaran(id_pesan, total, 85, 10);
+    gotoxy(30, 10); printf("[ESC] Batal   [ENTER] Lanjut");
+    tampilDetailPesanan(id_pesan, namaKasir, 30, 11);
+    pembayaran(id_pesan, total, 85, 11);
 }

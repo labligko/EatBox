@@ -342,7 +342,7 @@ void menuCari()
         printf("[ESC] Batal   [ENTER] Lanjut");
         gotoxy(30, 12);
         printf("Cari Nama Kasir: ");
-        inputtext(keyword);
+        inputName(keyword);
         searchMode = 1;
     }
     else if (p == 1) {
@@ -477,7 +477,7 @@ void detailPesanan()
 
     gotoxy(30, 11); printf("[ESC] Batal   [ENTER] Lanjut");
     gotoxy(30, 12); printf("No Urut: "); showcurs();
-    inputtext(buf);
+    inputField(buf);
 
     if (!onlyNum(buf)) return;
     no = atoi(buf);

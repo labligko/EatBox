@@ -59,9 +59,10 @@ void createKar()
         do {
             clearinput(left+17, top+2, 35); gotoxy(left+17, top+2); showcurs();
             if (inputusname(a.username) == 0) return;
-            if (strlen(a.username) == 0) { gotoxy(left+17, top+3); printf("Wajib diisi!"); }
-            else if (strlen(a.username) < 4) { //Minimal 4 huruf biar gak kependekan
+            if (strlen(a.username) == 0) { gotoxy(left+17, top+3); printf("Wajib diisi!       "); continue; }
+            if (strlen(a.username) < 4) { //Minimal 4 huruf biar gak kependekan
                 gotoxy(left+17, top+3); printf("Minimal 4 karakter!");
+                continue;
             }
             if (isDuplicate("username", a.username, "")) { // CEK DUPLIKAT
                 gotoxy(left+17, top+3); printf("Nama pengguna sudah dipakai!"); continue;
@@ -74,8 +75,10 @@ void createKar()
         do {
             clearinput(left+17, top+4, 35); gotoxy(left+17, top+4); showcurs();
             if (inputpass(a.password, left+2, top+4, "Kata Sandi   ") == 0) return;
-            if (strlen(a.password) == 0) { gotoxy(left+17, top+5); printf("Wajib diisi!"); }
-        } while (strlen(a.password) == 0);
+            if (strlen(a.password) == 0) { gotoxy(left+17, top+5); printf("Wajib diisi!       "); continue;}
+            if (strlen(a.password) < 6) {  gotoxy(left+17, top+5); printf("Minimal 6 karakter!");continue;}
+            break;
+        } while (1);
         clearinput(left+17, top+5, 30);
 
         // 3. NAMA LENGKAP (VALIDASI KHUSUS)
@@ -84,9 +87,7 @@ void createKar()
             if (inputName(a.nama) == 0) return;
 
             if (strlen(a.nama) == 0) {
-                gotoxy(left+17, top+7); printf("Nama wajib diisi!");
-            } else if (strlen(a.nama) < 3) {
-                 gotoxy(left+17, top+7); printf("Nama terlalu pendek!");
+                gotoxy(left+17, top+7);  printf("Nama wajib diisi!");
             } else {
                 break;
             }
@@ -121,7 +122,7 @@ void createKar()
         // 6. ROLE
         do {
             clearinput(left+17, top+12, 20); gotoxy(left+17, top+12); showcurs();
-            if (inputtext(a.role) == 0) return;
+            if (inputName(a.role) == 0) return;
             if (!cekrole(a.role)) { gotoxy(left+17, top+13); printf("manajer/staff/kasir"); }
             else break;
         } while (1);
@@ -191,7 +192,8 @@ void updateKar()
         // 1. Username
         while (1)
         {
-            clearinput(left+17, top+2, 35); gotoxy(left+17, top+2); showcurs();
+            gotoxy(left+17, top+2); showcurs();
+            setRGBColor(251, 255, 199, 0);
             if (inputusname(buffer) == 0) return;
             if (strlen(buffer) > 0) strcpy(a.username, buffer);
             if (strlen(buffer) < 4) {
@@ -255,14 +257,16 @@ void updateKar()
         gotoxy(left+17, top+4); for(int i=0;i<strlen(a.password);i++) printf("*");
 
         // 3. Nama Lengkap
-        clearinput(left+17, top+6, 35); gotoxy(left+17, top+6); showcurs();
+        gotoxy(left+17, top+6); showcurs();
+        setRGBColor(251, 255, 199, 0);
         if (inputName(buffer) == 0) return;
         if (strlen(buffer) > 0) strcpy(a.nama, buffer);
         gotoxy(left+17, top+6); printf("%-35s", a.nama);
 
         // 4. Telp
         do {
-            clearinput(left+17, top+8, 20); gotoxy(left+17, top+8); showcurs();
+            gotoxy(left+17, top+8); showcurs();
+            setRGBColor(251, 255, 199, 0);
             if (inputTelp08(buffer) == 0) return;
             if (strcmp(buffer, "08") == 0) break; // Skip
 
@@ -277,7 +281,8 @@ void updateKar()
 
         // 5. Email
         do {
-            clearinput(left+17, top+10, 30); gotoxy(left+17, top+10); showcurs();
+            gotoxy(left+17, top+10); showcurs();
+            setRGBColor(251, 255, 199, 0);
             if (inputtext(buffer) == 0) return;
             if (strlen(buffer) == 0) break;
 
@@ -290,10 +295,9 @@ void updateKar()
         clearinput(left+17, top+11, 30);
         gotoxy(left+17, top+10); printf("%-30s", a.email);
 
-        // 6. Role (tidak bisa dirubah)
-
         // 7. Alamat
-        clearinput(left+17, top+14, 40); gotoxy(left+17, top+14);
+        gotoxy(left+17, top+12); showcurs();
+        setRGBColor(251, 255, 199, 0);
         if (inputbebas(buffer) == 0) return;
         if (strlen(buffer) > 0) strcpy(a.alamat, buffer);
         gotoxy(left+17, top+14); printf("%-40s", a.alamat);
@@ -664,17 +668,22 @@ void formEdit(Karyawan *a)
     gotoxy(left, top-1); printf(" [ESC] Kembali   [ENTER] Lewati/Lanjut");
 
     int y = top + 2;
-
     // Tampilkan Data Lama (Sebagai referensi user)
-    gotoxy(left+2, y);       printf("Nama Pengguna: %s", a->username);
-    y+=2; gotoxy(left+2, y); printf("Kata Sandi   : "); for(int i=0;i<strlen(a->password);i++) printf("*");
-    y+=2; gotoxy(left+2, y); printf("Nama Lengkap : %s", a->nama);
-    y+=2; gotoxy(left+2, y); printf("No. Telp     : %s", a->telp);
-    y+=2; gotoxy(left+2, y); printf("Email        : %s", a->email);
-    y+=2; gotoxy(left+2, y); printf("Role         : %s", a->role);
-    y+=2; gotoxy(left+2, y); printf("Alamat       : %s", a->alamat);
-    // STATUS HANYA DITAMPILKAN (READ ONLY)
-    y+=2; gotoxy(left+2, y); printf("Status       : %s", (a->status == 1 ? "Aktif" : "Non-Aktif"));
+    gotoxy(left+2, y);       printf("Nama Pengguna:");
+    y+=2; gotoxy(left+2, y); printf("Kata Sandi   :");
+    y+=2; gotoxy(left+2, y); printf("Nama Lengkap :");
+    y+=2; gotoxy(left+2, y); printf("No. Telp     :");
+    y+=2; gotoxy(left+2, y); printf("Email        :");
+    y+=2; gotoxy(left+2, y); printf("Alamat       :");
+
+    setRGBColor(235, 238, 215, 0);
+    int yin = top + 2;
+    gotoxy(left+16, yin);       printf(" %s", a->username);
+    yin+=2; gotoxy(left+16, yin); printf(" "); for(int i=0;i<strlen(a->password);i++) printf("*");
+    yin+=2; gotoxy(left+16, yin); printf(" %s", a->nama);
+    yin+=2; gotoxy(left+16, yin); printf(" %s", a->telp);
+    yin+=2; gotoxy(left+16, yin); printf(" %s", a->email);
+    yin+=2; gotoxy(left+16, yin); printf(" %s", a->alamat);
 }
 int finID(int targetNo, char *destID){
     FILE *f = fopen(FILE_KARYAWAN, "rb");

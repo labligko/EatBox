@@ -660,6 +660,19 @@ int isDuplicate(char *jenis, char *isiData, char *idPengecualian) {
     fclose(f);
     return 0;
 }
+int isDuplicateBahan(char *namaBahan, char *idPengecualian)
+{
+    for (int i = 0; i < totalBahan; i++)
+    {
+        if (daftarBahan[i].status == 0) continue;
+        if (strcmp(daftarBahan[i].id_bahan, idPengecualian) == 0)
+            continue;
+
+        if (strcmpi(daftarBahan[i].nama_bahan, namaBahan) == 0)
+            return 1;
+    }
+    return 0;
+}
 
 void resetColor() {
     printf("\x1b[0m"); //Reset semua atribut tampilan ke default.

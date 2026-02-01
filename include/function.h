@@ -53,6 +53,7 @@ int cekEmail(char *s);
 int cekrole(char *r);
 int onlyNum(char *s);
 int isDuplicate(char *jenis, char *isiData, char *idPengecualian);
+int isDuplicateBahan(char *namaBahan, char *idPengecualian);
 
 void resetColor();
 void showcurs();

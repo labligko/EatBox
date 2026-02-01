@@ -201,10 +201,19 @@ void tambahBahan()
             clearinput(inputX, top + 4, 30);
             gotoxy(inputX, top + 4);
             showcurs();
-            if (inputtext(b.nama_bahan) == 0) return;
+
+            if (inputbebas(b.nama_bahan) == 0) return;
+
+            if (isDuplicateBahan(b.nama_bahan, b.id_bahan)) {
+                gotoxy(inputX, top + 5);
+                printf("Bahan sudah tersedia!");
+                continue;
+            }
+
             if (strlen(b.nama_bahan) > 0) break;
         }
         while (1);
+        clearinput(inputX, top + 5, 30);
 
         // 2. Stok (Angka)
         do
@@ -212,14 +221,17 @@ void tambahBahan()
             clearinput(inputX, top + 6, 10);
             gotoxy(inputX, top + 6);
             showcurs();
-            if (inputtext(buffer) == 0) return;
+            if (inputField(buffer) == 0) return;
             if (onlyNum(buffer) && strlen(buffer) > 0)
             {
                 b.stok = atoi(buffer);
                 break;
             }
+            gotoxy(inputX, top + 7);
+            printf("Masukan angka valid!");
         }
         while (1);
+        clearinput(inputX, top + 7, 30);
 
         // 3. Satuan (Kg, Gram, Pcs, dll)
         do
@@ -227,7 +239,7 @@ void tambahBahan()
             clearinput(inputX, top + 8, 15);
             gotoxy(inputX, top + 8);
             showcurs();
-            if (inputtext(b.satuan) == 0) return;
+            if (inputName(b.satuan) == 0) return;
             if (
                 strlen(b.satuan) > 0 &&
                 (strcmp(b.satuan, "g") == 0 ||
@@ -235,8 +247,11 @@ void tambahBahan()
                     strcmp(b.satuan, "pcs") == 0)
             )
                 break;
+            gotoxy(inputX, top + 9);
+            printf("Input tidak sesuai!");
         }
         while (1);
+        clearinput(inputX, top + 9, 30);
 
         // 4. Minimal Stok (Alert limit)
         do
@@ -244,14 +259,17 @@ void tambahBahan()
             clearinput(inputX, top + 10, 10);
             gotoxy(inputX, top + 10);
             showcurs();
-            if (inputtext(buffer) == 0) return;
+            if (inputField(buffer) == 0) return;
             if (onlyNum(buffer) && strlen(buffer) > 0)
             {
                 b.minimal_stok = atoi(buffer);
                 break;
             }
+            gotoxy(inputX, top + 11);
+            printf("Masukan angka valid!");
         }
         while (1);
+        clearinput(inputX, top + 11, 30);
 
         // Simpan
         if (popupConfirm("Simpan Bahan Ini?", "Ya", "Batal"))
@@ -286,7 +304,7 @@ void ubahBahan()
         printf("Masukkan No Bahan : ");
         showcurs();
 
-        if (inputtext(buffer) == 0) return;
+        if (inputField(buffer) == 0) return;
         no = atoi(buffer);
 
         int idx = getIndexByNoUrut(no);
@@ -313,35 +331,51 @@ void ubahBahan()
 
         int y = top + 2;
         // Tampilkan Data Lama
-        gotoxy(left + 3, y);
-        printf("ID Bahan     : %s", b->id_bahan);
-        y += 2;
-        gotoxy(left + 3, y);
-        printf("Nama Bahan   : %s", b->nama_bahan);
-        y += 2;
-        gotoxy(left + 3, y);
-        printf("Stok Saat Ini: %s", stok);
-        y += 2;
-        gotoxy(left + 3, y);
-        printf("Satuan       : %s", b->satuan);
-        y += 2;
-        gotoxy(left + 3, y);
-        printf("Min. Stok    : %s", minstok);
+        gotoxy(left + 3, y);       printf("ID Bahan     : %s", b->id_bahan);
+        y += 2;gotoxy(left + 3, y);printf("Nama Bahan   : ");
+        y += 2;gotoxy(left + 3, y);printf("Stok Saat Ini: ");
+        y += 2;gotoxy(left + 3, y);printf("Satuan       : ");
+        y += 2;gotoxy(left + 3, y);printf("Min. Stok    : ");
+
+        int yin = top + 2;
+        setRGBColor(235, 238, 215, 0);
+        yin += 2;gotoxy(inputX, yin);printf("%s", b->nama_bahan);
+        yin += 2;gotoxy(inputX, yin);printf("%s", stok);
+        yin += 2;gotoxy(inputX, yin);printf("%s", b->satuan);
+        yin += 2;gotoxy(inputX, yin);printf("%s", minstok);
 
         // EDIT NAMA
-        clearinput(inputX, top + 4, 30);
-        gotoxy(inputX, top + 4);
-        if (inputtext(buffer) == 0) return;
-        if (strlen(buffer) > 0) strcpy(b->nama_bahan, buffer);
+        do
+        {
+            gotoxy(inputX, top + 4); showcurs();
+            setRGBColor(251, 255, 199, 0);
+
+            if (inputbebas(buffer) == 0) return;
+
+            // ENTER → skip
+            if (strlen(buffer) == 0)
+                break;
+
+            if (isDuplicateBahan(buffer, b->id_bahan)) {
+                gotoxy(inputX, top + 5);
+                printf("Bahan sudah tersedia!");
+                continue;
+            }
+
+            strcpy(b->nama_bahan, buffer);
+            break;
+        }
+        while (1);
         gotoxy(inputX, top + 4);
         printf("%-30s", b->nama_bahan);
+        clearinput(inputX, top + 5, 30);
 
         // EDIT STOK
         do
         {
-            clearinput(inputX, top + 6, 10);
-            gotoxy(inputX, top + 6);
-            if (inputtext(buffer) == 0) return;
+            gotoxy(inputX, top + 6);showcurs();
+            setRGBColor(251, 255, 199, 0);
+            if (inputField(buffer) == 0) return;
             if (strlen(buffer) == 0) break; // Skip
             if (onlyNum(buffer))
             {
@@ -354,24 +388,42 @@ void ubahBahan()
         printf("%-10d", b->stok);
 
         // EDIT SATUAN
-        clearinput(inputX, top + 8, 15);
-        gotoxy(inputX, top + 8);
-        if (inputtext(buffer) == 0) return;
-        if (strlen(b->satuan) > 0 &&
-            (strcmp(b->satuan,"g")==0 ||
-             strcmp(b->satuan,"ml")==0 ||
-             strcmp(b->satuan,"pcs")==0)
-        )
-        strcpy(b->satuan, buffer);
-        gotoxy(inputX, top + 8);
+        do
+        {
+            clearinput(inputX, top + 8, 15);
+            gotoxy(inputX, top + 8);
+            showcurs();
+            setRGBColor(251, 255, 199, 0);
+
+            if (inputName(buffer) == 0) return;
+
+            // ENTER → skip (pakai nilai lama)
+            if (strlen(buffer) == 0)
+                break;
+
+            if (
+                strcmp(buffer, "g") == 0 ||
+                strcmp(buffer, "ml") == 0 ||
+                strcmp(buffer, "pcs") == 0
+            )
+            {
+                strcpy(b->satuan, buffer);
+                break;
+            }
+
+            gotoxy(inputX, top + 9);
+            printf("Input harus: g / ml / pcs!");
+        }
+        while (1);
+        clearinput(inputX, top + 9, 30); gotoxy(inputX, top + 8);
         printf("%-15s", b->satuan);
 
         // EDIT MINIMAL STOK
         do
         {
-            clearinput(inputX, top + 10, 10);
-            gotoxy(inputX, top + 10);
-            if (inputtext(buffer) == 0) return;
+            gotoxy(inputX, top + 10); showcurs();
+            setRGBColor(251, 255, 199, 0);
+            if (inputField(buffer) == 0) return;
             if (strlen(buffer) == 0) break;
             if (onlyNum(buffer))
             {
@@ -409,7 +461,7 @@ void hapusBahan()
         printf("Masukkan No Bahan : ");
         showcurs();
 
-        if (inputtext(buf) == 0) return;
+        if (inputField(buf) == 0) return;
         no = atoi(buf);
 
         int idx = getIndexByNoUrut(no);

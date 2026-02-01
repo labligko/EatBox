@@ -244,27 +244,88 @@ void ubahMeja() {
 
             int y = top + 2;
             gotoxy(left+2, y); printf("ID Meja    : %s", m->id_meja);
-            y+=2; gotoxy(left+2, y); printf("Nomor Meja : %d", m->nomor_meja);
-            y+=2; gotoxy(left+2, y); printf("Kapasitas  : %d Orang", m->kapasitas);
-            y+=2; gotoxy(left+2, y); printf("Keterangan : %d", m->keterangan);
+            y+=2; gotoxy(left+2, y); printf("Nomor Meja : ");
+            y+=2; gotoxy(left+2, y); printf("Kapasitas  : ");
+            y+=2; gotoxy(left+2, y); printf("Keterangan : ");
             y+=1; gotoxy(left+15, y); printf("(1=Kosong, 2=Terisi)");
 
+            setRGBColor(235, 238, 215, 0);
+            int yin = top + 2;
+            yin+=2; gotoxy(left+15, yin); printf("%d", m->nomor_meja);
+            yin+=2; gotoxy(left+15, yin); printf("%d Orang", m->kapasitas);
+            yin+=2; gotoxy(left+15, yin); printf("%d", m->keterangan);
+
             // EDIT NOMOR
-            clearinput(left+15, top+4, 10); gotoxy(left+15, top+4); showcurs();
-            if(inputField(buffer) == 0) return;
-            if(strlen(buffer) > 0) m->nomor_meja = atoi(buffer);
+            do {
+                gotoxy(left+15, top+4); showcurs();
+                setRGBColor(251, 255, 199, 0);
+                if(inputField(buffer) == 0) return;
+
+                if(strlen(buffer) == 0) break; // tidak diubah
+
+                if(!onlyNum(buffer)) {
+                    gotoxy(left+2, bot-2); printf("Nomor meja harus angka!");
+                    continue;
+                }
+
+                int no = atoi(buffer);
+                int idx = cariMeja(no);
+                if(idx != -1 && daftarMeja[idx].nomor_meja != m->nomor_meja) {
+                    gotoxy(left+2, bot-2); printf("Nomor meja sudah ada!");
+                    continue;
+                }
+
+                m->nomor_meja = no;
+                break;
+
+            } while(1);
+            clearinput(left+2, bot-2, 40);
             gotoxy(left+15, top+4); printf("%d", m->nomor_meja);
 
             // EDIT KAPASITAS
-            clearinput(left+15, top+6, 10); gotoxy(left+15, top+6); showcurs();
-            if(inputField(buffer) == 0) return;
-            if(strlen(buffer) > 0) m->kapasitas = atoi(buffer);
+            do {
+                gotoxy(left+15, top+6); showcurs();
+                setRGBColor(251, 255, 199, 0);
+                if(inputField(buffer) == 0) return;
+
+                if(strlen(buffer) == 0) break;
+
+                if(!onlyNum(buffer) || atoi(buffer) <= 0) {
+                    gotoxy(left+2, bot-2); printf("Kapasitas harus angka > 0!");
+                    continue;
+                }
+
+                m->kapasitas = atoi(buffer);
+                break;
+
+            } while(1);
+            clearinput(left+2, bot-2, 40);
             gotoxy(left+15, top+6); printf("%d", m->kapasitas);
 
             // EDIT STATUS
-            clearinput(left+15, top+8, 5); gotoxy(left+15, top+8); showcurs();
-            if (inputField(buffer) == 0) return;
-            if (strlen(buffer) > 0) m->keterangan = atoi(buffer);
+            do {
+                gotoxy(left+15, top+8); showcurs();
+                setRGBColor(251, 255, 199, 0);
+                if(inputField(buffer) == 0) return;
+
+                if(strlen(buffer) == 0) break;
+
+                if(!onlyNum(buffer)) {
+                    gotoxy(left+2, bot-2); printf("Status harus angka!");
+                    continue;
+                }
+
+                int st = atoi(buffer);
+                if(st < 0 || st > 2) {
+                    gotoxy(left+2, bot-2); printf("Status tidak valid!");
+                    continue;
+                }
+
+                m->keterangan = st;
+                break;
+
+            } while(1);
+            clearinput(left+2, bot-2, 40);
             gotoxy(left+15, top+8); printf("%d", m->keterangan);
 
             if(popupConfirm("Simpan Perubahan?", "Ya", "batal")) {

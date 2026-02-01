@@ -673,6 +673,21 @@ int isDuplicateBahan(char *namaBahan, char *idPengecualian)
     }
     return 0;
 }
+int isDuplicateMenu(char *namaMenu, char *idPengecualian)
+{
+    for (int i = 0; i < jumlahMenu; i++)
+    {
+        if (daftarMenu[i].status == 0) continue;
+
+        // skip dirinya sendiri (buat edit)
+        if (strcmp(daftarMenu[i].id_menu, idPengecualian) == 0)
+            continue;
+
+        if (strcmpi(daftarMenu[i].nama_menu, namaMenu) == 0)
+            return 1;
+    }
+    return 0;
+}
 
 void resetColor() {
     printf("\x1b[0m"); //Reset semua atribut tampilan ke default.

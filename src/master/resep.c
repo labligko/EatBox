@@ -55,10 +55,10 @@ void kelolaResepMenu(char *id_menu) {
             printf("%d. %s (%s)", no++, daftarBahan[i].nama_bahan, daftarBahan[i].satuan);
         }
 
-        gotoxy(100, 12);
+        gotoxy(80, 12);
         printf("Pilih No Bahan (0 = Tambah Bahan Baru): ");
         showcurs();
-        inputtext(buf);
+        inputField(buf);
 
         int pilih = atoi(buf);
         if (pilih == 0) {
@@ -70,9 +70,9 @@ void kelolaResepMenu(char *id_menu) {
         int idxBahan = getIndexByNoUrut(pilih);
         if (idxBahan == -1) continue;
 
-        gotoxy(100, 13);
+        gotoxy(80, 13);
         printf("Jumlah pemakaian per 1 menu: ");
-        inputtext(buf);
+        inputField(buf);
         if (!onlyNum(buf)) continue;
 
         ResepMenu r;

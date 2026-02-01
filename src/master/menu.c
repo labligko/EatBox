@@ -92,33 +92,69 @@ void tambahMenu() {
         y += 2; gotoxy(left + 3, y); printf("Status       : Tersedia (Default)");
         // printf("\033[0m"); // reset warna      JANGAN DIRUSAK BASE COLOR KITA
 
-        // Input Kategori
+        // Input Kategori (hanya: makanan / minuman / snack)
         do {
-            clearinput(inputX, top + 6, 40); gotoxy(inputX, top + 6); showcurs();
-            // inputtext harus return 0 jika ditekan ESC
-            if (inputtext(m.kategori) == 0) return;
-            if (strlen(m.kategori) > 0) break; // Validasi tidak boleh kosong
+            clearinput(inputX, top + 6, 40);
+            gotoxy(inputX, top + 6);
+            showcurs();
+
+            if (inputName(m.kategori) == 0) return;
+
+            if (strlen(m.kategori) == 0)
+                continue;
+
+            if (
+                strcmpi(m.kategori, "makanan") == 0 ||
+                strcmpi(m.kategori, "minuman") == 0 ||
+                strcmpi(m.kategori, "snack") == 0
+            ) {
+                // Normalisasi (biar konsisten di data)
+                strlwr(m.kategori);
+                break;
+            }
+
+            gotoxy(inputX, top + 7);
+            printf("Kategori hanya: makanan / minuman / snack!");
         } while (1);
+        clearinput(inputX, top + 7, 50);
 
         // Input Nama Menu
         do {
-            clearinput(inputX, top + 8, 40); gotoxy(inputX, top + 8); showcurs();
+            clearinput(inputX, top + 8, 40);
+            gotoxy(inputX, top + 8);
+            showcurs();
+
             if (inputbebas(m.nama_menu) == 0) return;
-            if (strlen(m.nama_menu) > 0) break;
+
+            if (strlen(m.nama_menu) == 0) continue;
+
+            if (isDuplicateMenu(m.nama_menu, m.id_menu)) {
+                gotoxy(inputX, top + 9);
+                printf("Menu sudah tersedia!");
+                continue;
+            }
+
+            break;
         } while (1);
+        clearinput(inputX, top + 9, 40);
 
         // Input Harga
         do {
-            clearinput(inputX, top + 10, 20); gotoxy(inputX, top + 10); showcurs();
-            if (inputtext(buffer) == 0) return;
-            // Cek apakah angka valid
+            clearinput(inputX, top + 10, 20);
+            gotoxy(inputX, top + 10);
+            showcurs();
+
+            if (inputField(buffer) == 0) return;
+
             if (onlyNum(buffer) && strlen(buffer) > 0) {
-                m.harga = atof(buffer); // Convert string ke double
-                break;
+                m.harga = atof(buffer);
+                if (m.harga > 0) break;
             }
-            gotoxy(inputX, top+11); printf("Masukan angka!");
+
+            gotoxy(inputX, top + 11);
+            printf("Harga tidak valid!");
         } while (1);
-        clearinput(inputX, top+11, 25);
+        clearinput(inputX, top + 11, 30);
 
         // Input Deskripsi
         do {
@@ -153,7 +189,7 @@ void ubahMenu() {
         gotoxy(30, 11); printf("Masukkan No Menu : ");
         showcurs();
 
-        if (inputtext(buffer) == 0)return;
+        if (inputField(buffer) == 0)return;
         noMenu = atoi(buffer) - 1; //← konversi No → index array
 
         // validasi index
@@ -184,25 +220,34 @@ void ubahMenu() {
         gotoxy(left + 2, y);     printf("No Menu   : %d", noMenu + 1);
         y += 2; gotoxy(left + 2, y); printf("Kategori  : %s", m->kategori);
         y += 2; gotoxy(left + 2, y); printf("Nama Menu : %s", m->nama_menu);
-        y += 2; gotoxy(left + 2, y); printf("Harga     : Rp %6s", hargaMenu);
-        y += 2; gotoxy(left + 2, y); printf("Deskripsi : %s", m->deskripsi);
+        y += 2; gotoxy(left + 2, y); printf("Harga     : Rp ");
+        y += 2; gotoxy(left + 2, y); printf("Deskripsi : ");
         y += 2; gotoxy(left + 2, y); printf("Status    : %s",
                 m->status == 1 ? "1 (Tersedia)" : "0 (Habis)");
 
+        setRGBColor(235, 238, 215, 0);
+        int yin = top + 10;
+        yin += 2; gotoxy(left + 17, yin); printf("%6s", hargaMenu);
+        yin += 2; gotoxy(left + 14, yin); printf("%s", m->deskripsi);
+
         //mengedit harga
+        char hargabaru[30];
         do {
-            clearinput(left + 17, top + 12, 40);
-            gotoxy(left + 17, top + 12); showcurs();if (inputtext(buffer) == 0) return; //harga lama
+            setRGBColor(251, 255, 199, 0);
+            gotoxy(left + 17, top + 12); showcurs();
+            if (inputField(buffer) == 0) return; //harga lama
             if (strlen(buffer) == 0) break;if (onlyNum(buffer)) {
                 m->harga = atof(buffer);
+                formatHarga(m->harga, hargabaru);
                 break;
             }
         } while (1);
-        gotoxy(left+17, top+12); printf("%6s", hargaMenu);
+        gotoxy(left+17, top+12); printf("%6s", hargabaru);
 
         //mengubah deskripsi
-        clearinput(left + 14, top + 14, 50);
-        gotoxy(left + 14, top + 14); showcurs();if (inputbebas(buffer) == 0) return;
+        gotoxy(left + 14, top + 14); showcurs();
+        setRGBColor(251, 255, 199, 0);
+        if (inputbebas(buffer) == 0) return;
         if (strlen(buffer) > 0) strcpy(m->deskripsi, buffer);
         gotoxy(left+14, top+14); printf("%s", m->deskripsi);
 
@@ -230,7 +275,7 @@ void hapusMenu() {
             gotoxy(30, 11); printf("Masukkan No Menu : ");
             showcurs();
 
-            if (inputtext(buffer) == 0) return;
+            if (inputField(buffer) == 0) return;
             noMenu = atoi(buffer) - 1; // ← No → index
 
             // validasi
@@ -275,7 +320,7 @@ void detailMenu()
     gotoxy(30, 11); printf("Masukkan No Menu : ");
     showcurs();
 
-    if (inputtext(buffer) == 0) return;
+    if (inputField(buffer) == 0) return;
 
     pilihan = atoi(buffer) - 1; // ← konversi No → index array
 

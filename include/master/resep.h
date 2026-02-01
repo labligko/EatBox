@@ -9,5 +9,6 @@ void kelolaResepMenu(char *id_menu);
 
 int cariBahanByID(char *id);
 void kurangiStokDariPesanan(char *id_pesan);
+int cekStokMenu(const char *id_menu, int qty);
 
 #endif //PERAPIHAN_RESEP_H

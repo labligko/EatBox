@@ -6,6 +6,7 @@
 #include "../../include/function.h"
 #include "../../include/master/meja.h"
 #include "../../include/master/menu.h"
+#include "../../include/master/resep.h"
 #include "../../include/transaksi/pembayaran.h"
 #include "../../include/transaksi/pesanan.h"
 
@@ -97,6 +98,28 @@ void resetMejaJikaBedaHari()
 
     fclose(f);
     simpanResetHariIni(); // ✅ tandai sudah reset
+}
+void hapusDetailPesanan(const char *id_pesan)
+{
+    FILE *f = fopen(FILE_DETAIL, "rb");
+    FILE *tmp = fopen("tmp_detail.dat", "wb");
+
+    if (!f || !tmp) return;
+
+    DetailPesanan d;
+    while (fread(&d, sizeof(DetailPesanan), 1, f))
+    {
+        if (strcmp(d.id_pesan, id_pesan) != 0)
+        {
+            fwrite(&d, sizeof(DetailPesanan), 1, tmp);
+        }
+    }
+
+    fclose(f);
+    fclose(tmp);
+
+    remove(FILE_DETAIL);
+    rename("tmp_detail.dat", FILE_DETAIL);
 }
 
 /* =====================================================
@@ -257,59 +280,74 @@ void tambahPesan() {
 
         strcpy(d.id_pesan, p.id_pesan);
 
-        showMiniMenu(page);
-        clearinput(left, top + 3, 50);
-        gotoxy(left, top + 3);
-        printf("No Menu : ");
-        showcurs();
+        while (1)
+        {
+            showMiniMenu(page);
+            clearinput(left, top + 3, 50);
+            gotoxy(left, top + 3);
+            printf("No Menu : ");
+            showcurs();
 
-        int res = inputField(buf);
+            int res = inputField(buf);
 
-        if (res == 0) return;   // ESC batal pesanan
-        if (res == -1 && page > 1) page--;
-        if (res == -2 && page < maxPage) page++;
+            if (res == 0) return; // ESC batal pesanan
+            if (res == -1 && page > 1) page--;
+            if (res == -2 && page < maxPage) page++;
 
-        if (res == 1) {
-            clearinput(left, msgY, 40);
+            if (res == 1)
+            {
+                clearinput(left, msgY, 40);
 
-            if (buf[0] == '\0') {
-                gotoxy(left, msgY);
-                printf("Menu tidak boleh kosong!");
-                continue;
+                if (buf[0] == '\0')
+                {
+                    gotoxy(left, msgY);
+                    printf("Menu tidak boleh kosong!");
+                    continue;
+                }
+
+                if (!onlyNum(buf))
+                {
+                    gotoxy(left, msgY);
+                    printf("Input harus angka!");
+                    continue;
+                }
+
+                int idx = atoi(buf) - 1 + (page - 1) * 20;
+                if (idx < 0 || idx >= hitungMenuAktif())
+                {
+                    gotoxy(left, msgY);
+                    printf("Menu tidak ditemukan!");
+                    continue;
+                }
+
+                strcpy(d.id_menu, daftarMenu[idx].id_menu);
+
+                gotoxy(left, top + 4);
+                printf("Jumlah : ");
+                inputtext(buf);
+                if (!onlyNum(buf)) continue;
+
+                d.jumlah = atoi(buf);
+
+                if (!cekStokMenu(daftarMenu[idx].id_menu, d.jumlah))
+                {
+                    gotoxy(left, msgY);
+                    printf("Stok bahan tidak mencukupi!");
+                    continue;
+                }
+
+                d.subtotal = d.jumlah * daftarMenu[idx].harga;
+                p.total += d.subtotal;
+
+                FILE *fd = fopen(FILE_DETAIL, "ab");
+                fwrite(&d, sizeof(DetailPesanan), 1, fd);
+                fclose(fd);
+
+                int lanjut = popupConfirm("Apakah ingin menambah pesanan?", "Ya", "Tidak");
+                if (lanjut == 1) continue;   // balik ke input No Menu
+
+                break;      // lanjut ke pembayaran
             }
-
-            if (!onlyNum(buf)) {
-                gotoxy(left, msgY);
-                printf("Input harus angka!");
-                continue;
-            }
-
-            int idx = atoi(buf) - 1 + (page - 1) * 20;
-            if (idx < 0 || idx >= hitungMenuAktif()) {
-                gotoxy(left, msgY);
-                printf("Menu tidak ditemukan!");
-                continue;
-            }
-
-            strcpy(d.id_menu, daftarMenu[idx].id_menu);
-
-            gotoxy(left, top + 4);
-            printf("Jumlah : ");
-            inputtext(buf);
-            if (!onlyNum(buf)) continue;
-
-            d.jumlah = atoi(buf);
-            d.subtotal = d.jumlah * daftarMenu[idx].harga;
-            p.total += d.subtotal;
-
-            FILE *fd = fopen(FILE_DETAIL, "ab");
-            fwrite(&d, sizeof(DetailPesanan), 1, fd);
-            fclose(fd);
-
-            int lanjut = popupConfirm("Apakah ingin menambah pesanan?", "Ya", "Tidak");
-            if (lanjut == 1) continue;   // balik ke input No Menu
-
-            break;      // lanjut ke pembayaran
         }
     }
     clearArea(110, top+1, 20, jumlahMeja+2);

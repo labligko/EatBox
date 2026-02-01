@@ -7,6 +7,7 @@ void setMeja(const char *id, int ket);
 int sudahResetHariIni();
 void simpanResetHariIni();
 void resetMejaJikaBedaHari();
+void hapusDetailPesanan(const char *id_pesan);
 
 void showMiniMeja(int page);
 void showMiniMenu(int page);

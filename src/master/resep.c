@@ -102,7 +102,7 @@ int cariBahanByID(char *id) {
 }
 void kurangiStokDariPesanan(char *id_pesan)
 {
-    FILE *fpDetail = fopen("../file/detail_pesanan.dat", "rb");
+    FILE *fpDetail = fopen(FILE_DETAIL, "rb");
     if (!fpDetail) return;
 
     loadResep();
@@ -137,4 +137,24 @@ void kurangiStokDariPesanan(char *id_pesan)
 
     fclose(fpDetail);
     saveBahan();
+}
+
+int cekStokMenu(const char *id_menu, int qty)
+{
+    loadResep();
+    loadBahan();
+
+    for (int i = 0; i < totalResep; i++)
+    {
+        if (strcmp(daftarResep[i].id_menu, id_menu) != 0)
+            continue;
+
+        int idx = cariBahanByID(daftarResep[i].id_bahan);
+        if (idx == -1) return 0;
+
+        int butuh = daftarResep[i].jumlah * qty;
+        if (daftarBahan[idx].stok < butuh)
+            return 0;
+    }
+    return 1;
 }

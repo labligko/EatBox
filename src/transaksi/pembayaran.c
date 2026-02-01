@@ -7,6 +7,7 @@
 #include "../../include/function.h"
 #include "../../include/master/resep.h"
 #include "../../include/master/menu.h"
+#include "../../include/transaksi/pesanan.h"
 #include "../../include/transaksi/pembayaran.h"
 
 void autoIDBayar(char *out) {
@@ -163,6 +164,7 @@ int pembayaran(char *id_pesan, double total, int xLeft, int yTop) {
                 }
             }
             fclose(f);
+            hapusDetailPesanan(id_pesan);
             return 0;
         }
 
